@@ -66,49 +66,41 @@ public class Lexico {
 
 
     private int[][] matrizTransiciones = {
-            //L,l,_ d  .  +   -   <  >  =  &  |  /  :  %  bt nl 'S' ot $
-            //0  1  2  3   4   5  6  7  8  9 10  11 12 13 14 15 16 17
-            {1, 2, 3, F, F, 8, 9, 10,11 , 12, 13, 16, 17, 0, 0, 1, F, F},//0
-            {1, 1, F, F, F, F, F, F, F, F, F, F, F, F, F, 1, F, F },//1
-            {F, 2, 4, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F },//2
-            {-1, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//3 todo caracter que no sea un digito es considerado como un error.
-            {F, 4, F, F, F, F, F, F, F, F, F, F, F, F, F, 5, F, F},//4
-            {-1, 7, -1, 6, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//5
-            {-1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//6 todo caracter que no sea un digito es considerado como un error.
-            {F, 7, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//7
-            {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//8
-            {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//9
+          //L,l  _  d  .   +   -  <  >  =  ‘  !  /  :  bt nl 'F' ot $
+            //0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17
+            {1, -1, 2, 3, F, F, 8, 10, 11, 12, F, F, F, 0, 0, 1, F, F},//0
+            {1, 1, 1, F, F, F, F, F, F, F, F, F, F, F, F, 1, F, F },//1
+            {F, F, 2, 4, F, F, F, F, F, F, F, F, F, F, F, F, F, F },//2
+            {-1, -1, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//3 todo caracter que no sea un digito es considerado como un error.
+            {F, F, 4, F, F, F, F, F, F, F, F, F, F, F, F, 5, F, F},//4
+            {-1, -1, 7, -1, 6, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//5
+            {-1, -1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//6 todo caracter que no sea un digito es considerado como un error.
+            {F, F, 7, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//7
+            {F, F, F, F, F, F, 9, F, F, F, F, F, F, F, F, F, F, F},//8
+            {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 9, 9, F},//9
             {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//10
-            {-1, -1, -1, -1, -1, -1, -1, -1, F, -1, -1, -1, -1, -1, -1, -1, -1, F}, //11 todo caracter que no sea un &, es considerado como un error.
-            {-1, -1, -1, -1, -1, -1, -1, -1, -1, F, -1, -1, -1, -1, -1, -1, -1, F},//12 todo caracter que no sea una | es considerado un error.
-            {F, F, F, F, F, F, F, F, F, F, 14, F, F, F, F, F, F, F},//13
-            {14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 15, 14, 14, 14, 14, 14, 14, F},//14
-            {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1, -1, -1, -1, -1, F},//15 todo caracter que no sea una / es considerado como un error.
-            {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//16 Todas F por tema asignado para reconocer solo :
-            {17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, F, 17, -1, 17, 17, F},//17
+            {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F}, //11
+            {12, 12, 12, 12, 12, 12, 12, 12, 12, F, 12, 13, 12, 12, -1, 12, 12, F},//12
+            {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 12, -1, -1, F},//13
     };
 
     private AccionSemantica[][] accionesEnTabla = {
-            //L,l,_ d  .  +   -   <  >  =  &  |  /  :  %  bt nl 'S' ot $
-            //0  1  2  3   4   5  6  7  8  9 10  11 12 13 14 15 16 17
-            {as1, as1, as1, as6, as6, null, null, null, null, null, null, null, as1, null, null, as1, as6, null},//0
-            {as2, as2, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as2, as3, as3 },//1
-            {as4, as2, as2, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4 },//2
-            {err1, as2, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1},//3
-            {as5, as2, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as2, as5, as5},//4
-            {err3, as2, err3, as2, as2, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3, err3},//5
-            {err1, as2, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1, err1},//6
-            {as5, as2, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5},//7
-            {as8, as8, as8, as8, as8, as8, as9, as7, as8, as8, as8, as8, as8, as8, as8, as8, as8, as8},//8
-            {as11, as11, as11, as11, as11, as11, as11, as10, as11, as11, as11, as11, as11, as11, as11, as11, as11, as11},//9
-            {as13, as13, as13, as13, as13, as13, as13, as12, as13, as13, as13, as13, as13, as13, as13, as13, as13, as13},//10
-            {err4, err4, err4, err4, err4, err4, err4, err4, as14, err4, err4, err4, err4, err4, err4, err4, err4, err4},//11
-            {err5, err5, err5, err5, err5, err5, err5, err5, err5, as15, err5, err5, err5, err5, err5, err5, err5, err5},//12
-            {as16, as16, as16, as16, as16, as16, as16, as16, as16, as16, null, as16, as16, as16, as16, as16, as16, as16},//13
-            {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},//14
-            {err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, null, err6, err6, err6, err6, err6, err6, err6},//15
-            {as17, as17, as17, as17, as17, as17, as17, as18, as17, as17, as17, as17, as17, as17, as17, as17, as17, as17},//16
-            {as2, as2, as2, as2, as2, as2, as2, as2, as2, as2, as2, as2, as19, as2, err7, as2, as2, as19},//17
+            //L,l  _  d  .   +   -  <  >  =  ‘  !  /  :  bt nl 'F' ot $
+            //0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17
+            {as1, err1, as1, as1, as6, as6, null, null, null, as1, null, null, null, null, null, as1, as6, null},//0
+            {as2, as2, as2, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3 },//1
+            {as4, as4, as2, as2, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4 },//2
+            {err2, err2, as2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2},//3
+            {as5, as5, as2, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as2, as5, as5},//4
+            {err4, err4, as2, err4, as2, as2, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4, err4},//5
+            {err2, err2, as2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2},//6
+            {as5, as5, as2, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5},//7
+            {as8, as8, as8, as8, as8, as8, null, as8, as7, as8, as8, as8, as8, as8, as8, as8, as8, as8},//8
+            {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},//9
+            {as10, as10, as10, as10, as10, as10, as10, as10, as9, as10, as10, as10, as10, as10, as10, as10, as10, as10},//10
+            {as13, as13, as13, as13, as13, as13, as13, as13, as13, as13, as12, as13, as11, as13, as13, as13, as13, as13},//11
+            {as2, as2, as2, as2, as2, as2, as2, as2, as2, as14, as2, null, as2, as2, err5, as2, as2, as2},//12
+            {err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, err6, null, err6, err6, err6},//13
     };
 
     public Lexico(StringBuilder textoDeEntrada) {
