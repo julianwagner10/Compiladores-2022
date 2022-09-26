@@ -1,0 +1,5 @@
+Programa
+INT a;
+IF ( )THEN
+c:=1;
+ENDIF;

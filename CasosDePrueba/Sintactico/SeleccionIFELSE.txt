@@ -1,0 +1,6 @@
+programa
+IF ( x < z + y )THEN
+c = 1;
+ELSE
+d = 2;
+ENDIF;

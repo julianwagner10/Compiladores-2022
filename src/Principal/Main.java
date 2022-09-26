@@ -45,12 +45,13 @@ public class Main{
 
         Lexico l1 = new Lexico(codigo);
 
+
         /*Parser p = new Parser(l1);
         System.out.println("Corriendo Parser");
         System.out.println("------------------------------------------");
         p.run();*/
 
         System.out.println("\n TABLA DE SIMBOLOS ");
-        //tablaDeSimbolos.mostrarTablasimbolos();
+        tablaDeSimbolos.mostrarTablasimbolos();
     }
 }

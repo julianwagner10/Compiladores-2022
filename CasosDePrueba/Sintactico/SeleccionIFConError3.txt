@@ -1,0 +1,6 @@
+Programa
+INT a;
+IF ( x < z )THEN
+BEGIN
+END;
+ENDIF;

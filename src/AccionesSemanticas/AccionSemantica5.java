@@ -5,7 +5,7 @@ import Principal.AccionSemantica;
 import Principal.Lexico;
 import Principal.Token;
 
-public class AccionSemantica5 extends AccionSemantica { //Accion semantica para constantes singles CTE_SINGLE
+public class AccionSemantica5 extends AccionSemantica { //Accion semantica para constantes flotantes, CTE_FLOTANTE
     @Override
     public Token ejecutarAccion() {
 

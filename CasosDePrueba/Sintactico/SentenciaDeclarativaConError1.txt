@@ -1,0 +1,2 @@
+programa
+INT x

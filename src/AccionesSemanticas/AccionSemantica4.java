@@ -5,7 +5,7 @@ import Principal.AccionSemantica;
 import Principal.Lexico;
 import Principal.Token;
 
-public class AccionSemantica4 extends AccionSemantica { //Accion semantica para constantes CTE_INT
+public class AccionSemantica4 extends AccionSemantica { //Accion semantica para constantes CTE_INT, en este caso los enteros son largos.
     @Override
     public Token ejecutarAccion() {
         Integer constante = Integer.parseInt(AccionSemantica.buffer); //Convierto el string dentro del buffer en una constante entera.

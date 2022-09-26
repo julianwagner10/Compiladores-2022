@@ -1,0 +1,2 @@
+programa
+SINGLE x y;

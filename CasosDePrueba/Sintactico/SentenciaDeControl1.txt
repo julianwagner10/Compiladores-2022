@@ -1,0 +1,10 @@
+programa
+INT z;
+BEGIN
+REPEAT
+X:=1;
+UNTIL(x == 5)
+END;
+
+
+

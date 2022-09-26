@@ -1,16 +1,13 @@
 package Principal;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TablaSimbolos {
-    private static Hashtable<String, List<AtributosTablaS>> tablaSimbolos;
+    private static Hashtable<String,AtributosTablaS> tablaSimbolos;
 
     public TablaSimbolos(){
 
-        tablaSimbolos = new Hashtable<String,List<AtributosTablaS>>();
+        tablaSimbolos = new Hashtable<>();
     }
 
     public void eliminarSimbolo(String lexema) {
@@ -21,14 +18,9 @@ public class TablaSimbolos {
         return (tablaSimbolos.containsKey(lexema));
     }
 
-    public List<Integer> getIdentificador(String lexema){
-        List<Integer> retorno = new ArrayList<>();
+    public Integer getIdentificador(String lexema){
         if(tablaSimbolos.containsKey(lexema)){
-            List<AtributosTablaS> aux = tablaSimbolos.get(lexema);
-            for(int i=0;i<aux.size();i++) {
-                retorno.add(aux.get(i).getIdentificador());
-            }
-            return retorno;
+            return tablaSimbolos.get(lexema).getIdentificador();
         }
         else
             return null;
@@ -41,7 +33,7 @@ public class TablaSimbolos {
 
     public boolean esPalabraReservada(String lexema) {
         if (tablaSimbolos.containsKey(lexema)) {
-            int identificador = this.tablaSimbolos.get(lexema).get(0).getIdentificador();
+            int identificador = tablaSimbolos.get(lexema).getIdentificador();
             if (identificador > 256 && identificador < 268)
                 return false;
             else
@@ -50,35 +42,29 @@ public class TablaSimbolos {
         return false;
     }
 
-    public void setAtributosDeSimbolo(String nuevoLexema, List<AtributosTablaS> atributos){
+    public void setAtributosDeSimbolo(String nuevoLexema, AtributosTablaS atributos){
         this.tablaSimbolos.replace(nuevoLexema,atributos);
     }
 
     public void setSimbolo(String lexema, int id){
 
-        if(tablaSimbolos.containsKey(lexema)){
-            if(!this.esPalabraReservada(lexema)){
-                /*AtributosTablaS at = new AtributosTablaS(id,tipo,uso);
-                tablaSimbolos.put(lexema,at);*/
+        if(tablaSimbolos.containsKey(lexema))
+            System.out.println("El lexema "+lexema +" ya existe." );
+        else {
+            if (!this.esPalabraReservada(lexema)) {
+                AtributosTablaS at = new AtributosTablaS(id);
+                tablaSimbolos.put(lexema, at);
             }
         }
     }
 
     public void mostrarTablasimbolos(){
-        ArrayList<String> aux = new ArrayList<>();
-        List<Integer> identificadores = new ArrayList<>();
-        Set<String> keys = tablaSimbolos.keySet();
-        aux.addAll(keys);
-        for(String lexema:aux){
-            if(!this.esPalabraReservada(lexema)) {
-                identificadores = this.getIdentificador(lexema);
-                if (identificadores!=null) {
-                    for(int i=0;i<identificadores.size();i++){
-                        System.out.print("Id:" + identificadores.get(i) + " Lexema: " + lexema);
-                        System.out.println();
-                    }
-                }
-            }
+        Enumeration iterator = tablaSimbolos.keys();
+        while(iterator.hasMoreElements()){
+            String lexema = (String)iterator.nextElement();
+            AtributosTablaS ats = tablaSimbolos.get(lexema);
+            System.out.print("Id:" + ats.getIdentificador() + " Lexema: " + lexema);
+            System.out.println();
         }
     }
 }

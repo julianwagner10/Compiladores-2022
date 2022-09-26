@@ -1,0 +1,7 @@
+Programa
+INT FUNC aux (INT x , INT y)
+INT z;
+BEGIN
+y:=y+x;
+RETURN ( y ) ;
+END ;

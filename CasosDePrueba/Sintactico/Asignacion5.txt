@@ -1,0 +1,3 @@
+programaAsignacion
+INT a;
+x := -3.5;

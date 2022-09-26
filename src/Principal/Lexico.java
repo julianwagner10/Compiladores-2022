@@ -26,7 +26,7 @@ public class Lexico {
     public static final int FOR = 277;
     public static final int CONTINUE = 278;
     public static final int F32 = 279;
-
+    public static final int I32 = 280;
 
     //TOKEN SIN ASCII
     public static final int ID = 257;
@@ -56,7 +56,6 @@ public class Lexico {
 
     // ERRORES
     private Error1 err1 = new Error1();
-
     private Error2 err2 = new Error2();
     private Error3 err3 = new Error3();
     private Error4 err4 = new Error4();
@@ -71,10 +70,10 @@ public class Lexico {
             {1, -1, 2, 3, F, F, 8, 10, 11, 12, F, F, F, 0, 0, 1, F, F},//0
             {1, 1, 1, F, F, F, F, F, F, F, F, F, F, F, F, 1, F, F },//1
             {F, F, 2, 4, F, F, F, F, F, F, F, F, F, F, F, F, F, F },//2
-            {-1, -1, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//3 todo caracter que no sea un digito es considerado como un error.
+            {-1, -1, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//3
             {F, F, 4, F, F, F, F, F, F, F, F, F, F, F, F, 5, F, F},//4
             {-1, -1, 7, -1, 6, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//5
-            {-1, -1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//6 todo caracter que no sea un digito es considerado como un error.
+            {-1, -1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//6
             {F, F, 7, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//7
             {F, F, F, F, F, F, 9, F, F, F, F, F, F, F, F, F, F, F},//8
             {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 9, 9, F},//9
@@ -121,49 +120,48 @@ public class Lexico {
         this.tablaSimbolos.setSimbolo("for",277);
         this.tablaSimbolos.setSimbolo("continue",278);
         this.tablaSimbolos.setSimbolo("f32",279);
+        this.tablaSimbolos.setSimbolo("i32",280);
     }
 
 
 
     private int obtenerColumna(char caracter) { //Queremos obtener la columna que representa el caracter ingresante a mi estado actual.
 
-        if (caracter == 83)                         //Representacion correspondiente ASCII para letra S
+        if (caracter == 70)                         //Representacion correspondiente ASCII para letra F
             return 15;
         if ((caracter >= 65) && (caracter <= 90))   //Representacion correspondiente ASCII para letras mayusculas
             return 0;
         if ((caracter >= 97) && (caracter <= 122))  //Representacion correspondiente ASCII para letras minusculas
             return 0;
         if (caracter == 95)                         //Representacion correspondiente ASCII para guion bajo
-            return 0;
-        if ((caracter >= 48) && (caracter <= 57))   //Representacion correspondiente ASCII para digitos numericos.
             return 1;
-        if (caracter == 46)                         //Representacion correspondiente ASCII para el .(punto)
+        if ((caracter >= 48) && (caracter <= 57))   //Representacion correspondiente ASCII para digitos numericos.
             return 2;
-        if (caracter == 43)                         //Representacion correspondiente ASCII para signo +
+        if (caracter == 46)                         //Representacion correspondiente ASCII para el .(punto)
             return 3;
-        if (caracter == 45)                         //Representacion correspondiente ASCII para signo -
+        if (caracter == 43)                         //Representacion correspondiente ASCII para signo +
             return 4;
-        if (caracter == 60)                         //Representacion correspondiente ASCII para <
+        if (caracter == 45)                         //Representacion correspondiente ASCII para signo -
             return 5;
-        if (caracter == 62)                         //Representacion correspondiente ASCII para >
+        if (caracter == 60)                         //Representacion correspondiente ASCII para <
             return 6;
-        if (caracter == 61)                         //Representacion correspondiente ASCII para =
+        if (caracter == 62)                         //Representacion correspondiente ASCII para >
             return 7;
-        if (caracter == 38)                         //Representacion correspondiente ASCII para &
+        if (caracter == 61)                         //Representacion correspondiente ASCII para =
             return 8;
-        if (caracter == 179)                         //Representacion correspondiente ASCII para |
+        if (caracter == 44)                         //Representacion correspondiente ASCII para ‘
             return 9;
-        if (caracter == 47)                         //Representacion correspondiente ASCII para /
+        if (caracter == 33)                         //Representacion correspondiente ASCII para !
             return 10;
-        if (caracter == 58)                         //Representacion correspondiente ASCII para :
+        if (caracter == 47)                         //Representacion correspondiente ASCII para /
             return 11;
-        if (caracter == 37)                         //Representacion correspondiente ASCII para %
+        if (caracter == 58)                         //Representacion correspondiente ASCII para :
             return 12;
         if ((caracter == 32) || (caracter == 9))    //Representacion correspondiente ASCII para tab = 9 y blanco = 32
             return 13;
         if (caracter == 10)                         //Representacion correspondiente ASCII para salto de linea
             return 14;
-        if (caracter == 42 || caracter == 44 || caracter == 41 || caracter == 40  || caracter == 59) //Representacion correspondiente ASCII para '*' , '(' , ')' , ',' , ';'
+        if (caracter == 42 || caracter == 44 || caracter == 41 || caracter == 40  || caracter == 59 || caracter == 123 || caracter == 125) //Representacion correspondiente ASCII para '*' , '(' , ')' , ',' , ';' , '{', '}'
             return 16;
         if (caracter == 36)                         //Representacion correspondiente ASCII para '$' (fin de archivo).
             return 17;
