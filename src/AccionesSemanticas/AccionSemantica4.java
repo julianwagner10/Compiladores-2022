@@ -8,7 +8,7 @@ import Principal.Token;
 public class AccionSemantica4 extends AccionSemantica { //Accion semantica para constantes CTE_INT, en este caso los enteros son largos.
     @Override
     public Token ejecutarAccion() {
-        Integer constante = Integer.parseInt(AccionSemantica.buffer); //Convierto el string dentro del buffer en una constante entera.
+        Long constante = Long.parseLong(AccionSemantica.buffer); //Convierto el string dentro del buffer en una constante entera.
         if((constante >= (-Math.pow(2,31))) && (constante <= (Math.pow(2,31) - 1))){
             Lexico.cursor--; // Me paro en el ultimo caracter leido y lo devuelvo
             Lexico.tablaSimbolos.setSimbolo(buffer,Lexico.CTE_INT);

@@ -44,6 +44,7 @@ public class Main{
         System.out.println("");
 
         Lexico l1 = new Lexico(codigo);
+        l1.obtenerToken();
 
 
         /*Parser p = new Parser(l1);

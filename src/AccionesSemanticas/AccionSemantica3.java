@@ -13,15 +13,18 @@ public class AccionSemantica3 extends AccionSemantica { //Esta accion semantica 
             buffer = buffer.substring(0, 25);
             System.out.println("Warning: en la linea "+ Lexico.linea +" se truncó el identificador a 25 caracteres");
         }
-        if(!Lexico.tablaSimbolos.existeLexema(buffer)) //Si no existe en la tabla lo agrego, y ademas ya se que no es una palabra reservada.
+        if(!Lexico.tablaSimbolos.existeLexema(buffer)){ //Si no existe en la tabla lo agrego, y ademas ya se que no es una palabra reservada.
             Lexico.tablaSimbolos.setSimbolo(buffer,Lexico.ID);
-        else //Si existe tengo que chequear si es palabra reservada o solo un identificador
-            if(Lexico.tablaSimbolos.esPalabraReservada(buffer)){ //Si es palabra reservada retorno el token solamente con su id.
-                System.out.println("[Lexico | linea "+Lexico.linea + "] Se detecto una palabra reservada");
+        }
+        else  //Si existe tengo que chequear si es palabra reservada o solo un identificador
+            if (Lexico.tablaSimbolos.esPalabraReservada(buffer)) { //Si es palabra reservada retorno el token solamente con su id.
+                System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto una palabra reservada");
                 return new Token(this.getIdPalabra());
             }
-            System.out.println("[Lexico | linea "+Lexico.linea + "] Se detecto un identificador");
-            return new Token(Lexico.ID,buffer); //Si no es palabra reservada retorno el token con el lexico y el id.
+
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un identificador");
+            return new Token(Lexico.ID, buffer); //Si no es palabra reservada retorno el token con el lexico y el id.
+
     }
 
     public int getIdPalabra(){
@@ -50,6 +53,8 @@ public class AccionSemantica3 extends AccionSemantica { //Esta accion semantica 
                 return Lexico.FOR;
             case "continue":
                 return Lexico.CONTINUE;
+            case "i32":
+                return Lexico.I32;
 
         }
         return 0;
