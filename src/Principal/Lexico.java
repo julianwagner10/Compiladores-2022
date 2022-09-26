@@ -5,7 +5,7 @@ import Errores.*;
 
 public class Lexico {
 
-    private int FIN = 50;    // Estado final
+    private int F = 50;    // Estado final
     public static StringBuilder textoDeEntrada; // Se representa al texto de entrada como una secuencia mutable de caracteres.
 
     public static TablaSimbolos tablaSimbolos = new TablaSimbolos();
@@ -67,27 +67,27 @@ public class Lexico {
     private int[][] matrizTransiciones = {
           //L,l  _  d  .   +   -  <  >  =  ‘  !  /  :  bt nl 'F' ot $
             //0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17
-            {1, -1, 2, 3, FIN, FIN, 8, 10, 11, 12, FIN, FIN, FIN, 0, 0, 1, FIN, FIN},//0
-            {1, 1, 1, FIN, FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN,FIN, FIN, FIN, 1, FIN, FIN },//1
-            {FIN, FIN, 2, 4, FIN, FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN, FIN, FIN, FIN },//2
-            {-1, -1, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, FIN},//3
-            {FIN, FIN, 4, FIN, FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN, FIN, 5, FIN, FIN},//4
-            {-1, -1, 7, -1, 6, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, FIN},//5
-            {-1, -1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, FIN},//6
-            {FIN, FIN, 7, FIN, FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN, FIN, FIN, FIN, FIN},//7
-            {FIN, FIN, FIN, FIN, FIN, FIN, 9,  FIN, FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN},//8
-            {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 9, 9, FIN},//9
-            { FIN, FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN, FIN, FIN},//10
-            {FIN, FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN,FIN, FIN, FIN, FIN, FIN, FIN, FIN}, //11
-            {12, 12, 12, 12, 12, 12, 12, 12, 12, FIN, 12, 13, 12, 12, -1, 12, 12, FIN},//12
-            {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 12, -1, -1, FIN},//13
+            {1, -1, 2, 3, F, F, 8, 10, 11, 12, F, F, F, 0, 0, 1, F, F},//0
+            {1, 1, 1, F, F, F, F, F, F, F, F, F, F, F, F, 1, F, F },//1
+            {F, F, 2, 4, F, F, F, F, F, F, F, F, F, F, F, F, F, F },//2
+            {-1, -1, 4, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//3
+            {F, F, 4, F, F, F, F, F, F, F, F, F, F, F, F, 5, F, F},//4
+            {-1, -1, 7, -1, 6, 6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//5
+            {-1, -1, 7, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, F},//6
+            {F, F, 7, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//7
+            {F, F, F, F, F, F, 9, F, F, F, F, F, F, F, F, F, F, F},//8
+            {9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 0, 9, 9, F},//9
+            {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F},//10
+            {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F}, //11
+            {12, 12, 12, 12, 12, 12, 12, 12, 12, F, 12, 13, 12, 12, -1, 12, 12, F},//12
+            {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 12, -1, -1, F},//13
     };
 
     private AccionSemantica[][] accionesEnTabla = {
             //L,l  _  d  .   +   -  <  >  =  ‘  !  /  :  bt nl 'F' ot $
             //0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17
             {as1, err1, as1, as1, as6, as6, null, null, null, as1, null, null, null, null, null, as1, as6, null},//0
-            {as2, as2, as2, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, null },//1
+            {as2, as2, as2, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as2, as3, as3 },//1
             {as4, as4, as2, as2, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4 },//2
             {err2, err2, as2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2},//3
             {as5, as5, as2, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as5, as2, as5, as5},//4
@@ -124,13 +124,10 @@ public class Lexico {
     }
 
     private int obtenerColumna(char caracter) { //Queremos obtener la columna que representa el caracter ingresante a mi estado actual.
-
-        if ((caracter >= 65) && (caracter <= 90)){   //Representacion correspondiente ASCII para letras mayusculas
-            if (caracter == 70)                     //Representacion correspondiente ASCII para letra F
-                return 15;
-            else
-                return 0;
-        }
+        if (caracter == 70)                         //Representacion correspondiente ASCII para letra F
+            return 15;
+        if ((caracter >= 65) && (caracter <= 90))   //Representacion correspondiente ASCII para letras mayusculas
+            return 0;
         if ((caracter >= 97) && (caracter <= 122))  //Representacion correspondiente ASCII para letras minusculas
             return 0;
         if (caracter == 95)                         //Representacion correspondiente ASCII para guion bajo
@@ -193,10 +190,10 @@ public class Lexico {
                 if (estadoActual == -1)
                     return token; //Retorna null y vuelve al estado 0 en la proxima iteracion.
                 else
-                if ((estadoActual == FIN) && (token != null))// En estado final siempre hay un token(distinto de null) para retornar.
+                if ((estadoActual == F) && (token != null))// En estado final siempre hay un token(distinto de null) para retornar.
                     return token;
 
-                if (estadoActual == FIN)
+                if (estadoActual == F)
                     estadoActual = 0;
             }
             if (caracter == '\n')
