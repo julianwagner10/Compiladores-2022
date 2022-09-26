@@ -1,8 +1,0 @@
-programa
-FUNC aux(INT x , INT y , INT z)
-x:=1;
-INT y:= 2;
-BEGIN
-y:=y+x;
-RETURN y;
-END;

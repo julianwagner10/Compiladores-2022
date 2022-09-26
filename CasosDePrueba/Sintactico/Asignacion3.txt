@@ -1,3 +1,0 @@
-programaAsignacion
-INT a;
-z:=x+y*t;

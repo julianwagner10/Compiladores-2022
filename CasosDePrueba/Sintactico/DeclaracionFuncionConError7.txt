@@ -1,2 +1,0 @@
-Programa
-INT FUNC aux (INT x)

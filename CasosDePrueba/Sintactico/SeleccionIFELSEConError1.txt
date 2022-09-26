@@ -1,7 +1,0 @@
-programa
-IF ( x < z + y )THEN
-c = 1;
-ELSE
-c = 2;
-d = 2;
-ENDIF;

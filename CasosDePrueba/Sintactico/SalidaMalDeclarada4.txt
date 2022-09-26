@@ -1,3 +1,0 @@
-PROGRAMA
-INT a;
-PRINT %salida1%;

@@ -123,8 +123,6 @@ public class Lexico {
         this.tablaSimbolos.setSimbolo("i32",280);
     }
 
-
-
     private int obtenerColumna(char caracter) { //Queremos obtener la columna que representa el caracter ingresante a mi estado actual.
 
         if (caracter == 70)                         //Representacion correspondiente ASCII para letra F
@@ -199,13 +197,9 @@ public class Lexico {
                 if (estadoActual == F)
                     estadoActual = 0;
             }
-
             if (caracter == '\n')
                 linea++;
-
-
         }
-
         return new Token(0); //Principal.Token = 0 de fin de archivo
     }
 }

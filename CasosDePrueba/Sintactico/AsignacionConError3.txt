@@ -1,3 +1,0 @@
-programaAsignacion
-INT a;
-:=x ;

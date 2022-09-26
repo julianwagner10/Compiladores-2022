@@ -1,5 +1,0 @@
-Programa
-INT a;
-IF ( x < z THEN
-c:=1;
-ENDIF;

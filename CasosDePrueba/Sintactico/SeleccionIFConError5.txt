@@ -1,4 +1,0 @@
-Programa
-INT a;
-IF ( x < z )THEN
-ENDIF;
