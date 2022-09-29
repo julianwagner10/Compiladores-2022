@@ -1,4 +1,6 @@
 package Principal;
+import Parser.Parser;
+
 import java.io.*;
 public class Main{
 
@@ -44,13 +46,13 @@ public class Main{
         System.out.println("");
 
         Lexico l1 = new Lexico(codigo);
-        l1.obtenerToken();
+        //l1.obtenerToken();
 
 
-        /*Parser p = new Parser(l1);
+        Parser p = new Parser(l1);
         System.out.println("Corriendo Parser");
         System.out.println("------------------------------------------");
-        p.run();*/
+        p.run();
 
         System.out.println("\n TABLA DE SIMBOLOS ");
         tablaDeSimbolos.mostrarTablasimbolos();
