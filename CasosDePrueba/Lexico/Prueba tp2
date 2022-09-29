@@ -1,1 +1,10 @@
-Prueba continue;
+programa
+{
+f32 float;
+i32 entero;
+}
+{
+continue;
+break;
+}
+

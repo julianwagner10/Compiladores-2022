@@ -7,7 +7,6 @@ package Parser;//#############################################
  * This class provides some of the functionality
  * of the yacc/C 'union' directive
  */
-import Principal.*;
 public class ParserVal
 {
 /**

@@ -14,19 +14,19 @@ public class Lexico {
     public static int linea; //es la linea que se esta leyendo del texto recibido como entrada.
 
     // PALABRAS RESERVADAS
-    public static final int IF = 268;
-    public static final int THEN = 269;
-    public static final int ELSE = 270;
-    public static final int ENDIF = 271;
-    public static final int OUT = 272;
-    public final static int FUN = 273;
-    public final static int RETURN = 274;
-    public static final int BREAK = 275;
-    public static final int DISCARD = 276;
-    public static final int FOR = 277;
-    public static final int CONTINUE = 278;
-    public static final int F32 = 279;
-    public static final int I32 = 280;
+    public static final int IF = 265;
+    public static final int THEN = 266;
+    public static final int ELSE = 267;
+    public static final int ENDIF = 268;
+    public static final int OUT = 269;
+    public final static int FUN = 270;
+    public final static int RETURN = 271;
+    public static final int BREAK = 272;
+    public static final int DISCARD = 273;
+    public static final int FOR = 274;
+    public static final int CONTINUE = 275;
+    public static final int F32 = 276;
+    public static final int I32 = 277;
 
     //TOKEN SIN ASCII
     public static final int ID = 257;
@@ -86,7 +86,7 @@ public class Lexico {
     private AccionSemantica[][] accionesEnTabla = {
             //L,l  _  d  .   +   -  <  >  =  ‘  !  /  :  bt nl 'F' ot $
             //0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17
-            {as1, err1, as1, as1, as6, as6, null, null, null, as1, null, null, null, null, null, as1, as6, null},//0
+            {as1, err1, as1, as1, as6, as6, null, null, null, as1, null, null, as6, null, null, as1, as6, null},//0
             {as2, as2, as2, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as2, as3, as3 },//1
             {as4, as4, as2, as2, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4 },//2
             {err2, err2, as2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2},//3
@@ -108,19 +108,19 @@ public class Lexico {
         this.textoDeEntrada = textoDeEntrada;
 
         caracter = textoDeEntrada.charAt(cursor);
-        this.tablaSimbolos.setSimbolo("if",268);
-        this.tablaSimbolos.setSimbolo("then",269);
-        this.tablaSimbolos.setSimbolo("else",270);
-        this.tablaSimbolos.setSimbolo("end-if",271);
-        this.tablaSimbolos.setSimbolo("out",272);
-        this.tablaSimbolos.setSimbolo("fun",273);
-        this.tablaSimbolos.setSimbolo("return",274);
-        this.tablaSimbolos.setSimbolo("break",275);
-        this.tablaSimbolos.setSimbolo("discard",276);
-        this.tablaSimbolos.setSimbolo("for",277);
-        this.tablaSimbolos.setSimbolo("continue",278);
-        this.tablaSimbolos.setSimbolo("f32",279);
-        this.tablaSimbolos.setSimbolo("i32",280);
+        this.tablaSimbolos.setSimbolo("if",265);
+        this.tablaSimbolos.setSimbolo("then",266);
+        this.tablaSimbolos.setSimbolo("else",267);
+        this.tablaSimbolos.setSimbolo("end-if",268);
+        this.tablaSimbolos.setSimbolo("out",269);
+        this.tablaSimbolos.setSimbolo("fun",270);
+        this.tablaSimbolos.setSimbolo("return",271);
+        this.tablaSimbolos.setSimbolo("break",272);
+        this.tablaSimbolos.setSimbolo("discard",273);
+        this.tablaSimbolos.setSimbolo("for",274);
+        this.tablaSimbolos.setSimbolo("continue",275);
+        this.tablaSimbolos.setSimbolo("f32",276);
+        this.tablaSimbolos.setSimbolo("i32",287);
     }
 
     private int obtenerColumna(char caracter) { //Queremos obtener la columna que representa el caracter ingresante a mi estado actual.

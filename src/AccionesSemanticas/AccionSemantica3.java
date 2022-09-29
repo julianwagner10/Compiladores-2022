@@ -18,7 +18,7 @@ public class AccionSemantica3 extends AccionSemantica { //Esta accion semantica 
         }
         else  //Si existe tengo que chequear si es palabra reservada o solo un identificador
             if (Lexico.tablaSimbolos.esPalabraReservada(buffer)) { //Si es palabra reservada retorno el token solamente con su id.
-                System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto una palabra reservada");
+                System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto la palabra reservada "+buffer);
                 return new Token(this.getIdPalabra());
             }
 
