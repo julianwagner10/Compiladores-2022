@@ -111,7 +111,7 @@ public class Lexico {
         this.tablaSimbolos.setSimbolo("if",265);
         this.tablaSimbolos.setSimbolo("then",266);
         this.tablaSimbolos.setSimbolo("else",267);
-        this.tablaSimbolos.setSimbolo("end-if",268);
+        this.tablaSimbolos.setSimbolo("end_if",268);
         this.tablaSimbolos.setSimbolo("out",269);
         this.tablaSimbolos.setSimbolo("fun",270);
         this.tablaSimbolos.setSimbolo("return",271);

@@ -1,10 +1,13 @@
-programa
 {
-f32 float;
-i32 entero;
-}
+i32 izq;
+i32 der;
+if ( izq<der ) then
 {
 continue;
+continue;
+continue;
 break;
+}
+end_if;
 }
 

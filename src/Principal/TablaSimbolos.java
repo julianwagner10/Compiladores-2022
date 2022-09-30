@@ -34,7 +34,7 @@ public class TablaSimbolos {
     public boolean esPalabraReservada(String lexema) {
         if (tablaSimbolos.containsKey(lexema)) {
             int identificador = tablaSimbolos.get(lexema).getIdentificador();
-            if (identificador > 256 && identificador < 268)
+            if (identificador > 256 && identificador < 265)
                 return false;
             else
                 return true;

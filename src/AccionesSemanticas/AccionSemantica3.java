@@ -22,7 +22,7 @@ public class AccionSemantica3 extends AccionSemantica { //Esta accion semantica 
                 return new Token(this.getIdPalabra());
             }
 
-            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un identificador");
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto el identificador "+ buffer);
             return new Token(Lexico.ID, buffer); //Si no es palabra reservada retorno el token con el lexico y el id.
 
     }
@@ -35,7 +35,7 @@ public class AccionSemantica3 extends AccionSemantica { //Esta accion semantica 
                 return Lexico.THEN;
             case "else":
                 return Lexico.ELSE;
-            case "end-if":
+            case "end_if":
                 return Lexico.ENDIF;
             case "fun":
                 return Lexico.FUN;

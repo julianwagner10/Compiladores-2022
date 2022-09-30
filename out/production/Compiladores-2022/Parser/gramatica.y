@@ -9,46 +9,44 @@ import Principal.*;
 
 %%
 
-programa : ID bloque {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó un programa");}
+programa : ID '{'bloque'}' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
+         | error_programa;
          ;
 
-bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] ambos bloques ");}
-       | bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] solo bloque declarativo ");}
-       | bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] solo bloque ejecutable ");}
+error_programa : '{'bloque'}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador de programa");}
+               | ID error bloque'}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la llave de apertura de bloque de programa");}
+               | ID '{'bloque {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la llave de cierre de bloque de programa");}
+               ;
+
+bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero declarativo y luego ejecutable ");}
+       | bloque_ejecutable bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero ejecutable y luego declarativo ");}
+       | bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque declarativo ");}
+       | bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque ejecutable ");}
        ;
 
 bloque_declarativo : declaracion
-				   | '{' bloque_sentencias_declarativo '}'
+				   | bloque_declarativo declaracion
 				   ;
 
-bloque_sentencias_declarativo : declaracion
-				              | bloque_sentencias_declarativo declaracion
-				              ;
-
-bloque_ejecutable : ejecucion {System.out.println("[Parser | Linea " + Lexico.linea + "] ejecucion ");}
-                  | '{' bloque_sentencias_ejecutable '}'
+bloque_ejecutable : ejecucion
+                  | '{' bloque_sentencias_ejecutables '}'
                   ;
 
-bloque_sentencias_ejecutable : ejecucion
-                             | bloque_sentencias_ejecutable ejecucion
-                             ;
+bloque_sentencias_ejecutables : ejecucion
+                              | bloque_sentencias_ejecutables ejecucion
+                              ;
 
-
-declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variables");}
+declaracion : tipo lista_de_variables';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion ';'
             | lista_de_variables ';'
             ;
-
-
 
 lista_de_variables : ID {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $1.sval);}
       		       | lista_de_variables ',' ID {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $3.sval);}
                    ;
 
-
 funcion : declaracion_fun '{'bloque_ejecutable'}' {System.out.println("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");}
         ;
-
 
 declaracion_fun : FUN ID lista_de_parametros ':' tipo
                 ;
@@ -68,12 +66,12 @@ tipo : I32 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó u
 
 ejecucion : asignacion ';'
 	      | DISCARD invocacion ';'
-	      | seleccion ';'
+	      | seleccion
 	      | retorno ';'
 	      | control ';'
 	      | salida';'
-	      | BREAK ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] TOY EN BREAK");}
-	      | CONTINUE ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] TOY EN CONTINUE");}
+	      | BREAK ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
+	      | CONTINUE ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
           ;
 
 asignacion : ID '=' ':' expresion_aritmetica
@@ -93,9 +91,9 @@ termino : termino '*' factor { System.out.println("[Parser | Linea " + Lexico.li
 	    | factor
         ;
 
-factor 	: CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
+factor 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}
+        | CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
         | CTE_INT {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + $1.sval);}
-	    | ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}
         ;
 
 invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una resta");}
@@ -106,8 +104,8 @@ parametros_reales : factor
                   | factor parametros_reales
                   ;
 
-seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
-	      | IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
+seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF';' {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
+	      | IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
 	      ;
 
 condicion : expresion_aritmetica comparador expresion_aritmetica
@@ -152,11 +150,9 @@ public int yylex(){
 
    if(token != null ){
    	int val = token.getId();
-   	System.out.println("lexema: "+token.getLexema()+" Identificador "+token.getId());
    	yylval = new ParserVal(token.getLexema());
    	return val;
    }
-   System.out.println("Token = null");
    return 0;
 }
 
