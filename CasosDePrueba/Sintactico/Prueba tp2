@@ -1,10 +1,7 @@
-{
-i32 izq;
-i32 der;
+programa{
+i32 izq der;
 if ( izq<der ) then
 {
-continue;
-continue;
 continue;
 break;
 }

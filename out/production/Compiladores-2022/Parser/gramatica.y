@@ -36,28 +36,60 @@ bloque_sentencias_ejecutables : ejecucion
                               | bloque_sentencias_ejecutables ejecucion
                               ;
 
-declaracion : tipo lista_de_variables';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
-            | funcion ';'
+declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
+            | funcion
             | lista_de_variables ';'
+            | error_declaracion
             ;
+
+error_declaracion : tipo lista_de_variables error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la declaracion de variables");}
+                  ;
 
 lista_de_variables : ID {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $1.sval);}
       		       | lista_de_variables ',' ID {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $3.sval);}
+                   | error_lista_de_variables
                    ;
 
-funcion : declaracion_fun '{'bloque_ejecutable'}' {System.out.println("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");}
+error_lista_de_variables : lista_de_variables ID {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ',' entre identificadores de variables");}
+                         ;
+
+funcion : declaracion_fun '{'bloque'}' {System.out.println("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");}
+        | error_funcion
         ;
 
+error_funcion : declaracion_fun error bloque '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de apertura al bloque de la funcion");}
+              | declaracion_fun '{' bloque error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de cierre al bloque de la funcion");}
+              | declaracion_fun '{' '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta bloque ejecutable de la funcion");}
+              ;
+
 declaracion_fun : FUN ID lista_de_parametros ':' tipo
+                | error_declaracion_fun
                 ;
 
-lista_de_parametros : '(' ')' //Considero que se contemplara asi el hecho de que no haya parametros.
+error_declaracion_fun : ID lista_de_parametros ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada fun");}
+                      | FUN lista_de_parametros ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta identificador de funcion");}
+                      | FUN ID ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta lista de parametros de funcion");}
+                      | FUN ID lista_de_parametros tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo al tipo que devuelve la funcion");}
+                      | FUN ID lista_de_parametros ':' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion");}
+                      ;
+
+lista_de_parametros : '(' ')'
                     | '('parametro')'
                     | '(' parametro ',' parametro ')'
+                    | error_lista_de_parametros
                     ;
 
+error_lista_de_parametros : parametro')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta parentesis de apertura de lista de parametros");}
+                          | '('parametro {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta parentesis de cierre de lista de parametros");}
+                          ;
+
 parametro : tipo ID
+          | error_parametro
           ;
+
+error_parametro : tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador del parametro");}
+                | error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo del parametro");}
+                ;
 
 tipo : I32 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó un tipo INT LARGO I32");}
      | F32 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó un tipo FLOAT F32");}
