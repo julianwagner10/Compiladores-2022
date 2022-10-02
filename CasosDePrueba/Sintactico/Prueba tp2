@@ -1,9 +1,10 @@
 programa{
-i32 izq der;
+i32 izq , der;
 if ( izq<der ) then
 {
 continue;
 break;
+out('hola')
 }
 end_if;
 }

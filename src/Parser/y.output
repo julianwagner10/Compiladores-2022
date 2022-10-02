@@ -42,67 +42,113 @@
   29                | declaracion_fun '{' '}'
 
   30  declaracion_fun : FUN ID lista_de_parametros ':' tipo
+  31                  | error_declaracion_fun
 
-  31  lista_de_parametros : '(' ')'
-  32                      | '(' parametro ')'
-  33                      | '(' parametro ',' parametro ')'
+  32  error_declaracion_fun : ID lista_de_parametros ':' tipo
+  33                        | FUN lista_de_parametros ':' tipo
+  34                        | FUN ID ':' tipo
+  35                        | FUN ID lista_de_parametros tipo
+  36                        | FUN ID lista_de_parametros ':'
 
-  34  parametro : tipo ID
+  37  lista_de_parametros : '(' ')'
+  38                      | '(' parametro ')'
+  39                      | '(' parametro ',' parametro ')'
+  40                      | error_lista_de_parametros
 
-  35  tipo : I32
-  36       | F32
+  41  error_lista_de_parametros : parametro ')'
+  42                            | '(' parametro
 
-  37  ejecucion : asignacion ';'
-  38            | DISCARD invocacion ';'
-  39            | seleccion
-  40            | retorno ';'
-  41            | control ';'
-  42            | salida ';'
-  43            | BREAK ';'
-  44            | CONTINUE ';'
+  43  parametro : tipo ID
+  44            | error_parametro
 
-  45  asignacion : ID '=' ':' expresion_aritmetica
+  45  error_parametro : tipo
+  46                  | error ID
 
-  46  retorno : RETURN expresion_aritmetica
-  47          | RETURN comparador
+  47  tipo : I32
+  48       | F32
 
-  48  expresion_aritmetica : termino
-  49                       | expresion_aritmetica '+' termino
-  50                       | expresion_aritmetica '-' termino
+  49  ejecucion : asignacion ';'
+  50            | DISCARD invocacion ';'
+  51            | seleccion ';'
+  52            | retorno ';'
+  53            | control ';'
+  54            | salida ';'
+  55            | BREAK ';'
+  56            | CONTINUE ';'
+  57            | error_ejecucion
 
-  51  termino : termino '*' factor
-  52          | termino '/' factor
-  53          | factor
+  58  error_ejecucion : asignacion
+  59                  | seleccion
+  60                  | retorno
+  61                  | control
+  62                  | salida
+  63                  | BREAK
+  64                  | CONTINUE
+  65                  | DISCARD ';'
+  66                  | DISCARD invocacion
+  67                  | invocacion ';'
 
-  54  factor : ID
-  55         | CTE_FLOTANTE
-  56         | CTE_INT
+  68  asignacion : ID '=' ':' expresion_aritmetica
+  69             | error_asignacion
 
-  57  invocacion : ID '(' parametros_reales ')'
+  70  error_asignacion : ID ':' expresion_aritmetica
+  71                   | ID '=' expresion_aritmetica
+  72                   | ID '=' ':' error
+  73                   | '=' ':' expresion_aritmetica
 
-  58  parametros_reales : factor
-  59                    | factor parametros_reales
+  74  retorno : RETURN expresion_aritmetica
+  75          | error_retorno
 
-  60  seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF ';'
-  61            | IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF ';'
+  76  error_retorno : RETURN error
 
-  62  condicion : expresion_aritmetica comparador expresion_aritmetica
+  77  expresion_aritmetica : termino
+  78                       | expresion_aritmetica '+' termino
+  79                       | expresion_aritmetica '-' termino
 
-  63  comparador : '<'
-  64             | '>'
-  65             | '='
-  66             | MAYOR_IGUAL
-  67             | MENOR_IGUAL
-  68             | DISTINTO
+  80  termino : termino '*' factor
+  81          | termino '/' factor
+  82          | factor
+  83          | error_termino
 
-  69  control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'
-  70          | FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'
+  84  error_termino : termino '*' error
+  85                | termino '/' error
+  86                | '*' factor
+  87                | '/' factor
 
-  71  asignacion_for : ID '=' ':' CTE_INT
+  88  factor : ID
+  89         | CTE_FLOTANTE
+  90         | CTE_INT
+  91         | '-' factor
 
-  72  condicion_for : ID comparador expresion_aritmetica
+  92  invocacion : ID '(' parametros_reales ')'
+  93             | ID '(' ')'
+  94             | error_invocacion
 
-  73  salida : OUT '(' CADENA ')' ';'
+  95  error_invocacion : ID '(' parametros_reales error
+
+  96  parametros_reales : factor
+  97                    | factor parametros_reales
+
+  98  seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF
+  99            | IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF
+
+ 100  condicion : expresion_aritmetica comparador expresion_aritmetica
+
+ 101  comparador : '<'
+ 102             | '>'
+ 103             | '='
+ 104             | MAYOR_IGUAL
+ 105             | MENOR_IGUAL
+ 106             | DISTINTO
+
+ 107  control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'
+ 108          | FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'
+
+ 109  asignacion_for : ID '=' ':' CTE_INT
+
+ 110  condicion_for : ID comparador expresion_aritmetica
+
+ 111  salida : OUT '(' CADENA ')'
 
 state 0
 	$accept : . programa $end  (0)
@@ -140,25 +186,32 @@ state 2
 	F32  shift 16
 	I32  shift 17
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque  goto 19
-	bloque_declarativo  goto 20
-	bloque_ejecutable  goto 21
-	declaracion  goto 22
-	ejecucion  goto 23
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque  goto 20
+	bloque_declarativo  goto 21
+	bloque_ejecutable  goto 22
+	declaracion  goto 23
+	ejecucion  goto 24
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
 state 3
@@ -188,25 +241,32 @@ state 5
 	F32  shift 16
 	I32  shift 17
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque  goto 36
-	bloque_declarativo  goto 20
-	bloque_ejecutable  goto 21
-	declaracion  goto 22
-	ejecucion  goto 23
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque  goto 43
+	bloque_declarativo  goto 21
+	bloque_ejecutable  goto 22
+	declaracion  goto 23
+	ejecucion  goto 24
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
 state 6
@@ -225,127 +285,202 @@ state 6
 	F32  shift 16
 	I32  shift 17
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque  goto 37
-	bloque_declarativo  goto 20
-	bloque_ejecutable  goto 21
-	declaracion  goto 22
-	ejecucion  goto 23
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque  goto 44
+	bloque_declarativo  goto 21
+	bloque_ejecutable  goto 22
+	declaracion  goto 23
+	ejecucion  goto 24
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
 state 7
 	lista_de_variables : ID .  (21)
-	asignacion : ID . '=' ':' expresion_aritmetica  (45)
+	error_declaracion_fun : ID . lista_de_parametros ':' tipo  (32)
+	asignacion : ID . '=' ':' expresion_aritmetica  (68)
+	error_asignacion : ID . ':' expresion_aritmetica  (70)
+	error_asignacion : ID . '=' expresion_aritmetica  (71)
+	error_asignacion : ID . '=' ':' error  (72)
+	invocacion : ID . '(' parametros_reales ')'  (92)
+	invocacion : ID . '(' ')'  (93)
+	error_invocacion : ID . '(' parametros_reales error  (95)
 
-	'='  shift 38
+	error  shift 45
+	F32  shift 16
+	I32  shift 17
+	':'  shift 46
+	'('  shift 47
+	'='  shift 48
 	ID  reduce 21
 	';'  reduce 21
 	','  reduce 21
 
+	tipo  goto 49
+	lista_de_parametros  goto 50
+	parametro  goto 51
+	error_lista_de_parametros  goto 52
+	error_parametro  goto 53
+
 
 state 8
-	seleccion : IF . '(' condicion ')' THEN bloque_ejecutable ENDIF ';'  (60)
-	seleccion : IF . '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF ';'  (61)
+	seleccion : IF . '(' condicion ')' THEN bloque_ejecutable ENDIF  (98)
+	seleccion : IF . '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF  (99)
 
-	'('  shift 39
+	'('  shift 54
 	.  error
 
 
 state 9
-	salida : OUT . '(' CADENA ')' ';'  (73)
+	salida : OUT . '(' CADENA ')'  (111)
 
-	'('  shift 40
+	'('  shift 55
 	.  error
 
 
 state 10
 	declaracion_fun : FUN . ID lista_de_parametros ':' tipo  (30)
+	error_declaracion_fun : FUN . lista_de_parametros ':' tipo  (33)
+	error_declaracion_fun : FUN . ID ':' tipo  (34)
+	error_declaracion_fun : FUN . ID lista_de_parametros tipo  (35)
+	error_declaracion_fun : FUN . ID lista_de_parametros ':'  (36)
 
-	ID  shift 41
+	error  shift 45
+	ID  shift 56
+	F32  shift 16
+	I32  shift 17
+	'('  shift 57
 	.  error
+
+	tipo  goto 49
+	lista_de_parametros  goto 58
+	parametro  goto 51
+	error_lista_de_parametros  goto 52
+	error_parametro  goto 53
 
 
 state 11
-	retorno : RETURN . expresion_aritmetica  (46)
-	retorno : RETURN . comparador  (47)
+	retorno : RETURN . expresion_aritmetica  (74)
+	error_retorno : RETURN . error  (76)
 
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	MENOR_IGUAL  shift 45
-	MAYOR_IGUAL  shift 46
-	DISTINTO  shift 47
-	'='  shift 48
-	'<'  shift 49
-	'>'  shift 50
+	error  shift 59
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
 	.  error
 
-	expresion_aritmetica  goto 51
-	comparador  goto 52
-	termino  goto 53
-	factor  goto 54
+	expresion_aritmetica  goto 66
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
 
 
 state 12
-	ejecucion : BREAK . ';'  (43)
+	ejecucion : BREAK . ';'  (55)
+	error_ejecucion : BREAK .  (63)
 
-	';'  shift 55
-	.  error
+	';'  shift 70
+	$end  reduce 63
+	error  reduce 63
+	ID  reduce 63
+	IF  reduce 63
+	ELSE  reduce 63
+	ENDIF  reduce 63
+	OUT  reduce 63
+	FUN  reduce 63
+	RETURN  reduce 63
+	BREAK  reduce 63
+	DISCARD  reduce 63
+	FOR  reduce 63
+	CONTINUE  reduce 63
+	F32  reduce 63
+	I32  reduce 63
+	'}'  reduce 63
+	'='  reduce 63
 
 
 state 13
-	ejecucion : DISCARD . invocacion ';'  (38)
+	ejecucion : DISCARD . invocacion ';'  (50)
+	error_ejecucion : DISCARD . ';'  (65)
+	error_ejecucion : DISCARD . invocacion  (66)
 
-	ID  shift 56
+	ID  shift 71
+	';'  shift 72
 	.  error
 
-	invocacion  goto 57
+	invocacion  goto 73
+	error_invocacion  goto 42
 
 
 state 14
-	control : FOR . '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (69)
-	control : FOR . '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (70)
+	control : FOR . '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (107)
+	control : FOR . '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (108)
 
-	'('  shift 58
+	'('  shift 74
 	.  error
 
 
 state 15
-	ejecucion : CONTINUE . ';'  (44)
+	ejecucion : CONTINUE . ';'  (56)
+	error_ejecucion : CONTINUE .  (64)
 
-	';'  shift 59
-	.  error
+	';'  shift 75
+	$end  reduce 64
+	error  reduce 64
+	ID  reduce 64
+	IF  reduce 64
+	ELSE  reduce 64
+	ENDIF  reduce 64
+	OUT  reduce 64
+	FUN  reduce 64
+	RETURN  reduce 64
+	BREAK  reduce 64
+	DISCARD  reduce 64
+	FOR  reduce 64
+	CONTINUE  reduce 64
+	F32  reduce 64
+	I32  reduce 64
+	'}'  reduce 64
+	'='  reduce 64
 
 
 state 16
-	tipo : F32 .  (36)
+	tipo : F32 .  (48)
 
-	.  reduce 36
+	.  reduce 48
 
 
 state 17
-	tipo : I32 .  (35)
+	tipo : I32 .  (47)
 
-	.  reduce 35
+	.  reduce 47
 
 
 state 18
 	bloque_ejecutable : '{' . bloque_sentencias_ejecutables '}'  (13)
 
-	ID  shift 60
+	ID  shift 76
 	IF  shift 8
 	OUT  shift 9
 	RETURN  shift 11
@@ -353,25 +488,38 @@ state 18
 	DISCARD  shift 13
 	FOR  shift 14
 	CONTINUE  shift 15
+	'='  shift 19
 	.  error
 
-	ejecucion  goto 61
-	bloque_sentencias_ejecutables  goto 62
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	ejecucion  goto 77
+	bloque_sentencias_ejecutables  goto 78
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
 state 19
-	error_programa : '{' bloque . '}'  (3)
+	error_asignacion : '=' . ':' expresion_aritmetica  (73)
 
-	'}'  shift 63
+	':'  shift 79
 	.  error
 
 
 state 20
+	error_programa : '{' bloque . '}'  (3)
+
+	'}'  shift 80
+	.  error
+
+
+state 21
 	bloque : bloque_declarativo . bloque_ejecutable  (6)
 	bloque : bloque_declarativo .  (8)
 	bloque_declarativo : bloque_declarativo . declaracion  (11)
@@ -388,32 +536,39 @@ state 20
 	F32  shift 16
 	I32  shift 17
 	'{'  shift 18
+	'='  shift 19
 	$end  reduce 8
 	error  reduce 8
 	'}'  reduce 8
 
-	bloque_ejecutable  goto 64
-	declaracion  goto 65
-	ejecucion  goto 23
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque_ejecutable  goto 81
+	declaracion  goto 82
+	ejecucion  goto 24
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 21
+state 22
 	bloque : bloque_ejecutable . bloque_declarativo  (7)
 	bloque : bloque_ejecutable .  (9)
 
-	ID  shift 66
+	ID  shift 83
 	FUN  shift 10
 	F32  shift 16
 	I32  shift 17
@@ -421,322 +576,660 @@ state 21
 	error  reduce 9
 	'}'  reduce 9
 
-	bloque_declarativo  goto 67
-	declaracion  goto 22
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
+	bloque_declarativo  goto 84
+	declaracion  goto 23
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
 
 
-state 22
+state 23
 	bloque_declarativo : declaracion .  (10)
 
 	.  reduce 10
 
 
-state 23
+state 24
 	bloque_ejecutable : ejecucion .  (12)
 
 	.  reduce 12
 
 
-state 24
+state 25
 	declaracion : tipo . lista_de_variables ';'  (16)
 	error_declaracion : tipo . lista_de_variables error  (20)
 
-	ID  shift 66
+	ID  shift 85
 	.  error
 
-	lista_de_variables  goto 68
-	error_lista_de_variables  goto 28
+	lista_de_variables  goto 86
+	error_lista_de_variables  goto 29
 
 
-state 25
+state 26
 	declaracion : lista_de_variables . ';'  (18)
 	lista_de_variables : lista_de_variables . ',' ID  (22)
 	error_lista_de_variables : lista_de_variables . ID  (24)
 
-	ID  shift 69
-	';'  shift 70
-	','  shift 71
+	ID  shift 87
+	';'  shift 88
+	','  shift 89
 	.  error
 
 
-state 26
+state 27
 	declaracion : funcion .  (17)
 
 	.  reduce 17
 
 
-state 27
+state 28
 	declaracion : error_declaracion .  (19)
 
 	.  reduce 19
 
 
-state 28
+state 29
 	lista_de_variables : error_lista_de_variables .  (23)
 
 	.  reduce 23
 
 
-state 29
+state 30
 	funcion : declaracion_fun . '{' bloque '}'  (25)
 	error_funcion : declaracion_fun . error bloque '}'  (27)
 	error_funcion : declaracion_fun . '{' bloque error  (28)
 	error_funcion : declaracion_fun . '{' '}'  (29)
 
-	error  shift 72
-	'{'  shift 73
+	error  shift 90
+	'{'  shift 91
 	.  error
 
 
-state 30
+state 31
 	funcion : error_funcion .  (26)
 
 	.  reduce 26
 
 
-state 31
-	ejecucion : asignacion . ';'  (37)
-
-	';'  shift 74
-	.  error
-
-
 state 32
-	ejecucion : seleccion .  (39)
+	declaracion_fun : error_declaracion_fun .  (31)
 
-	.  reduce 39
+	.  reduce 31
 
 
 state 33
-	ejecucion : retorno . ';'  (40)
+	ejecucion : asignacion . ';'  (49)
+	error_ejecucion : asignacion .  (58)
 
-	';'  shift 75
-	.  error
+	';'  shift 92
+	$end  reduce 58
+	error  reduce 58
+	ID  reduce 58
+	IF  reduce 58
+	ELSE  reduce 58
+	ENDIF  reduce 58
+	OUT  reduce 58
+	FUN  reduce 58
+	RETURN  reduce 58
+	BREAK  reduce 58
+	DISCARD  reduce 58
+	FOR  reduce 58
+	CONTINUE  reduce 58
+	F32  reduce 58
+	I32  reduce 58
+	'}'  reduce 58
+	'='  reduce 58
 
 
 state 34
-	ejecucion : control . ';'  (41)
+	error_ejecucion : invocacion . ';'  (67)
 
-	';'  shift 76
+	';'  shift 93
 	.  error
 
 
 state 35
-	ejecucion : salida . ';'  (42)
+	ejecucion : seleccion . ';'  (51)
+	error_ejecucion : seleccion .  (59)
 
-	';'  shift 77
-	.  error
+	';'  shift 94
+	$end  reduce 59
+	error  reduce 59
+	ID  reduce 59
+	IF  reduce 59
+	ELSE  reduce 59
+	ENDIF  reduce 59
+	OUT  reduce 59
+	FUN  reduce 59
+	RETURN  reduce 59
+	BREAK  reduce 59
+	DISCARD  reduce 59
+	FOR  reduce 59
+	CONTINUE  reduce 59
+	F32  reduce 59
+	I32  reduce 59
+	'}'  reduce 59
+	'='  reduce 59
 
 
 state 36
-	error_programa : ID error bloque . '}'  (4)
+	ejecucion : retorno . ';'  (52)
+	error_ejecucion : retorno .  (60)
 
-	'}'  shift 78
-	.  error
+	';'  shift 95
+	$end  reduce 60
+	error  reduce 60
+	ID  reduce 60
+	IF  reduce 60
+	ELSE  reduce 60
+	ENDIF  reduce 60
+	OUT  reduce 60
+	FUN  reduce 60
+	RETURN  reduce 60
+	BREAK  reduce 60
+	DISCARD  reduce 60
+	FOR  reduce 60
+	CONTINUE  reduce 60
+	F32  reduce 60
+	I32  reduce 60
+	'}'  reduce 60
+	'='  reduce 60
 
 
 state 37
-	programa : ID '{' bloque . '}'  (1)
-	error_programa : ID '{' bloque .  (5)
+	ejecucion : control . ';'  (53)
+	error_ejecucion : control .  (61)
 
-	'}'  shift 79
-	$end  reduce 5
+	';'  shift 96
+	$end  reduce 61
+	error  reduce 61
+	ID  reduce 61
+	IF  reduce 61
+	ELSE  reduce 61
+	ENDIF  reduce 61
+	OUT  reduce 61
+	FUN  reduce 61
+	RETURN  reduce 61
+	BREAK  reduce 61
+	DISCARD  reduce 61
+	FOR  reduce 61
+	CONTINUE  reduce 61
+	F32  reduce 61
+	I32  reduce 61
+	'}'  reduce 61
+	'='  reduce 61
 
 
 state 38
-	asignacion : ID '=' . ':' expresion_aritmetica  (45)
+	ejecucion : salida . ';'  (54)
+	error_ejecucion : salida .  (62)
 
-	':'  shift 80
-	.  error
+	';'  shift 97
+	$end  reduce 62
+	error  reduce 62
+	ID  reduce 62
+	IF  reduce 62
+	ELSE  reduce 62
+	ENDIF  reduce 62
+	OUT  reduce 62
+	FUN  reduce 62
+	RETURN  reduce 62
+	BREAK  reduce 62
+	DISCARD  reduce 62
+	FOR  reduce 62
+	CONTINUE  reduce 62
+	F32  reduce 62
+	I32  reduce 62
+	'}'  reduce 62
+	'='  reduce 62
 
 
 state 39
-	seleccion : IF '(' . condicion ')' THEN bloque_ejecutable ENDIF ';'  (60)
-	seleccion : IF '(' . condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF ';'  (61)
+	ejecucion : error_ejecucion .  (57)
 
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	expresion_aritmetica  goto 81
-	termino  goto 53
-	factor  goto 54
-	condicion  goto 82
+	.  reduce 57
 
 
 state 40
-	salida : OUT '(' . CADENA ')' ';'  (73)
+	asignacion : error_asignacion .  (69)
 
-	CADENA  shift 83
-	.  error
+	.  reduce 69
 
 
 state 41
-	declaracion_fun : FUN ID . lista_de_parametros ':' tipo  (30)
+	retorno : error_retorno .  (75)
 
-	'('  shift 84
-	.  error
-
-	lista_de_parametros  goto 85
+	.  reduce 75
 
 
 state 42
-	factor : ID .  (54)
+	invocacion : error_invocacion .  (94)
 
-	.  reduce 54
+	.  reduce 94
 
 
 state 43
-	factor : CTE_INT .  (56)
+	error_programa : ID error bloque . '}'  (4)
 
-	.  reduce 56
+	'}'  shift 98
+	.  error
 
 
 state 44
-	factor : CTE_FLOTANTE .  (55)
+	programa : ID '{' bloque . '}'  (1)
+	error_programa : ID '{' bloque .  (5)
 
-	.  reduce 55
+	'}'  shift 99
+	$end  reduce 5
 
 
 state 45
-	comparador : MENOR_IGUAL .  (67)
+	error_parametro : error . ID  (46)
 
-	.  reduce 67
+	ID  shift 100
+	.  error
 
 
 state 46
-	comparador : MAYOR_IGUAL .  (66)
+	error_asignacion : ID ':' . expresion_aritmetica  (70)
 
-	.  reduce 66
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	expresion_aritmetica  goto 101
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
 
 
 state 47
-	comparador : DISTINTO .  (68)
+	lista_de_parametros : '(' . ')'  (37)
+	lista_de_parametros : '(' . parametro ')'  (38)
+	lista_de_parametros : '(' . parametro ',' parametro ')'  (39)
+	error_lista_de_parametros : '(' . parametro  (42)
+	invocacion : ID '(' . parametros_reales ')'  (92)
+	invocacion : ID '(' . ')'  (93)
+	error_invocacion : ID '(' . parametros_reales error  (95)
 
-	.  reduce 68
+	error  shift 45
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	F32  shift 16
+	I32  shift 17
+	')'  shift 102
+	'-'  shift 63
+	.  error
+
+	tipo  goto 49
+	parametro  goto 103
+	error_parametro  goto 53
+	factor  goto 104
+	parametros_reales  goto 105
 
 
 state 48
-	comparador : '=' .  (65)
+	asignacion : ID '=' . ':' expresion_aritmetica  (68)
+	error_asignacion : ID '=' . expresion_aritmetica  (71)
+	error_asignacion : ID '=' . ':' error  (72)
 
-	.  reduce 65
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	':'  shift 106
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	expresion_aritmetica  goto 107
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
 
 
 state 49
-	comparador : '<' .  (63)
+	parametro : tipo . ID  (43)
+	error_parametro : tipo .  (45)
 
-	.  reduce 63
+	ID  shift 108
+	F32  reduce 45
+	I32  reduce 45
+	','  reduce 45
+	':'  reduce 45
+	')'  reduce 45
 
 
 state 50
-	comparador : '>' .  (64)
+	error_declaracion_fun : ID lista_de_parametros . ':' tipo  (32)
 
-	.  reduce 64
+	':'  shift 109
+	.  error
 
 
 state 51
-	retorno : RETURN expresion_aritmetica .  (46)
-	expresion_aritmetica : expresion_aritmetica . '+' termino  (49)
-	expresion_aritmetica : expresion_aritmetica . '-' termino  (50)
+	error_lista_de_parametros : parametro . ')'  (41)
 
-	'+'  shift 86
-	'-'  shift 87
-	';'  reduce 46
+	')'  shift 110
+	.  error
 
 
 state 52
-	retorno : RETURN comparador .  (47)
+	lista_de_parametros : error_lista_de_parametros .  (40)
 
-	.  reduce 47
+	.  reduce 40
 
 
 state 53
-	expresion_aritmetica : termino .  (48)
-	termino : termino . '*' factor  (51)
-	termino : termino . '/' factor  (52)
-
-	'*'  shift 88
-	'/'  shift 89
-	MENOR_IGUAL  reduce 48
-	MAYOR_IGUAL  reduce 48
-	DISTINTO  reduce 48
-	';'  reduce 48
-	')'  reduce 48
-	'='  reduce 48
-	'+'  reduce 48
-	'-'  reduce 48
-	'<'  reduce 48
-	'>'  reduce 48
-
-
-state 54
-	termino : factor .  (53)
-
-	.  reduce 53
-
-
-state 55
-	ejecucion : BREAK ';' .  (43)
-
-	.  reduce 43
-
-
-state 56
-	invocacion : ID . '(' parametros_reales ')'  (57)
-
-	'('  shift 90
-	.  error
-
-
-state 57
-	ejecucion : DISCARD invocacion . ';'  (38)
-
-	';'  shift 91
-	.  error
-
-
-state 58
-	control : FOR '(' . asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (69)
-	control : FOR '(' . asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (70)
-
-	ID  shift 92
-	.  error
-
-	asignacion_for  goto 93
-
-
-state 59
-	ejecucion : CONTINUE ';' .  (44)
+	parametro : error_parametro .  (44)
 
 	.  reduce 44
 
 
-state 60
-	asignacion : ID . '=' ':' expresion_aritmetica  (45)
+state 54
+	seleccion : IF '(' . condicion ')' THEN bloque_ejecutable ENDIF  (98)
+	seleccion : IF '(' . condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF  (99)
 
-	'='  shift 38
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	expresion_aritmetica  goto 111
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
+	condicion  goto 112
+
+
+state 55
+	salida : OUT '(' . CADENA ')'  (111)
+
+	CADENA  shift 113
 	.  error
 
 
+state 56
+	declaracion_fun : FUN ID . lista_de_parametros ':' tipo  (30)
+	error_declaracion_fun : FUN ID . ':' tipo  (34)
+	error_declaracion_fun : FUN ID . lista_de_parametros tipo  (35)
+	error_declaracion_fun : FUN ID . lista_de_parametros ':'  (36)
+
+	error  shift 45
+	F32  shift 16
+	I32  shift 17
+	':'  shift 114
+	'('  shift 57
+	.  error
+
+	tipo  goto 49
+	lista_de_parametros  goto 115
+	parametro  goto 51
+	error_lista_de_parametros  goto 52
+	error_parametro  goto 53
+
+
+state 57
+	lista_de_parametros : '(' . ')'  (37)
+	lista_de_parametros : '(' . parametro ')'  (38)
+	lista_de_parametros : '(' . parametro ',' parametro ')'  (39)
+	error_lista_de_parametros : '(' . parametro  (42)
+
+	error  shift 45
+	F32  shift 16
+	I32  shift 17
+	')'  shift 116
+	.  error
+
+	tipo  goto 49
+	parametro  goto 103
+	error_parametro  goto 53
+
+
+state 58
+	error_declaracion_fun : FUN lista_de_parametros . ':' tipo  (33)
+
+	':'  shift 117
+	.  error
+
+
+state 59
+	error_retorno : RETURN error .  (76)
+
+	.  reduce 76
+
+
+state 60
+	factor : ID .  (88)
+
+	.  reduce 88
+
+
 state 61
+	factor : CTE_INT .  (90)
+
+	.  reduce 90
+
+
+state 62
+	factor : CTE_FLOTANTE .  (89)
+
+	.  reduce 89
+
+
+state 63
+	factor : '-' . factor  (91)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	.  error
+
+	factor  goto 118
+
+
+state 64
+	error_termino : '*' . factor  (86)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	.  error
+
+	factor  goto 119
+
+
+state 65
+	error_termino : '/' . factor  (87)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	.  error
+
+	factor  goto 120
+
+
+state 66
+	retorno : RETURN expresion_aritmetica .  (74)
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
+
+	'+'  shift 121
+	'-'  shift 122
+	$end  reduce 74
+	error  reduce 74
+	ID  reduce 74
+	IF  reduce 74
+	ELSE  reduce 74
+	ENDIF  reduce 74
+	OUT  reduce 74
+	FUN  reduce 74
+	RETURN  reduce 74
+	BREAK  reduce 74
+	DISCARD  reduce 74
+	FOR  reduce 74
+	CONTINUE  reduce 74
+	F32  reduce 74
+	I32  reduce 74
+	'}'  reduce 74
+	';'  reduce 74
+	'='  reduce 74
+
+
+state 67
+	expresion_aritmetica : termino .  (77)
+	termino : termino . '*' factor  (80)
+	termino : termino . '/' factor  (81)
+	error_termino : termino . '*' error  (84)
+	error_termino : termino . '/' error  (85)
+
+	'*'  shift 123
+	'/'  shift 124
+	$end  reduce 77
+	error  reduce 77
+	ID  reduce 77
+	MENOR_IGUAL  reduce 77
+	MAYOR_IGUAL  reduce 77
+	DISTINTO  reduce 77
+	IF  reduce 77
+	ELSE  reduce 77
+	ENDIF  reduce 77
+	OUT  reduce 77
+	FUN  reduce 77
+	RETURN  reduce 77
+	BREAK  reduce 77
+	DISCARD  reduce 77
+	FOR  reduce 77
+	CONTINUE  reduce 77
+	F32  reduce 77
+	I32  reduce 77
+	'}'  reduce 77
+	';'  reduce 77
+	')'  reduce 77
+	'='  reduce 77
+	'+'  reduce 77
+	'-'  reduce 77
+	'<'  reduce 77
+	'>'  reduce 77
+
+
+state 68
+	termino : factor .  (82)
+
+	.  reduce 82
+
+
+state 69
+	termino : error_termino .  (83)
+
+	.  reduce 83
+
+
+state 70
+	ejecucion : BREAK ';' .  (55)
+
+	.  reduce 55
+
+
+state 71
+	invocacion : ID . '(' parametros_reales ')'  (92)
+	invocacion : ID . '(' ')'  (93)
+	error_invocacion : ID . '(' parametros_reales error  (95)
+
+	'('  shift 125
+	.  error
+
+
+state 72
+	error_ejecucion : DISCARD ';' .  (65)
+
+	.  reduce 65
+
+
+state 73
+	ejecucion : DISCARD invocacion . ';'  (50)
+	error_ejecucion : DISCARD invocacion .  (66)
+
+	';'  shift 126
+	$end  reduce 66
+	error  reduce 66
+	ID  reduce 66
+	IF  reduce 66
+	ELSE  reduce 66
+	ENDIF  reduce 66
+	OUT  reduce 66
+	FUN  reduce 66
+	RETURN  reduce 66
+	BREAK  reduce 66
+	DISCARD  reduce 66
+	FOR  reduce 66
+	CONTINUE  reduce 66
+	F32  reduce 66
+	I32  reduce 66
+	'}'  reduce 66
+	'='  reduce 66
+
+
+state 74
+	control : FOR '(' . asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (107)
+	control : FOR '(' . asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (108)
+
+	ID  shift 127
+	.  error
+
+	asignacion_for  goto 128
+
+
+state 75
+	ejecucion : CONTINUE ';' .  (56)
+
+	.  reduce 56
+
+
+state 76
+	asignacion : ID . '=' ':' expresion_aritmetica  (68)
+	error_asignacion : ID . ':' expresion_aritmetica  (70)
+	error_asignacion : ID . '=' expresion_aritmetica  (71)
+	error_asignacion : ID . '=' ':' error  (72)
+	invocacion : ID . '(' parametros_reales ')'  (92)
+	invocacion : ID . '(' ')'  (93)
+	error_invocacion : ID . '(' parametros_reales error  (95)
+
+	':'  shift 46
+	'('  shift 125
+	'='  shift 48
+	.  error
+
+
+state 77
 	bloque_sentencias_ejecutables : ejecucion .  (14)
 
 	.  reduce 14
 
 
-state 62
+state 78
 	bloque_ejecutable : '{' bloque_sentencias_ejecutables . '}'  (13)
 	bloque_sentencias_ejecutables : bloque_sentencias_ejecutables . ejecucion  (15)
 
-	ID  shift 60
+	ID  shift 76
 	IF  shift 8
 	OUT  shift 9
 	RETURN  shift 11
@@ -744,46 +1237,82 @@ state 62
 	DISCARD  shift 13
 	FOR  shift 14
 	CONTINUE  shift 15
-	'}'  shift 94
+	'}'  shift 129
+	'='  shift 19
 	.  error
 
-	ejecucion  goto 95
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	ejecucion  goto 130
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 63
+state 79
+	error_asignacion : '=' ':' . expresion_aritmetica  (73)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	expresion_aritmetica  goto 131
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
+
+
+state 80
 	error_programa : '{' bloque '}' .  (3)
 
 	.  reduce 3
 
 
-state 64
+state 81
 	bloque : bloque_declarativo bloque_ejecutable .  (6)
 
 	.  reduce 6
 
 
-state 65
+state 82
 	bloque_declarativo : bloque_declarativo declaracion .  (11)
 
 	.  reduce 11
 
 
-state 66
+state 83
 	lista_de_variables : ID .  (21)
+	error_declaracion_fun : ID . lista_de_parametros ':' tipo  (32)
 
-	.  reduce 21
+	error  shift 45
+	F32  shift 16
+	I32  shift 17
+	'('  shift 57
+	ID  reduce 21
+	';'  reduce 21
+	','  reduce 21
+
+	tipo  goto 49
+	lista_de_parametros  goto 50
+	parametro  goto 51
+	error_lista_de_parametros  goto 52
+	error_parametro  goto 53
 
 
-state 67
+state 84
 	bloque : bloque_ejecutable bloque_declarativo .  (7)
 	bloque_declarativo : bloque_declarativo . declaracion  (11)
 
-	ID  shift 66
+	ID  shift 83
 	FUN  shift 10
 	F32  shift 16
 	I32  shift 17
@@ -791,49 +1320,56 @@ state 67
 	error  reduce 7
 	'}'  reduce 7
 
-	declaracion  goto 65
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
+	declaracion  goto 82
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
 
 
-state 68
+state 85
+	lista_de_variables : ID .  (21)
+
+	.  reduce 21
+
+
+state 86
 	declaracion : tipo lista_de_variables . ';'  (16)
 	error_declaracion : tipo lista_de_variables . error  (20)
 	lista_de_variables : lista_de_variables . ',' ID  (22)
 	error_lista_de_variables : lista_de_variables . ID  (24)
 
-	error  shift 96
-	ID  shift 69
-	';'  shift 97
-	','  shift 71
+	error  shift 132
+	ID  shift 87
+	';'  shift 133
+	','  shift 89
 	.  error
 
 
-state 69
+state 87
 	error_lista_de_variables : lista_de_variables ID .  (24)
 
 	.  reduce 24
 
 
-state 70
+state 88
 	declaracion : lista_de_variables ';' .  (18)
 
 	.  reduce 18
 
 
-state 71
+state 89
 	lista_de_variables : lista_de_variables ',' . ID  (22)
 
-	ID  shift 98
+	ID  shift 134
 	.  error
 
 
-state 72
+state 90
 	error_funcion : declaracion_fun error . bloque '}'  (27)
 
 	ID  shift 7
@@ -848,28 +1384,35 @@ state 72
 	F32  shift 16
 	I32  shift 17
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque  goto 99
-	bloque_declarativo  goto 20
-	bloque_ejecutable  goto 21
-	declaracion  goto 22
-	ejecucion  goto 23
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque  goto 135
+	bloque_declarativo  goto 21
+	bloque_ejecutable  goto 22
+	declaracion  goto 23
+	ejecucion  goto 24
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 73
+state 91
 	funcion : declaracion_fun '{' . bloque '}'  (25)
 	error_funcion : declaracion_fun '{' . bloque error  (28)
 	error_funcion : declaracion_fun '{' . '}'  (29)
@@ -886,452 +1429,828 @@ state 73
 	F32  shift 16
 	I32  shift 17
 	'{'  shift 18
-	'}'  shift 100
+	'}'  shift 136
+	'='  shift 19
 	.  error
 
-	bloque  goto 101
-	bloque_declarativo  goto 20
-	bloque_ejecutable  goto 21
-	declaracion  goto 22
-	ejecucion  goto 23
-	tipo  goto 24
-	lista_de_variables  goto 25
-	funcion  goto 26
-	error_declaracion  goto 27
-	error_lista_de_variables  goto 28
-	declaracion_fun  goto 29
-	error_funcion  goto 30
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque  goto 137
+	bloque_declarativo  goto 21
+	bloque_ejecutable  goto 22
+	declaracion  goto 23
+	ejecucion  goto 24
+	tipo  goto 25
+	lista_de_variables  goto 26
+	funcion  goto 27
+	error_declaracion  goto 28
+	error_lista_de_variables  goto 29
+	declaracion_fun  goto 30
+	error_funcion  goto 31
+	error_declaracion_fun  goto 32
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 74
-	ejecucion : asignacion ';' .  (37)
+state 92
+	ejecucion : asignacion ';' .  (49)
 
-	.  reduce 37
-
-
-state 75
-	ejecucion : retorno ';' .  (40)
-
-	.  reduce 40
+	.  reduce 49
 
 
-state 76
-	ejecucion : control ';' .  (41)
+state 93
+	error_ejecucion : invocacion ';' .  (67)
 
-	.  reduce 41
-
-
-state 77
-	ejecucion : salida ';' .  (42)
-
-	.  reduce 42
+	.  reduce 67
 
 
-state 78
+state 94
+	ejecucion : seleccion ';' .  (51)
+
+	.  reduce 51
+
+
+state 95
+	ejecucion : retorno ';' .  (52)
+
+	.  reduce 52
+
+
+state 96
+	ejecucion : control ';' .  (53)
+
+	.  reduce 53
+
+
+state 97
+	ejecucion : salida ';' .  (54)
+
+	.  reduce 54
+
+
+state 98
 	error_programa : ID error bloque '}' .  (4)
 
 	.  reduce 4
 
 
-state 79
+state 99
 	programa : ID '{' bloque '}' .  (1)
 
 	.  reduce 1
 
 
-state 80
-	asignacion : ID '=' ':' . expresion_aritmetica  (45)
+state 100
+	error_parametro : error ID .  (46)
 
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
+	.  reduce 46
+
+
+state 101
+	error_asignacion : ID ':' expresion_aritmetica .  (70)
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
+
+	'+'  shift 121
+	'-'  shift 122
+	$end  reduce 70
+	error  reduce 70
+	ID  reduce 70
+	IF  reduce 70
+	ELSE  reduce 70
+	ENDIF  reduce 70
+	OUT  reduce 70
+	FUN  reduce 70
+	RETURN  reduce 70
+	BREAK  reduce 70
+	DISCARD  reduce 70
+	FOR  reduce 70
+	CONTINUE  reduce 70
+	F32  reduce 70
+	I32  reduce 70
+	'}'  reduce 70
+	';'  reduce 70
+	'='  reduce 70
+
+
+state 102
+	lista_de_parametros : '(' ')' .  (37)
+	invocacion : ID '(' ')' .  (93)
+
+	';'  reduce 93
+	':'  reduce 37
+
+
+state 103
+	lista_de_parametros : '(' parametro . ')'  (38)
+	lista_de_parametros : '(' parametro . ',' parametro ')'  (39)
+	error_lista_de_parametros : '(' parametro .  (42)
+
+	','  shift 138
+	')'  shift 139
+	F32  reduce 42
+	I32  reduce 42
+	':'  reduce 42
+
+
+state 104
+	parametros_reales : factor .  (96)
+	parametros_reales : factor . parametros_reales  (97)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	error  reduce 96
+	')'  reduce 96
+
+	factor  goto 104
+	parametros_reales  goto 140
+
+
+state 105
+	invocacion : ID '(' parametros_reales . ')'  (92)
+	error_invocacion : ID '(' parametros_reales . error  (95)
+
+	error  shift 141
+	')'  shift 142
 	.  error
 
-	expresion_aritmetica  goto 102
-	termino  goto 53
-	factor  goto 54
 
+state 106
+	asignacion : ID '=' ':' . expresion_aritmetica  (68)
+	error_asignacion : ID '=' ':' . error  (72)
 
-state 81
-	expresion_aritmetica : expresion_aritmetica . '+' termino  (49)
-	expresion_aritmetica : expresion_aritmetica . '-' termino  (50)
-	condicion : expresion_aritmetica . comparador expresion_aritmetica  (62)
-
-	MENOR_IGUAL  shift 45
-	MAYOR_IGUAL  shift 46
-	DISTINTO  shift 47
-	'='  shift 48
-	'+'  shift 86
-	'-'  shift 87
-	'<'  shift 49
-	'>'  shift 50
+	error  shift 143
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
 	.  error
 
-	comparador  goto 103
+	expresion_aritmetica  goto 144
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
 
 
-state 82
-	seleccion : IF '(' condicion . ')' THEN bloque_ejecutable ENDIF ';'  (60)
-	seleccion : IF '(' condicion . ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF ';'  (61)
+state 107
+	error_asignacion : ID '=' expresion_aritmetica .  (71)
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
 
-	')'  shift 104
-	.  error
+	'+'  shift 121
+	'-'  shift 122
+	$end  reduce 71
+	error  reduce 71
+	ID  reduce 71
+	IF  reduce 71
+	ELSE  reduce 71
+	ENDIF  reduce 71
+	OUT  reduce 71
+	FUN  reduce 71
+	RETURN  reduce 71
+	BREAK  reduce 71
+	DISCARD  reduce 71
+	FOR  reduce 71
+	CONTINUE  reduce 71
+	F32  reduce 71
+	I32  reduce 71
+	'}'  reduce 71
+	';'  reduce 71
+	'='  reduce 71
 
 
-state 83
-	salida : OUT '(' CADENA . ')' ';'  (73)
+state 108
+	parametro : tipo ID .  (43)
 
-	')'  shift 105
-	.  error
+	.  reduce 43
 
 
-state 84
-	lista_de_parametros : '(' . ')'  (31)
-	lista_de_parametros : '(' . parametro ')'  (32)
-	lista_de_parametros : '(' . parametro ',' parametro ')'  (33)
+state 109
+	error_declaracion_fun : ID lista_de_parametros ':' . tipo  (32)
 
 	F32  shift 16
 	I32  shift 17
-	')'  shift 106
 	.  error
 
-	tipo  goto 107
-	parametro  goto 108
+	tipo  goto 145
 
 
-state 85
+state 110
+	error_lista_de_parametros : parametro ')' .  (41)
+
+	.  reduce 41
+
+
+state 111
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
+	condicion : expresion_aritmetica . comparador expresion_aritmetica  (100)
+
+	MENOR_IGUAL  shift 146
+	MAYOR_IGUAL  shift 147
+	DISTINTO  shift 148
+	'='  shift 149
+	'+'  shift 121
+	'-'  shift 122
+	'<'  shift 150
+	'>'  shift 151
+	.  error
+
+	comparador  goto 152
+
+
+state 112
+	seleccion : IF '(' condicion . ')' THEN bloque_ejecutable ENDIF  (98)
+	seleccion : IF '(' condicion . ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF  (99)
+
+	')'  shift 153
+	.  error
+
+
+state 113
+	salida : OUT '(' CADENA . ')'  (111)
+
+	')'  shift 154
+	.  error
+
+
+state 114
+	error_declaracion_fun : FUN ID ':' . tipo  (34)
+
+	F32  shift 16
+	I32  shift 17
+	.  error
+
+	tipo  goto 155
+
+
+state 115
 	declaracion_fun : FUN ID lista_de_parametros . ':' tipo  (30)
+	error_declaracion_fun : FUN ID lista_de_parametros . tipo  (35)
+	error_declaracion_fun : FUN ID lista_de_parametros . ':'  (36)
 
-	':'  shift 109
+	F32  shift 16
+	I32  shift 17
+	':'  shift 156
+	.  error
+
+	tipo  goto 157
+
+
+state 116
+	lista_de_parametros : '(' ')' .  (37)
+
+	.  reduce 37
+
+
+state 117
+	error_declaracion_fun : FUN lista_de_parametros ':' . tipo  (33)
+
+	F32  shift 16
+	I32  shift 17
+	.  error
+
+	tipo  goto 158
+
+
+state 118
+	factor : '-' factor .  (91)
+
+	.  reduce 91
+
+
+state 119
+	error_termino : '*' factor .  (86)
+
+	.  reduce 86
+
+
+state 120
+	error_termino : '/' factor .  (87)
+
+	.  reduce 87
+
+
+state 121
+	expresion_aritmetica : expresion_aritmetica '+' . termino  (78)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	termino  goto 159
+	factor  goto 68
+	error_termino  goto 69
+
+
+state 122
+	expresion_aritmetica : expresion_aritmetica '-' . termino  (79)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	termino  goto 160
+	factor  goto 68
+	error_termino  goto 69
+
+
+state 123
+	termino : termino '*' . factor  (80)
+	error_termino : termino '*' . error  (84)
+
+	error  shift 161
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	.  error
+
+	factor  goto 162
+
+
+state 124
+	termino : termino '/' . factor  (81)
+	error_termino : termino '/' . error  (85)
+
+	error  shift 163
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	.  error
+
+	factor  goto 164
+
+
+state 125
+	invocacion : ID '(' . parametros_reales ')'  (92)
+	invocacion : ID '(' . ')'  (93)
+	error_invocacion : ID '(' . parametros_reales error  (95)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	')'  shift 165
+	'-'  shift 63
+	.  error
+
+	factor  goto 104
+	parametros_reales  goto 105
+
+
+state 126
+	ejecucion : DISCARD invocacion ';' .  (50)
+
+	.  reduce 50
+
+
+state 127
+	asignacion_for : ID . '=' ':' CTE_INT  (109)
+
+	'='  shift 166
 	.  error
 
 
-state 86
-	expresion_aritmetica : expresion_aritmetica '+' . termino  (49)
+state 128
+	control : FOR '(' asignacion_for . ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (107)
+	control : FOR '(' asignacion_for . ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (108)
 
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	termino  goto 110
-	factor  goto 54
-
-
-state 87
-	expresion_aritmetica : expresion_aritmetica '-' . termino  (50)
-
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	termino  goto 111
-	factor  goto 54
-
-
-state 88
-	termino : termino '*' . factor  (51)
-
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	factor  goto 112
-
-
-state 89
-	termino : termino '/' . factor  (52)
-
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	factor  goto 113
-
-
-state 90
-	invocacion : ID '(' . parametros_reales ')'  (57)
-
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	factor  goto 114
-	parametros_reales  goto 115
-
-
-state 91
-	ejecucion : DISCARD invocacion ';' .  (38)
-
-	.  reduce 38
-
-
-state 92
-	asignacion_for : ID . '=' ':' CTE_INT  (71)
-
-	'='  shift 116
+	';'  shift 167
 	.  error
 
 
-state 93
-	control : FOR '(' asignacion_for . ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (69)
-	control : FOR '(' asignacion_for . ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (70)
-
-	';'  shift 117
-	.  error
-
-
-state 94
+state 129
 	bloque_ejecutable : '{' bloque_sentencias_ejecutables '}' .  (13)
 
 	.  reduce 13
 
 
-state 95
+state 130
 	bloque_sentencias_ejecutables : bloque_sentencias_ejecutables ejecucion .  (15)
 
 	.  reduce 15
 
 
-state 96
+state 131
+	error_asignacion : '=' ':' expresion_aritmetica .  (73)
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
+
+	'+'  shift 121
+	'-'  shift 122
+	$end  reduce 73
+	error  reduce 73
+	ID  reduce 73
+	IF  reduce 73
+	ELSE  reduce 73
+	ENDIF  reduce 73
+	OUT  reduce 73
+	FUN  reduce 73
+	RETURN  reduce 73
+	BREAK  reduce 73
+	DISCARD  reduce 73
+	FOR  reduce 73
+	CONTINUE  reduce 73
+	F32  reduce 73
+	I32  reduce 73
+	'}'  reduce 73
+	';'  reduce 73
+	'='  reduce 73
+
+
+state 132
 	error_declaracion : tipo lista_de_variables error .  (20)
 
 	.  reduce 20
 
 
-state 97
+state 133
 	declaracion : tipo lista_de_variables ';' .  (16)
 
 	.  reduce 16
 
 
-state 98
+state 134
 	lista_de_variables : lista_de_variables ',' ID .  (22)
 
 	.  reduce 22
 
 
-state 99
+state 135
 	error_funcion : declaracion_fun error bloque . '}'  (27)
 
-	'}'  shift 118
+	'}'  shift 168
 	.  error
 
 
-state 100
+state 136
 	error_funcion : declaracion_fun '{' '}' .  (29)
 
 	.  reduce 29
 
 
-state 101
+state 137
 	funcion : declaracion_fun '{' bloque . '}'  (25)
 	error_funcion : declaracion_fun '{' bloque . error  (28)
 
-	error  shift 119
-	'}'  shift 120
+	error  shift 169
+	'}'  shift 170
 	.  error
 
 
-state 102
-	asignacion : ID '=' ':' expresion_aritmetica .  (45)
-	expresion_aritmetica : expresion_aritmetica . '+' termino  (49)
-	expresion_aritmetica : expresion_aritmetica . '-' termino  (50)
+state 138
+	lista_de_parametros : '(' parametro ',' . parametro ')'  (39)
 
-	'+'  shift 86
-	'-'  shift 87
-	';'  reduce 45
-
-
-state 103
-	condicion : expresion_aritmetica comparador . expresion_aritmetica  (62)
-
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	expresion_aritmetica  goto 121
-	termino  goto 53
-	factor  goto 54
-
-
-state 104
-	seleccion : IF '(' condicion ')' . THEN bloque_ejecutable ENDIF ';'  (60)
-	seleccion : IF '(' condicion ')' . THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF ';'  (61)
-
-	THEN  shift 122
-	.  error
-
-
-state 105
-	salida : OUT '(' CADENA ')' . ';'  (73)
-
-	';'  shift 123
-	.  error
-
-
-state 106
-	lista_de_parametros : '(' ')' .  (31)
-
-	.  reduce 31
-
-
-state 107
-	parametro : tipo . ID  (34)
-
-	ID  shift 124
-	.  error
-
-
-state 108
-	lista_de_parametros : '(' parametro . ')'  (32)
-	lista_de_parametros : '(' parametro . ',' parametro ')'  (33)
-
-	','  shift 125
-	')'  shift 126
-	.  error
-
-
-state 109
-	declaracion_fun : FUN ID lista_de_parametros ':' . tipo  (30)
-
+	error  shift 45
 	F32  shift 16
 	I32  shift 17
 	.  error
 
-	tipo  goto 127
+	tipo  goto 49
+	parametro  goto 171
+	error_parametro  goto 53
 
 
-state 110
-	expresion_aritmetica : expresion_aritmetica '+' termino .  (49)
-	termino : termino . '*' factor  (51)
-	termino : termino . '/' factor  (52)
+state 139
+	lista_de_parametros : '(' parametro ')' .  (38)
 
-	'*'  shift 88
-	'/'  shift 89
-	MENOR_IGUAL  reduce 49
-	MAYOR_IGUAL  reduce 49
-	DISTINTO  reduce 49
-	';'  reduce 49
-	')'  reduce 49
-	'='  reduce 49
-	'+'  reduce 49
-	'-'  reduce 49
-	'<'  reduce 49
-	'>'  reduce 49
+	.  reduce 38
 
 
-state 111
-	expresion_aritmetica : expresion_aritmetica '-' termino .  (50)
-	termino : termino . '*' factor  (51)
-	termino : termino . '/' factor  (52)
+state 140
+	parametros_reales : factor parametros_reales .  (97)
 
-	'*'  shift 88
-	'/'  shift 89
-	MENOR_IGUAL  reduce 50
-	MAYOR_IGUAL  reduce 50
-	DISTINTO  reduce 50
-	';'  reduce 50
-	')'  reduce 50
-	'='  reduce 50
-	'+'  reduce 50
-	'-'  reduce 50
-	'<'  reduce 50
-	'>'  reduce 50
+	.  reduce 97
 
 
-state 112
-	termino : termino '*' factor .  (51)
+state 141
+	error_invocacion : ID '(' parametros_reales error .  (95)
 
-	.  reduce 51
-
-
-state 113
-	termino : termino '/' factor .  (52)
-
-	.  reduce 52
+	.  reduce 95
 
 
-state 114
-	parametros_reales : factor .  (58)
-	parametros_reales : factor . parametros_reales  (59)
+state 142
+	invocacion : ID '(' parametros_reales ')' .  (92)
 
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	')'  reduce 58
-
-	factor  goto 114
-	parametros_reales  goto 128
+	.  reduce 92
 
 
-state 115
-	invocacion : ID '(' parametros_reales . ')'  (57)
+state 143
+	error_asignacion : ID '=' ':' error .  (72)
 
-	')'  shift 129
+	.  reduce 72
+
+
+state 144
+	asignacion : ID '=' ':' expresion_aritmetica .  (68)
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
+
+	'+'  shift 121
+	'-'  shift 122
+	$end  reduce 68
+	error  reduce 68
+	ID  reduce 68
+	IF  reduce 68
+	ELSE  reduce 68
+	ENDIF  reduce 68
+	OUT  reduce 68
+	FUN  reduce 68
+	RETURN  reduce 68
+	BREAK  reduce 68
+	DISCARD  reduce 68
+	FOR  reduce 68
+	CONTINUE  reduce 68
+	F32  reduce 68
+	I32  reduce 68
+	'}'  reduce 68
+	';'  reduce 68
+	'='  reduce 68
+
+
+state 145
+	error_declaracion_fun : ID lista_de_parametros ':' tipo .  (32)
+
+	.  reduce 32
+
+
+state 146
+	comparador : MENOR_IGUAL .  (105)
+
+	.  reduce 105
+
+
+state 147
+	comparador : MAYOR_IGUAL .  (104)
+
+	.  reduce 104
+
+
+state 148
+	comparador : DISTINTO .  (106)
+
+	.  reduce 106
+
+
+state 149
+	comparador : '=' .  (103)
+
+	.  reduce 103
+
+
+state 150
+	comparador : '<' .  (101)
+
+	.  reduce 101
+
+
+state 151
+	comparador : '>' .  (102)
+
+	.  reduce 102
+
+
+state 152
+	condicion : expresion_aritmetica comparador . expresion_aritmetica  (100)
+
+	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	expresion_aritmetica  goto 172
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
+
+
+state 153
+	seleccion : IF '(' condicion ')' . THEN bloque_ejecutable ENDIF  (98)
+	seleccion : IF '(' condicion ')' . THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF  (99)
+
+	THEN  shift 173
 	.  error
 
 
-state 116
-	asignacion_for : ID '=' . ':' CTE_INT  (71)
+state 154
+	salida : OUT '(' CADENA ')' .  (111)
 
-	':'  shift 130
+	.  reduce 111
+
+
+state 155
+	error_declaracion_fun : FUN ID ':' tipo .  (34)
+
+	.  reduce 34
+
+
+state 156
+	declaracion_fun : FUN ID lista_de_parametros ':' . tipo  (30)
+	error_declaracion_fun : FUN ID lista_de_parametros ':' .  (36)
+
+	F32  shift 16
+	I32  shift 17
+	error  reduce 36
+	'{'  reduce 36
+
+	tipo  goto 174
+
+
+state 157
+	error_declaracion_fun : FUN ID lista_de_parametros tipo .  (35)
+
+	.  reduce 35
+
+
+state 158
+	error_declaracion_fun : FUN lista_de_parametros ':' tipo .  (33)
+
+	.  reduce 33
+
+
+state 159
+	expresion_aritmetica : expresion_aritmetica '+' termino .  (78)
+	termino : termino . '*' factor  (80)
+	termino : termino . '/' factor  (81)
+	error_termino : termino . '*' error  (84)
+	error_termino : termino . '/' error  (85)
+
+	'*'  shift 123
+	'/'  shift 124
+	$end  reduce 78
+	error  reduce 78
+	ID  reduce 78
+	MENOR_IGUAL  reduce 78
+	MAYOR_IGUAL  reduce 78
+	DISTINTO  reduce 78
+	IF  reduce 78
+	ELSE  reduce 78
+	ENDIF  reduce 78
+	OUT  reduce 78
+	FUN  reduce 78
+	RETURN  reduce 78
+	BREAK  reduce 78
+	DISCARD  reduce 78
+	FOR  reduce 78
+	CONTINUE  reduce 78
+	F32  reduce 78
+	I32  reduce 78
+	'}'  reduce 78
+	';'  reduce 78
+	')'  reduce 78
+	'='  reduce 78
+	'+'  reduce 78
+	'-'  reduce 78
+	'<'  reduce 78
+	'>'  reduce 78
+
+
+state 160
+	expresion_aritmetica : expresion_aritmetica '-' termino .  (79)
+	termino : termino . '*' factor  (80)
+	termino : termino . '/' factor  (81)
+	error_termino : termino . '*' error  (84)
+	error_termino : termino . '/' error  (85)
+
+	'*'  shift 123
+	'/'  shift 124
+	$end  reduce 79
+	error  reduce 79
+	ID  reduce 79
+	MENOR_IGUAL  reduce 79
+	MAYOR_IGUAL  reduce 79
+	DISTINTO  reduce 79
+	IF  reduce 79
+	ELSE  reduce 79
+	ENDIF  reduce 79
+	OUT  reduce 79
+	FUN  reduce 79
+	RETURN  reduce 79
+	BREAK  reduce 79
+	DISCARD  reduce 79
+	FOR  reduce 79
+	CONTINUE  reduce 79
+	F32  reduce 79
+	I32  reduce 79
+	'}'  reduce 79
+	';'  reduce 79
+	')'  reduce 79
+	'='  reduce 79
+	'+'  reduce 79
+	'-'  reduce 79
+	'<'  reduce 79
+	'>'  reduce 79
+
+
+state 161
+	error_termino : termino '*' error .  (84)
+
+	.  reduce 84
+
+
+state 162
+	termino : termino '*' factor .  (80)
+
+	.  reduce 80
+
+
+state 163
+	error_termino : termino '/' error .  (85)
+
+	.  reduce 85
+
+
+state 164
+	termino : termino '/' factor .  (81)
+
+	.  reduce 81
+
+
+state 165
+	invocacion : ID '(' ')' .  (93)
+
+	.  reduce 93
+
+
+state 166
+	asignacion_for : ID '=' . ':' CTE_INT  (109)
+
+	':'  shift 175
 	.  error
 
 
-state 117
-	control : FOR '(' asignacion_for ';' . condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (69)
-	control : FOR '(' asignacion_for ';' . condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (70)
+state 167
+	control : FOR '(' asignacion_for ';' . condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (107)
+	control : FOR '(' asignacion_for ';' . condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (108)
 
-	ID  shift 131
+	ID  shift 176
 	.  error
 
-	condicion_for  goto 132
+	condicion_for  goto 177
 
 
-state 118
+state 168
 	error_funcion : declaracion_fun error bloque '}' .  (27)
 
 	.  reduce 27
 
 
-state 119
+state 169
 	error_funcion : declaracion_fun '{' bloque error .  (28)
 
 	.  reduce 28
 
 
-state 120
+state 170
 	funcion : declaracion_fun '{' bloque '}' .  (25)
 
 	.  reduce 25
 
 
-state 121
-	expresion_aritmetica : expresion_aritmetica . '+' termino  (49)
-	expresion_aritmetica : expresion_aritmetica . '-' termino  (50)
-	condicion : expresion_aritmetica comparador expresion_aritmetica .  (62)
+state 171
+	lista_de_parametros : '(' parametro ',' parametro . ')'  (39)
 
-	'+'  shift 86
-	'-'  shift 87
-	')'  reduce 62
+	')'  shift 178
+	.  error
 
 
-state 122
-	seleccion : IF '(' condicion ')' THEN . bloque_ejecutable ENDIF ';'  (60)
-	seleccion : IF '(' condicion ')' THEN . bloque_ejecutable ELSE bloque_ejecutable ENDIF ';'  (61)
+state 172
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
+	condicion : expresion_aritmetica comparador expresion_aritmetica .  (100)
 
-	ID  shift 60
+	'+'  shift 121
+	'-'  shift 122
+	')'  reduce 100
+
+
+state 173
+	seleccion : IF '(' condicion ')' THEN . bloque_ejecutable ENDIF  (98)
+	seleccion : IF '(' condicion ')' THEN . bloque_ejecutable ELSE bloque_ejecutable ENDIF  (99)
+
+	ID  shift 76
 	IF  shift 8
 	OUT  shift 9
 	RETURN  shift 11
@@ -1340,141 +2259,109 @@ state 122
 	FOR  shift 14
 	CONTINUE  shift 15
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque_ejecutable  goto 133
-	ejecucion  goto 23
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque_ejecutable  goto 179
+	ejecucion  goto 24
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 123
-	salida : OUT '(' CADENA ')' ';' .  (73)
-
-	.  reduce 73
-
-
-state 124
-	parametro : tipo ID .  (34)
-
-	.  reduce 34
-
-
-state 125
-	lista_de_parametros : '(' parametro ',' . parametro ')'  (33)
-
-	F32  shift 16
-	I32  shift 17
-	.  error
-
-	tipo  goto 107
-	parametro  goto 134
-
-
-state 126
-	lista_de_parametros : '(' parametro ')' .  (32)
-
-	.  reduce 32
-
-
-state 127
+state 174
 	declaracion_fun : FUN ID lista_de_parametros ':' tipo .  (30)
 
 	.  reduce 30
 
 
-state 128
-	parametros_reales : factor parametros_reales .  (59)
+state 175
+	asignacion_for : ID '=' ':' . CTE_INT  (109)
 
-	.  reduce 59
-
-
-state 129
-	invocacion : ID '(' parametros_reales ')' .  (57)
-
-	.  reduce 57
-
-
-state 130
-	asignacion_for : ID '=' ':' . CTE_INT  (71)
-
-	CTE_INT  shift 135
+	CTE_INT  shift 180
 	.  error
 
 
-state 131
-	condicion_for : ID . comparador expresion_aritmetica  (72)
+state 176
+	condicion_for : ID . comparador expresion_aritmetica  (110)
 
-	MENOR_IGUAL  shift 45
-	MAYOR_IGUAL  shift 46
-	DISTINTO  shift 47
-	'='  shift 48
-	'<'  shift 49
-	'>'  shift 50
+	MENOR_IGUAL  shift 146
+	MAYOR_IGUAL  shift 147
+	DISTINTO  shift 148
+	'='  shift 149
+	'<'  shift 150
+	'>'  shift 151
 	.  error
 
-	comparador  goto 136
+	comparador  goto 181
 
 
-state 132
-	control : FOR '(' asignacion_for ';' condicion_for . ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (69)
-	control : FOR '(' asignacion_for ';' condicion_for . ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (70)
+state 177
+	control : FOR '(' asignacion_for ';' condicion_for . ';' '+' CTE_INT ')' '{' bloque_ejecutable '}'  (107)
+	control : FOR '(' asignacion_for ';' condicion_for . ';' '-' CTE_INT ')' '{' bloque_ejecutable '}'  (108)
 
-	';'  shift 137
-	.  error
-
-
-state 133
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable . ENDIF ';'  (60)
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable . ELSE bloque_ejecutable ENDIF ';'  (61)
-
-	ELSE  shift 138
-	ENDIF  shift 139
+	';'  shift 182
 	.  error
 
 
-state 134
-	lista_de_parametros : '(' parametro ',' parametro . ')'  (33)
+state 178
+	lista_de_parametros : '(' parametro ',' parametro ')' .  (39)
 
-	')'  shift 140
+	.  reduce 39
+
+
+state 179
+	seleccion : IF '(' condicion ')' THEN bloque_ejecutable . ENDIF  (98)
+	seleccion : IF '(' condicion ')' THEN bloque_ejecutable . ELSE bloque_ejecutable ENDIF  (99)
+
+	ELSE  shift 183
+	ENDIF  shift 184
 	.  error
 
 
-state 135
-	asignacion_for : ID '=' ':' CTE_INT .  (71)
+state 180
+	asignacion_for : ID '=' ':' CTE_INT .  (109)
 
-	.  reduce 71
-
-
-state 136
-	condicion_for : ID comparador . expresion_aritmetica  (72)
-
-	ID  shift 42
-	CTE_INT  shift 43
-	CTE_FLOTANTE  shift 44
-	.  error
-
-	expresion_aritmetica  goto 141
-	termino  goto 53
-	factor  goto 54
+	.  reduce 109
 
 
-state 137
-	control : FOR '(' asignacion_for ';' condicion_for ';' . '+' CTE_INT ')' '{' bloque_ejecutable '}'  (69)
-	control : FOR '(' asignacion_for ';' condicion_for ';' . '-' CTE_INT ')' '{' bloque_ejecutable '}'  (70)
-
-	'+'  shift 142
-	'-'  shift 143
-	.  error
-
-
-state 138
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ELSE . bloque_ejecutable ENDIF ';'  (61)
+state 181
+	condicion_for : ID comparador . expresion_aritmetica  (110)
 
 	ID  shift 60
+	CTE_INT  shift 61
+	CTE_FLOTANTE  shift 62
+	'-'  shift 63
+	'*'  shift 64
+	'/'  shift 65
+	.  error
+
+	expresion_aritmetica  goto 185
+	termino  goto 67
+	factor  goto 68
+	error_termino  goto 69
+
+
+state 182
+	control : FOR '(' asignacion_for ';' condicion_for ';' . '+' CTE_INT ')' '{' bloque_ejecutable '}'  (107)
+	control : FOR '(' asignacion_for ';' condicion_for ';' . '-' CTE_INT ')' '{' bloque_ejecutable '}'  (108)
+
+	'+'  shift 186
+	'-'  shift 187
+	.  error
+
+
+state 183
+	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ELSE . bloque_ejecutable ENDIF  (99)
+
+	ID  shift 76
 	IF  shift 8
 	OUT  shift 9
 	RETURN  shift 11
@@ -1483,112 +2370,98 @@ state 138
 	FOR  shift 14
 	CONTINUE  shift 15
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque_ejecutable  goto 144
-	ejecucion  goto 23
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque_ejecutable  goto 188
+	ejecucion  goto 24
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 139
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF . ';'  (60)
+state 184
+	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF .  (98)
 
-	';'  shift 145
-	.  error
-
-
-state 140
-	lista_de_parametros : '(' parametro ',' parametro ')' .  (33)
-
-	.  reduce 33
+	.  reduce 98
 
 
-state 141
-	expresion_aritmetica : expresion_aritmetica . '+' termino  (49)
-	expresion_aritmetica : expresion_aritmetica . '-' termino  (50)
-	condicion_for : ID comparador expresion_aritmetica .  (72)
+state 185
+	expresion_aritmetica : expresion_aritmetica . '+' termino  (78)
+	expresion_aritmetica : expresion_aritmetica . '-' termino  (79)
+	condicion_for : ID comparador expresion_aritmetica .  (110)
 
-	'+'  shift 86
-	'-'  shift 87
-	';'  reduce 72
-
-
-state 142
-	control : FOR '(' asignacion_for ';' condicion_for ';' '+' . CTE_INT ')' '{' bloque_ejecutable '}'  (69)
-
-	CTE_INT  shift 146
-	.  error
+	'+'  shift 121
+	'-'  shift 122
+	';'  reduce 110
 
 
-state 143
-	control : FOR '(' asignacion_for ';' condicion_for ';' '-' . CTE_INT ')' '{' bloque_ejecutable '}'  (70)
+state 186
+	control : FOR '(' asignacion_for ';' condicion_for ';' '+' . CTE_INT ')' '{' bloque_ejecutable '}'  (107)
 
-	CTE_INT  shift 147
+	CTE_INT  shift 189
 	.  error
 
 
-state 144
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable . ENDIF ';'  (61)
+state 187
+	control : FOR '(' asignacion_for ';' condicion_for ';' '-' . CTE_INT ')' '{' bloque_ejecutable '}'  (108)
 
-	ENDIF  shift 148
+	CTE_INT  shift 190
 	.  error
 
 
-state 145
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF ';' .  (60)
+state 188
+	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable . ENDIF  (99)
 
-	.  reduce 60
-
-
-state 146
-	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT . ')' '{' bloque_ejecutable '}'  (69)
-
-	')'  shift 149
+	ENDIF  shift 191
 	.  error
 
 
-state 147
-	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT . ')' '{' bloque_ejecutable '}'  (70)
+state 189
+	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT . ')' '{' bloque_ejecutable '}'  (107)
 
-	')'  shift 150
+	')'  shift 192
 	.  error
 
 
-state 148
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF . ';'  (61)
+state 190
+	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT . ')' '{' bloque_ejecutable '}'  (108)
 
-	';'  shift 151
+	')'  shift 193
 	.  error
 
 
-state 149
-	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' . '{' bloque_ejecutable '}'  (69)
+state 191
+	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF .  (99)
 
-	'{'  shift 152
+	.  reduce 99
+
+
+state 192
+	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' . '{' bloque_ejecutable '}'  (107)
+
+	'{'  shift 194
 	.  error
 
 
-state 150
-	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' . '{' bloque_ejecutable '}'  (70)
+state 193
+	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' . '{' bloque_ejecutable '}'  (108)
 
-	'{'  shift 153
+	'{'  shift 195
 	.  error
 
 
-state 151
-	seleccion : IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF ';' .  (61)
+state 194
+	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' . bloque_ejecutable '}'  (107)
 
-	.  reduce 61
-
-
-state 152
-	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' . bloque_ejecutable '}'  (69)
-
-	ID  shift 60
+	ID  shift 76
 	IF  shift 8
 	OUT  shift 9
 	RETURN  shift 11
@@ -1597,21 +2470,27 @@ state 152
 	FOR  shift 14
 	CONTINUE  shift 15
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque_ejecutable  goto 154
-	ejecucion  goto 23
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque_ejecutable  goto 196
+	ejecucion  goto 24
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 153
-	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' . bloque_ejecutable '}'  (70)
+state 195
+	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' . bloque_ejecutable '}'  (108)
 
-	ID  shift 60
+	ID  shift 76
 	IF  shift 8
 	OUT  shift 9
 	RETURN  shift 11
@@ -1620,42 +2499,48 @@ state 153
 	FOR  shift 14
 	CONTINUE  shift 15
 	'{'  shift 18
+	'='  shift 19
 	.  error
 
-	bloque_ejecutable  goto 155
-	ejecucion  goto 23
-	asignacion  goto 31
-	seleccion  goto 32
-	retorno  goto 33
-	control  goto 34
-	salida  goto 35
+	bloque_ejecutable  goto 197
+	ejecucion  goto 24
+	asignacion  goto 33
+	invocacion  goto 34
+	seleccion  goto 35
+	retorno  goto 36
+	control  goto 37
+	salida  goto 38
+	error_ejecucion  goto 39
+	error_asignacion  goto 40
+	error_retorno  goto 41
+	error_invocacion  goto 42
 
 
-state 154
-	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable . '}'  (69)
+state 196
+	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable . '}'  (107)
 
-	'}'  shift 156
+	'}'  shift 198
 	.  error
 
 
-state 155
-	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable . '}'  (70)
+state 197
+	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable . '}'  (108)
 
-	'}'  shift 157
+	'}'  shift 199
 	.  error
 
 
-state 156
-	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}' .  (69)
+state 198
+	control : FOR '(' asignacion_for ';' condicion_for ';' '+' CTE_INT ')' '{' bloque_ejecutable '}' .  (107)
 
-	.  reduce 69
-
-
-state 157
-	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}' .  (70)
-
-	.  reduce 70
+	.  reduce 107
 
 
-37 terminals, 32 nonterminals
-74 grammar rules, 158 states
+state 199
+	control : FOR '(' asignacion_for ';' condicion_for ';' '-' CTE_INT ')' '{' bloque_ejecutable '}' .  (108)
+
+	.  reduce 108
+
+
+37 terminals, 40 nonterminals
+112 grammar rules, 200 states

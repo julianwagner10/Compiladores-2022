@@ -88,56 +88,99 @@ parametro : tipo ID
           ;
 
 error_parametro : tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador del parametro");}
-                | error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo del parametro");}
+                | error ID {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo del parametro");}
                 ;
 
 tipo : I32 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó un tipo INT LARGO I32");}
      | F32 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó un tipo FLOAT F32");}
      ;
 
-
 ejecucion : asignacion ';'
 	      | DISCARD invocacion ';'
-	      | seleccion
+	      | seleccion ';'
 	      | retorno ';'
 	      | control ';'
-	      | salida';'
+	      | salida ';'
 	      | BREAK ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
 	      | CONTINUE ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
+	      | error_ejecucion
           ;
 
+error_ejecucion : asignacion {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la asignacion");}
+                |seleccion {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
+                |retorno {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
+                |control {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del for");}
+                |salida {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
+                |BREAK {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
+                |CONTINUE {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
+                |DISCARD ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
+                |DISCARD invocacion {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la invocacion");}
+                | invocacion ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
+                ;
+
 asignacion : ID '=' ':' expresion_aritmetica
+           | error_asignacion
            ;
 
+error_asignacion : ID ':' expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta '=' en la asignacion");}
+                 | ID '=' expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' en la asignacion");}
+                 | ID '=' ':' error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la asignacion");}
+                 | '=' ':' expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
+                 ;
+
 retorno : RETURN expresion_aritmetica
-        | RETURN comparador
+        | error_retorno
         ;
+
+error_retorno : RETURN error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra return");}
+              ;
 
 expresion_aritmetica : termino
 	                 | expresion_aritmetica '+' termino { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una suma");}
 	                 | expresion_aritmetica '-' termino { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una resta");}
+	                 //| error_expresion_aritmetica
                      ;
+
+/*error_expresion_aritmetica : expresion_aritmetica '+' error{System.out.println("Error sináctico: Linea " + Lexico.linea + "falta el termino luego de un '+' ");}
+                           |expresion_aritmetica '-' error{System.out.println("Error sináctico: Linea " + Lexico.linea + "falta el termino luego de un '+' ");}
+                           |expresion_aritmetica termino {System.out.println("Error sináctico: Linea " + Lexico.linea + "falta un '+' o un '-' entre la expresion y el termino ");}
+                           ;*/
+
 
 termino : termino '*' factor { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");}
 	    | termino '/' factor  { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una division");}
 	    | factor
+	    | error_termino
         ;
+
+error_termino : termino '*' error{System.out.println("Error sináctico: Linea " + Lexico.linea + "falta el factor luego de un '*' ");}
+              | termino '/' error{System.out.println("Error sináctico: Linea " + Lexico.linea + "falta el factor luego de un '/' ");}
+              | '*' factor {System.out.println("Error sináctico: Linea " + Lexico.linea + "falta el termino antes de un '*' ");}
+              | '/' factor {System.out.println("Error sináctico: Linea " + Lexico.linea + "falta el termino antes de un '/' ");}
+              ;
+
 
 factor 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}
         | CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
         | CTE_INT {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + $1.sval);}
+        | '-' factor
         ;
 
-invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una resta");}
+invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
+           | ID '(' ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
+           | error_invocacion
            ;
+
+error_invocacion : ID '(' parametros_reales  {System.out.println("Error sináctico: Linea " + Lexico.linea + "Falta EL ')' que encierra los parametros");}
+                 ;
 
 //Uso factor o creo uno nuevo(pq en factor esta la invocacion..)
 parametros_reales : factor
                   | factor parametros_reales
                   ;
 
-seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF';' {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
-	      | IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
+seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
+	      | IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
 	      ;
 
 condicion : expresion_aritmetica comparador expresion_aritmetica
@@ -162,7 +205,7 @@ condicion_for: ID comparador expresion_aritmetica
              ;
 
 
-salida : OUT '('CADENA')'';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");}
+salida : OUT '('CADENA')'{System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");}
        ;
 
 
