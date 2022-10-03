@@ -86,7 +86,7 @@ public class Lexico {
     private AccionSemantica[][] accionesEnTabla = {
             //L,l  _  d  .   +   -  <  >  =  ‘  !  /  :  bt nl 'F' ot $
             //0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  16  17
-            {as1, err1, as1, as1, as6, as6, null, null, null, as1, null, null, as6, null, null, as1, as6, null},//0
+            {as1, err1, as1, as1, as6, as6, null, null, null, as1, null, as6, as6, null, null, as1, as6, null},//0
             {as2, as2, as2, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as3, as2, as3, as3 },//1
             {as4, as4, as2, as2, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4, as4 },//2
             {err2, err2, as2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2, err2},//3

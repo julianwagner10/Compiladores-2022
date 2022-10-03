@@ -10,14 +10,13 @@ import Principal.*;
 %%
 
 programa : ID '{'bloque'}' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
-         //| error {System.out.println("Error sináctico: Linea " + Lexico.linea + " programa mal declarado");}
-         //| error_programa;
+         | error_programa;
          ;
 
-/*error_programa : '{'bloque'}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador de programa");}
+error_programa : '{'bloque'}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador de programa");}
                | ID error bloque'}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la llave de apertura de bloque de programa");}
                | ID '{'bloque {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la llave de cierre de bloque de programa");}
-               ;*/
+               ;
 
 bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero declarativo y luego ejecutable ");}
        | bloque_ejecutable bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero ejecutable y luego declarativo ");}
@@ -30,12 +29,9 @@ bloque_declarativo : declaracion
 				   ;
 
 bloque_ejecutable : ejecucion
-                  | '{' bloque_sentencias_ejecutables '}'
+                  | bloque_ejecutable ejecucion
                   ;
 
-bloque_sentencias_ejecutables : ejecucion
-                              | bloque_sentencias_ejecutables ejecucion
-                              ;
 
 declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion
@@ -179,9 +175,13 @@ parametros_reales : factor
                   | factor parametros_reales
                   ;
 
-seleccion : IF '(' condicion ')' THEN bloque_ejecutable ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
-	      | IF '(' condicion ')' THEN bloque_ejecutable ELSE bloque_ejecutable ENDIF {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
+seleccion : IF '(' condicion ')' THEN bloque_if ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
+	      | IF '(' condicion ')' THEN bloque_if ELSE bloque_ejecutable ENDIF {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
 	      ;
+
+bloque_if : ejecucion
+          | '{' bloque_ejecutable '}'
+
 
 condicion : expresion_aritmetica comparador expresion_aritmetica
           ;
