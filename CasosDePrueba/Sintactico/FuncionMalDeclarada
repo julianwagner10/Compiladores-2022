@@ -1,0 +1,5 @@
+Programa{
+fun x(i32 y):i32
+    {
+    }
+}

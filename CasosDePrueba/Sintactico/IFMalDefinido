@@ -1,0 +1,9 @@
+Programa{
+
+if (x>2) then
+
+    x=:2;
+    return x;
+    }
+end_if;
+}

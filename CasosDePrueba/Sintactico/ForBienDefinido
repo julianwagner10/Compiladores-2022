@@ -1,0 +1,8 @@
+programa{
+
+for (id=:2 ; id>4 ; +2){
+x=:2;
+return 2;
+};
+
+}
