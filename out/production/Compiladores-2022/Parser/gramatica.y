@@ -32,7 +32,6 @@ bloque_ejecutable : ejecucion
                   | bloque_ejecutable ejecucion
                   ;
 
-
 declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion
             | error_declaracion
@@ -142,9 +141,8 @@ expresion_aritmetica : termino
                      ;
 
 error_expresion_aritmetica : expresion_aritmetica '+' error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '+' ");}
-                           |expresion_aritmetica '-' error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '-' ");}
+                           | expresion_aritmetica '-' error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '-' ");}
                            ;
-
 
 termino : termino '*' factor { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");}
 	    | termino '/' factor  { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una division");}
@@ -158,39 +156,42 @@ error_termino : termino '*' error{System.out.println("Error sináctico: Linea " 
               | '/' factor {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '/' ");}
               ;
 
-
 factor 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}
         | CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
         | CTE_INT {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + $1.sval);}
-        | invocacion
+        | invocacion {System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");}
         | '-' factor
         ;
 
 invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
            | ID '('  ')'
-           //| error_invocacion
+           | error_invocacion
            ;
 
-/*
-error_invocacion : ID '(' parametros_reales error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
-               //  | ID  ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
+error_invocacion : ID '(' error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
+                 | ID '(' parametros_reales error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
+                 //| ID parametros_reales ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de apertura de la invocacion ");}
+                 //| ID ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de apertura de la invocacion ");}
                  ;
-*/
+
 parametros_reales : factor_invocacion
                   | factor_invocacion  ','  factor_invocacion
+                  | error_parametros_reales
                   ;
 
-factor_invocacion 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}
-        | CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
-        | CTE_INT {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + $1.sval);}
-        | '-' factor
-        ;
+error_parametros_reales : factor_invocacion factor_invocacion {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los parametros reales ");}
+                        ;
 
+factor_invocacion 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}
+                    | CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
+                    | CTE_INT {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + $1.sval);}
+                    | '-' factor_invocacion
+                    ;
 
 seleccion : IF '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
 	      | IF '(' condicion ')' THEN bloque_if_for ELSE bloque_if_for ENDIF {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
           | error_seleccion
-;
+          ;
 
 error_seleccion: '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
                | IF condicion ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' del IF ");}
@@ -201,15 +202,14 @@ error_seleccion: '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println(
                | IF '(' condicion ')' THEN bloque_if_for error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ENDIF ");}
                ;
 
-
 bloque_if_for : ejecucion
-          | '{' bloque_ejecutable '}'
-          | error_bloque_if
-          ;
+              | '{' bloque_ejecutable '}'
+              | error_bloque_if
+              ;
 
 error_bloque_if : bloque_ejecutable '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable ");}
-          | '{' bloque_ejecutable  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable ");}
-          ;
+                | '{' bloque_ejecutable  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable ");}
+                ;
 
 condicion : expresion_aritmetica comparador expresion_aritmetica
           ;
@@ -231,6 +231,7 @@ error_control : FOR '(' asignacion_for';'condicion_for';'  CTE_INT')' bloque_if_
               | FOR '(' asignacion_for';'condicion_for';' '-' ')' bloque_if_for {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
               | FOR '(' asignacion_for';'condicion_for';' '+' ')' bloque_if_for {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
               ;
+
 asignacion_for: ID ASIGNACION CTE_INT
               | error_asignacion_for
               ;
@@ -247,7 +248,7 @@ condicion_for: ID comparador expresion_aritmetica
 error_condicion_for : comparador expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la condicion del for ");}
                     | ID expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el comparador en la condicion del for ");}
                     | ID comparador  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la condicion del for ");}
-
+                    ;
 
 salida : OUT '('CADENA')'{System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");}
        | error_salida
