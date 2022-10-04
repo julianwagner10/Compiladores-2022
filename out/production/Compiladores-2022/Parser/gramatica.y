@@ -20,7 +20,11 @@ error_programa : '{'bloque'}' {System.out.println("Error sináctico: Linea " + L
 
 bloque : sentencia
        | bloque sentencia
+       | error_bloque
        ;
+
+error_bloque: error {System.out.println("Error sináctico: Linea " + Lexico.linea + " no es una sentencia declarativa o ejecutable valida");}
+            ;
 
 sentencia : declaracion
           | ejecucion
@@ -39,7 +43,9 @@ bloque_declarativo : declaracion
 */
 
 bloque_ejecutable : ejecucion
+                  | ejecucion_control
                   | bloque_ejecutable ejecucion
+                  | bloque_ejecutable ejecucion_control
                   ;
 
 
@@ -112,8 +118,6 @@ ejecucion : asignacion ';'
 	      | retorno ';'
 	      | control ';'
 	      | salida ';'
-	      | BREAK ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
-	      | CONTINUE ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
 	      | error_ejecucion
           ;
 
@@ -121,13 +125,20 @@ error_ejecucion : asignacion error{System.out.println("Error sináctico: Linea "
                 | seleccion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
                 | control error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del for");}
                 | salida error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
-                | BREAK error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
                 | retorno error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
-                | CONTINUE error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
                 | DISCARD ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
                 | DISCARD invocacion error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la invocacion");}
                 | invocacion ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
                 ;
+
+ejecucion_control: BREAK ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
+                 | CONTINUE ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
+                 | error_ejecucion_control
+                 ;
+
+error_ejecucion_control: BREAK error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
+                       | CONTINUE error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
+                       ;
 
 asignacion : ID ASIGNACION expresion_aritmetica
            | error_asignacion
