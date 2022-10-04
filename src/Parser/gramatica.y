@@ -116,6 +116,7 @@ ejecucion : asignacion ';'
 	      | DISCARD invocacion ';'
 	      | seleccion ';'
 	      | retorno ';'
+	      | ID ':' control';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
 	      | control ';'
 	      | salida ';'
 	      | error_ejecucion
@@ -124,6 +125,9 @@ ejecucion : asignacion ';'
 error_ejecucion : asignacion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la asignacion");}
                 | seleccion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
                 | control error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del for");}
+                | ':' control ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta de la sentencia de control");}
+                | ID ':' ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la sentencia de control en la etiqueta");}
+                | ID control ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' en la etiqueta");}
                 | salida error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
                 | retorno error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
                 | DISCARD ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
@@ -133,11 +137,15 @@ error_ejecucion : asignacion error{System.out.println("Error sináctico: Linea "
 
 ejecucion_control: BREAK ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
                  | CONTINUE ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
+                 | CONTINUE ':' ID ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia continue con etiqueta: " +$3.sval);}
                  | error_ejecucion_control
                  ;
 
 error_ejecucion_control: BREAK error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
                        | CONTINUE error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
+                       | CONTINUE ID ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo a la etiqueta del continue");}
+                       | CONTINUE ':' ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta del continue");}
+                       | CONTINUE ':' ID error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
                        ;
 
 asignacion : ID ASIGNACION expresion_aritmetica

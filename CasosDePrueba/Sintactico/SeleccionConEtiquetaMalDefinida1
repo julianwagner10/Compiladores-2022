@@ -1,0 +1,7 @@
+programa{
+etiqueta  for (id=:2 ; id>4 ; +2){
+    if(x<z)then
+        continue : etiqueta;
+    end_if;
+    };
+}
