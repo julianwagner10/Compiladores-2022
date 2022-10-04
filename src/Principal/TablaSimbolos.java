@@ -62,9 +62,11 @@ public class TablaSimbolos {
         Enumeration iterator = tablaSimbolos.keys();
         while(iterator.hasMoreElements()){
             String lexema = (String)iterator.nextElement();
-            AtributosTablaS ats = tablaSimbolos.get(lexema);
-            System.out.print("Id:" + ats.getIdentificador() + " Lexema: " + lexema);
-            System.out.println();
+            if (!esPalabraReservada(lexema)) {
+                AtributosTablaS ats = tablaSimbolos.get(lexema);
+                System.out.print("Id:" + ats.getIdentificador() + " Lexema: " + lexema);
+                System.out.println();
+            }
         }
     }
 }

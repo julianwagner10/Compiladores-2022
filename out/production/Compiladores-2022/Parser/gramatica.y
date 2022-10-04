@@ -168,14 +168,14 @@ factor 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó
 
 invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
            | ID '('  ')'
-           | error_invocacion
+           //| error_invocacion
            ;
 
-
+/*
 error_invocacion : ID '(' parametros_reales error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
                //  | ID  ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
                  ;
-
+*/
 parametros_reales : factor_invocacion
                   | factor_invocacion  ','  factor_invocacion
                   ;

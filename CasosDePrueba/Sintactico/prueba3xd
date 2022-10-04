@@ -1,2 +1,5 @@
 Programa{
+
+i32 x;
+
 }
