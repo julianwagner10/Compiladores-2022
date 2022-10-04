@@ -4,7 +4,7 @@ if ( izq<der ) then
 {
 continue;
 break;
-out('hola')
+out('hola');
 }
 end_if;
 }

@@ -9,7 +9,7 @@ import Principal.*;
 
 %%
 
-programa : ID '{'bloque'}' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
+programa : ID '{' bloque'}' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
          | error_programa;
          ;
 
@@ -18,7 +18,16 @@ error_programa : '{'bloque'}' {System.out.println("Error sináctico: Linea " + L
                | ID '{'bloque  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la llave de cierre de bloque de programa");}
                ;
 
-bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero declarativo y luego ejecutable ");}
+bloque : sentencia
+       | bloque sentencia
+       ;
+
+sentencia : declaracion
+          | ejecucion
+          ;
+
+
+/*bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero declarativo y luego ejecutable ");}
        | bloque_ejecutable bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero ejecutable y luego declarativo ");}
        | bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque declarativo ");}
        | bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque ejecutable ");}
@@ -27,10 +36,12 @@ bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Lin
 bloque_declarativo : declaracion
 				   | bloque_declarativo declaracion
 				   ;
+*/
 
 bloque_ejecutable : ejecucion
                   | bloque_ejecutable ejecucion
                   ;
+
 
 declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion
@@ -107,14 +118,14 @@ ejecucion : asignacion ';'
           ;
 
 error_ejecucion : asignacion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la asignacion");}
-                |seleccion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
-                |control error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del for");}
-                |salida error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
-                |BREAK error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
-                |retorno error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
-                |CONTINUE error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
-                |DISCARD ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
-                |DISCARD invocacion error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la invocacion");}
+                | seleccion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
+                | control error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del for");}
+                | salida error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
+                | BREAK error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
+                | retorno error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
+                | CONTINUE error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
+                | DISCARD ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
+                | DISCARD invocacion error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la invocacion");}
                 | invocacion ';'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
                 ;
 
@@ -168,10 +179,10 @@ invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea 
            | error_invocacion
            ;
 
-error_invocacion : ID '(' error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
-                 | ID '(' parametros_reales error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
-                 //| ID parametros_reales ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de apertura de la invocacion ");}
-                 //| ID ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de apertura de la invocacion ");}
+error_invocacion : ID '(' parametros_reales error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
+                 //| ID error parametros_reales ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' de apertura de la invocacion ");}
+                 | ID '(' error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
+                 //| ID error')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' de apertura de la invocacion ");}
                  ;
 
 parametros_reales : factor_invocacion
@@ -179,7 +190,7 @@ parametros_reales : factor_invocacion
                   | error_parametros_reales
                   ;
 
-error_parametros_reales : factor_invocacion factor_invocacion {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los parametros reales ");}
+error_parametros_reales : factor_invocacion factor_invocacion {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
                         ;
 
 factor_invocacion 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}

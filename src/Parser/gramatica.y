@@ -9,7 +9,7 @@ import Principal.*;
 
 %%
 
-programa : ID '{'bloque'}' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
+programa : ID '{' bloque'}' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
          | error_programa;
          ;
 
@@ -18,7 +18,16 @@ error_programa : '{'bloque'}' {System.out.println("Error sináctico: Linea " + L
                | ID '{'bloque  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la llave de cierre de bloque de programa");}
                ;
 
-bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero declarativo y luego ejecutable ");}
+bloque : sentencia
+       | bloque sentencia
+       ;
+
+sentencia : declaracion
+          | ejecucion
+          ;
+
+
+/*bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero declarativo y luego ejecutable ");}
        | bloque_ejecutable bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero ejecutable y luego declarativo ");}
        | bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque declarativo ");}
        | bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque ejecutable ");}
@@ -27,10 +36,12 @@ bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Lin
 bloque_declarativo : declaracion
 				   | bloque_declarativo declaracion
 				   ;
+*/
 
 bloque_ejecutable : ejecucion
                   | bloque_ejecutable ejecucion
                   ;
+
 
 declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion
