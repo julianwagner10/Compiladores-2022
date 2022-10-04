@@ -141,13 +141,17 @@ error_ejecucion_control: BREAK error{System.out.println("Error sináctico: Linea
                        ;
 
 asignacion : ID ASIGNACION expresion_aritmetica
+           | ID ASIGNACION control
            | error_asignacion
            ;
 
 error_asignacion : ID error expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
+                 | ID error control {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
                  | ID ASIGNACION error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la asignacion");}
                  | ASIGNACION expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
+                 | ASIGNACION control {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
                  ;
+
 
 retorno : RETURN expresion_aritmetica
         | error_retorno
@@ -225,6 +229,7 @@ error_seleccion: '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println(
                ;
 
 bloque_if_for : ejecucion
+              | ejecucion_control
               | '{' bloque_ejecutable '}'
               | error_bloque_if
               ;
