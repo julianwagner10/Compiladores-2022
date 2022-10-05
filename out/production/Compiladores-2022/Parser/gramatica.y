@@ -30,24 +30,11 @@ sentencia : declaracion
           | ejecucion
           ;
 
-
-/*bloque : bloque_declarativo bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero declarativo y luego ejecutable ");}
-       | bloque_ejecutable bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa declarado, es primero ejecutable y luego declarativo ");}
-       | bloque_declarativo {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque declarativo ");}
-       | bloque_ejecutable {System.out.println("[Parser | Linea " + Lexico.linea + "] el bloque de programa es solo bloque ejecutable ");}
-       ;
-
-bloque_declarativo : declaracion
-				   | bloque_declarativo declaracion
-				   ;
-*/
-
 bloque_ejecutable : ejecucion
                   | ejecucion_control
                   | bloque_ejecutable ejecucion
                   | bloque_ejecutable ejecucion_control
                   ;
-
 
 declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion
@@ -149,7 +136,7 @@ error_ejecucion_control: BREAK error{System.out.println("Error sináctico: Linea
                        ;
 
 asignacion : ID ASIGNACION expresion_aritmetica
-           | ID ASIGNACION control
+           | ID ASIGNACION control {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");}
            | error_asignacion
            ;
 
@@ -159,7 +146,6 @@ error_asignacion : ID error expresion_aritmetica {System.out.println("Error sin�
                  | ASIGNACION expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
                  | ASIGNACION control {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
                  ;
-
 
 retorno : RETURN expresion_aritmetica
         | error_retorno
@@ -203,9 +189,7 @@ invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea 
            ;
 
 error_invocacion : ID '(' parametros_reales error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
-                 //| ID error parametros_reales ')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' de apertura de la invocacion ");}
                  | ID '(' error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
-                 //| ID error')' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' de apertura de la invocacion ");}
                  ;
 
 parametros_reales : factor_invocacion
@@ -232,7 +216,7 @@ error_seleccion: '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println(
                | IF '(' ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la condicion del IF ");}
                | IF '(' condicion  THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' del IF ");}
                | IF '(' condicion ')'  bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el THEN del IF ");}
-               | IF '(' condicion ')' THEN  ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el bloque del IF ");}
+               | IF '(' condicion ')' THEN  ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable del IF ");}
                | IF '(' condicion ')' THEN bloque_if_for error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ENDIF ");}
                ;
 

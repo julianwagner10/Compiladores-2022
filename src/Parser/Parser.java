@@ -701,7 +701,7 @@ final static String yyrule[] = {
 "error_salida : OUT '(' CADENA",
 };
 
-//#line 297 "gramatica.y"
+//#line 281 "gramatica.y"
 
 private Lexico lexico;
 
@@ -926,398 +926,402 @@ case 9:
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " no es una sentencia declarativa o ejecutable valida");}
 break;
 case 16:
-//#line 52 "gramatica.y"
+//#line 39 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
 break;
 case 19:
-//#line 57 "gramatica.y"
+//#line 44 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la declaracion de variables");}
 break;
 case 20:
-//#line 58 "gramatica.y"
+//#line 45 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo de la variable");}
 break;
 case 21:
-//#line 59 "gramatica.y"
+//#line 46 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador de la variable");}
 break;
 case 22:
-//#line 62 "gramatica.y"
+//#line 49 "gramatica.y"
 {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + val_peek(0).sval);}
 break;
 case 23:
-//#line 63 "gramatica.y"
+//#line 50 "gramatica.y"
 {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + val_peek(0).sval);}
 break;
 case 25:
-//#line 67 "gramatica.y"
+//#line 54 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ',' entre identificadores de variables");}
 break;
 case 26:
-//#line 68 "gramatica.y"
+//#line 55 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador antes de la coma");}
 break;
 case 27:
-//#line 69 "gramatica.y"
+//#line 56 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador despues de la coma");}
 break;
 case 28:
-//#line 72 "gramatica.y"
+//#line 59 "gramatica.y"
 {System.out.println("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");}
 break;
 case 30:
-//#line 76 "gramatica.y"
+//#line 63 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de apertura al bloque de la funcion");}
 break;
 case 31:
-//#line 77 "gramatica.y"
+//#line 64 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de cierre al bloque de la funcion");}
 break;
 case 32:
-//#line 78 "gramatica.y"
+//#line 65 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta bloque de la funcion");}
 break;
 case 35:
-//#line 85 "gramatica.y"
+//#line 72 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada fun");}
 break;
 case 36:
-//#line 86 "gramatica.y"
+//#line 73 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta identificador de funcion");}
 break;
 case 37:
-//#line 87 "gramatica.y"
+//#line 74 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta lista de parametros de funcion");}
 break;
 case 38:
-//#line 88 "gramatica.y"
+//#line 75 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo al tipo que devuelve la funcion");}
 break;
 case 39:
-//#line 89 "gramatica.y"
+//#line 76 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion");}
 break;
 case 44:
-//#line 98 "gramatica.y"
+//#line 85 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta parentesis de apertura de lista de parametros");}
 break;
 case 45:
-//#line 99 "gramatica.y"
+//#line 86 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta parentesis de cierre de lista de parametros");}
 break;
 case 46:
-//#line 100 "gramatica.y"
+//#line 87 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " el número máximo de parámetros permitidos es 2");}
 break;
 case 49:
-//#line 107 "gramatica.y"
+//#line 94 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador del parametro");}
 break;
 case 50:
-//#line 108 "gramatica.y"
+//#line 95 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo del parametro");}
 break;
 case 51:
-//#line 111 "gramatica.y"
+//#line 98 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó un tipo INT LARGO I32");}
 break;
 case 52:
-//#line 112 "gramatica.y"
+//#line 99 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó un tipo FLOAT F32");}
 break;
 case 57:
-//#line 119 "gramatica.y"
+//#line 106 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +val_peek(3).sval);}
 break;
 case 61:
-//#line 125 "gramatica.y"
+//#line 112 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la asignacion");}
 break;
 case 62:
-//#line 126 "gramatica.y"
+//#line 113 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
 break;
 case 63:
-//#line 127 "gramatica.y"
+//#line 114 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del for");}
 break;
 case 64:
-//#line 128 "gramatica.y"
+//#line 115 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta de la sentencia de control");}
 break;
 case 65:
-//#line 129 "gramatica.y"
+//#line 116 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la sentencia de control en la etiqueta");}
 break;
 case 66:
-//#line 130 "gramatica.y"
+//#line 117 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' en la etiqueta");}
 break;
 case 67:
-//#line 131 "gramatica.y"
+//#line 118 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
 break;
 case 68:
-//#line 132 "gramatica.y"
+//#line 119 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
 break;
 case 69:
-//#line 133 "gramatica.y"
+//#line 120 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
 break;
 case 70:
-//#line 134 "gramatica.y"
+//#line 121 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la invocacion");}
 break;
 case 71:
-//#line 135 "gramatica.y"
+//#line 122 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
 break;
 case 72:
-//#line 138 "gramatica.y"
+//#line 125 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
 break;
 case 73:
-//#line 139 "gramatica.y"
+//#line 126 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
 break;
 case 74:
-//#line 140 "gramatica.y"
+//#line 127 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia continue con etiqueta: " +val_peek(1).sval);}
 break;
 case 76:
-//#line 144 "gramatica.y"
+//#line 131 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
 break;
 case 77:
-//#line 145 "gramatica.y"
+//#line 132 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
 break;
 case 78:
-//#line 146 "gramatica.y"
+//#line 133 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo a la etiqueta del continue");}
 break;
 case 79:
-//#line 147 "gramatica.y"
+//#line 134 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta del continue");}
 break;
 case 80:
-//#line 148 "gramatica.y"
+//#line 135 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
 break;
+case 82:
+//#line 139 "gramatica.y"
+{System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");}
+break;
 case 84:
-//#line 156 "gramatica.y"
+//#line 143 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
 break;
 case 85:
-//#line 157 "gramatica.y"
+//#line 144 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
 break;
 case 86:
-//#line 158 "gramatica.y"
+//#line 145 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la asignacion");}
 break;
 case 87:
-//#line 159 "gramatica.y"
+//#line 146 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
 break;
 case 88:
-//#line 160 "gramatica.y"
+//#line 147 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
 break;
 case 91:
-//#line 168 "gramatica.y"
+//#line 154 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra return");}
 break;
 case 93:
-//#line 172 "gramatica.y"
+//#line 158 "gramatica.y"
 { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una suma");}
 break;
 case 94:
-//#line 173 "gramatica.y"
+//#line 159 "gramatica.y"
 { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una resta");}
 break;
 case 96:
-//#line 177 "gramatica.y"
+//#line 163 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '+' ");}
 break;
 case 97:
-//#line 178 "gramatica.y"
+//#line 164 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '-' ");}
 break;
 case 98:
-//#line 181 "gramatica.y"
+//#line 167 "gramatica.y"
 { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");}
 break;
 case 99:
-//#line 182 "gramatica.y"
+//#line 168 "gramatica.y"
 { System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una division");}
 break;
 case 102:
-//#line 187 "gramatica.y"
+//#line 173 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el factor luego de un '*' ");}
 break;
 case 103:
-//#line 188 "gramatica.y"
+//#line 174 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el factor luego de un '/' ");}
 break;
 case 104:
-//#line 189 "gramatica.y"
+//#line 175 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '*' ");}
 break;
 case 105:
-//#line 190 "gramatica.y"
+//#line 176 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '/' ");}
 break;
 case 106:
-//#line 193 "gramatica.y"
+//#line 179 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + val_peek(0).sval);}
 break;
 case 107:
-//#line 194 "gramatica.y"
+//#line 180 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + val_peek(0).sval);}
 break;
 case 108:
-//#line 195 "gramatica.y"
+//#line 181 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + val_peek(0).sval);}
 break;
 case 109:
-//#line 196 "gramatica.y"
+//#line 182 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");}
 break;
 case 111:
-//#line 200 "gramatica.y"
+//#line 186 "gramatica.y"
 { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + val_peek(3).sval);}
 break;
 case 114:
-//#line 205 "gramatica.y"
+//#line 191 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
 break;
 case 115:
-//#line 207 "gramatica.y"
+//#line 192 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
 break;
 case 119:
-//#line 216 "gramatica.y"
+//#line 200 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
 break;
 case 120:
-//#line 219 "gramatica.y"
+//#line 203 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + val_peek(0).sval);}
 break;
 case 121:
-//#line 220 "gramatica.y"
+//#line 204 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + val_peek(0).sval);}
 break;
 case 122:
-//#line 221 "gramatica.y"
+//#line 205 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + val_peek(0).sval);}
 break;
 case 124:
-//#line 225 "gramatica.y"
+//#line 209 "gramatica.y"
 {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
 break;
 case 125:
-//#line 226 "gramatica.y"
+//#line 210 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
 break;
 case 127:
-//#line 230 "gramatica.y"
+//#line 214 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
 break;
 case 128:
-//#line 231 "gramatica.y"
+//#line 215 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' del IF ");}
 break;
 case 129:
-//#line 232 "gramatica.y"
+//#line 216 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la condicion del IF ");}
 break;
 case 130:
-//#line 233 "gramatica.y"
+//#line 217 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' del IF ");}
 break;
 case 131:
-//#line 234 "gramatica.y"
+//#line 218 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el THEN del IF ");}
 break;
 case 132:
-//#line 235 "gramatica.y"
-{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el bloque del IF ");}
+//#line 219 "gramatica.y"
+{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable del IF ");}
 break;
 case 133:
-//#line 236 "gramatica.y"
+//#line 220 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ENDIF ");}
 break;
 case 138:
-//#line 245 "gramatica.y"
+//#line 229 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable ");}
 break;
 case 139:
-//#line 246 "gramatica.y"
+//#line 230 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable ");}
 break;
 case 147:
-//#line 260 "gramatica.y"
+//#line 244 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia FOR");}
 break;
 case 148:
-//#line 261 "gramatica.y"
+//#line 245 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia FOR");}
 break;
 case 150:
-//#line 265 "gramatica.y"
+//#line 249 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
 break;
 case 151:
-//#line 266 "gramatica.y"
+//#line 250 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
 break;
 case 152:
-//#line 267 "gramatica.y"
+//#line 251 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
 break;
 case 155:
-//#line 274 "gramatica.y"
+//#line 258 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion del for ");}
 break;
 case 156:
-//#line 275 "gramatica.y"
+//#line 259 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '=:' en la asignacion del for ");}
 break;
 case 157:
-//#line 276 "gramatica.y"
+//#line 260 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la constante entera de la asignacion del for ");}
 break;
 case 160:
-//#line 283 "gramatica.y"
+//#line 267 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la condicion del for ");}
 break;
 case 161:
-//#line 284 "gramatica.y"
+//#line 268 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el comparador en la condicion del for ");}
 break;
 case 162:
-//#line 285 "gramatica.y"
+//#line 269 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la condicion del for ");}
 break;
 case 163:
-//#line 288 "gramatica.y"
+//#line 272 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");}
 break;
 case 165:
-//#line 292 "gramatica.y"
+//#line 276 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' que encierra la cadena ");}
 break;
 case 166:
-//#line 293 "gramatica.y"
+//#line 277 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la cadena que quiere imprimir ");}
 break;
 case 167:
-//#line 294 "gramatica.y"
+//#line 278 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' que encierra la cadena ");}
 break;
-//#line 1244 "Parser.java"
+//#line 1248 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

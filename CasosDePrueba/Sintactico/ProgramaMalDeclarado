@@ -1,0 +1,7 @@
+ProgramaMalDeclarado{
+fun x (i32 z,i32 x):i32
+    {
+    i32 x;
+    a1 =: 22;
+    }
+    f32 varibaleFlotante;

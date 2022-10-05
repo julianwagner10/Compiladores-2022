@@ -1,0 +1,7 @@
+InvocacionMalDef1{
+discard ;
+discard f1 (z,y)
+f1(z,y);
+discard f1 ( ;
+discard f1 (z,y ;
+}

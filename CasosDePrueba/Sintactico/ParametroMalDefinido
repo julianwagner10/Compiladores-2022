@@ -1,4 +1,4 @@
-Programa{
+ParametroMalDefinido{
 fun x (i32,i32 x):i32
     {
     i32 x;

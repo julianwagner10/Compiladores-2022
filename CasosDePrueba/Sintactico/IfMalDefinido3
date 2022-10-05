@@ -1,0 +1,6 @@
+IfMalDefinido3{
+if() then{
+    x =: 50;
+}
+end_if;
+}

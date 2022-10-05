@@ -1,4 +1,4 @@
-programa{
+ControlComoExpresionBienDef{
 a1 =: for (id=:2 ; id>4 ; +2)
         if(x<z)then
             break;
