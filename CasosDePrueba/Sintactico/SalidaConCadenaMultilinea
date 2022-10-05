@@ -1,0 +1,4 @@
+SalidaConCadenaML{
+out('salida con /
+cadena multilinea');
+}

@@ -42,12 +42,12 @@ declaracion : tipo lista_de_variables ';'{System.out.println("[Parser | Linea " 
             ;
 
 error_declaracion : tipo lista_de_variables error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la declaracion de variables");}
-                  | lista_de_variables ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo de la variable");}
-                  | tipo  ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador de la variable");}
+                  | lista_de_variables ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo de la variable en la declaracion");}
+                  | tipo  ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador de la variable en la declaracion");}
                   ;
 
 lista_de_variables : ID {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $1.sval);}
-      		       | lista_de_variables ',' ID {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $3.sval);}
+      		       | lista_de_variables ',' ID {System.out.println("[Parser | linea " + Lexico.linea + "] se leyo una lista de variables con identificador -> " + $3.sval);}
                    | error_lista_de_variables
                    ;
 
@@ -60,20 +60,20 @@ funcion : declaracion_fun '{'bloque'}' {System.out.println("[Parser | linea " + 
         | error_funcion
         ;
 
-error_funcion : declaracion_fun  bloque '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de apertura al bloque de la funcion");}
-              | declaracion_fun '{' bloque error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de cierre al bloque de la funcion");}
-              | declaracion_fun '{' '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta bloque de la funcion");}
+error_funcion : declaracion_fun  bloque '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de apertura al bloque de sentencias de la funcion");}
+              | declaracion_fun '{' bloque error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta llave de cierre al bloque de sentencias de la funcion");}
+              | declaracion_fun '{' '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el bloque de sentencias de la funcion");}
               ;
 
 declaracion_fun : FUN ID lista_de_parametros ':' tipo
                 | error_declaracion_fun
                 ;
 
-error_declaracion_fun :  ID lista_de_parametros ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada fun");}
-                      | FUN lista_de_parametros ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta identificador de funcion");}
-                      | FUN ID ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta lista de parametros de funcion");}
-                      | FUN ID lista_de_parametros tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo al tipo que devuelve la funcion");}
-                      | FUN ID lista_de_parametros ':' error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion");}
+error_declaracion_fun :  ID lista_de_parametros ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada fun en la declaracion");}
+                      | FUN lista_de_parametros ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta identificador de funcion en la declaracion");}
+                      | FUN ID ':' tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta lista de parametros de funcion en la declaracion");}
+                      | FUN ID lista_de_parametros tipo {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo al tipo que devuelve la funcion en la declaracion");}
+                      | FUN ID lista_de_parametros ':' error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion en la declaracion");}
                       ;
 
 lista_de_parametros : '(' ')'
@@ -111,7 +111,7 @@ ejecucion : asignacion ';'
 
 error_ejecucion : asignacion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la asignacion");}
                 | seleccion error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
-                | control error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del for");}
+                | control error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia de control");}
                 | ':' control ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta de la sentencia de control");}
                 | ID ':' ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la sentencia de control en la etiqueta");}
                 | ID control ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' en la etiqueta");}
@@ -124,15 +124,15 @@ error_ejecucion : asignacion error{System.out.println("Error sináctico: Linea "
 
 ejecucion_control: BREAK ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
                  | CONTINUE ';'{System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
-                 | CONTINUE ':' ID ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia continue con etiqueta: " +$3.sval);}
+                 | CONTINUE ':' ID ';' {System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);}
                  | error_ejecucion_control
                  ;
 
-error_ejecucion_control: BREAK error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del break");}
-                       | CONTINUE error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
-                       | CONTINUE ID ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo a la etiqueta del continue");}
-                       | CONTINUE ':' ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta del continue");}
-                       | CONTINUE ':' ID error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del continue");}
+error_ejecucion_control: BREAK error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia BREAK");}
+                       | CONTINUE error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
+                       | CONTINUE ID ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ':' previo a la etiqueta de la sentencia CONTINUE");}
+                       | CONTINUE ':' ';' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta en la sentencia CONTINUE");}
+                       | CONTINUE ':' ID error{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
 asignacion : ID ASIGNACION expresion_aritmetica
@@ -151,7 +151,7 @@ retorno : RETURN expresion_aritmetica
         | error_retorno
         ;
 
-error_retorno : RETURN {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra return");}
+error_retorno : RETURN {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra reservada RETURN");}
               ;
 
 expresion_aritmetica : termino
@@ -184,7 +184,7 @@ factor 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó
         ;
 
 invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
-           | ID '('  ')'
+           | ID '('  ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
            | error_invocacion
            ;
 
@@ -206,18 +206,18 @@ factor_invocacion 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + 
                     | '-' factor_invocacion
                     ;
 
-seleccion : IF '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia IF");}
-	      | IF '(' condicion ')' THEN bloque_if_for ELSE bloque_if_for ENDIF {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia IF con ELSE");}
+seleccion : IF '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
+	      | IF '(' condicion ')' THEN bloque_if_for ELSE bloque_if_for ENDIF {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF con ELSE");}
           | error_seleccion
           ;
 
 error_seleccion: '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
-               | IF condicion ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' del IF ");}
-               | IF '(' ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la condicion del IF ");}
-               | IF '(' condicion  THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' del IF ");}
-               | IF '(' condicion ')'  bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el THEN del IF ");}
-               | IF '(' condicion ')' THEN  ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable del IF ");}
-               | IF '(' condicion ')' THEN bloque_if_for error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ENDIF ");}
+               | IF condicion ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' de la sentencia IF ");}
+               | IF '(' ')' THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la condicion de la sentencia IF ");}
+               | IF '(' condicion  THEN bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' de la sentencia IF ");}
+               | IF '(' condicion ')'  bloque_if_for ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada THEN de la sentencia IF ");}
+               | IF '(' condicion ')' THEN  ENDIF {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable de la sentencia IF ");}
+               | IF '(' condicion ')' THEN bloque_if_for error {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
                ;
 
 bloque_if_for : ejecucion
@@ -226,8 +226,8 @@ bloque_if_for : ejecucion
               | error_bloque_if
               ;
 
-error_bloque_if : bloque_ejecutable '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable ");}
-                | '{' bloque_ejecutable  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable ");}
+error_bloque_if : bloque_ejecutable '}' {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
+                | '{' bloque_ejecutable  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
                 ;
 
 condicion : expresion_aritmetica comparador expresion_aritmetica
@@ -241,8 +241,8 @@ comparador : '<'
            | DISTINTO
            ;
 
-control : FOR '(' asignacion_for';'condicion_for';' '+' CTE_INT')' bloque_if_for {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia FOR");}
-        | FOR '(' asignacion_for';'condicion_for';' '-' CTE_INT')' bloque_if_for {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia FOR");}
+control : FOR '(' asignacion_for';'condicion_for';' '+' CTE_INT')' bloque_if_for {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
+        | FOR '(' asignacion_for';'condicion_for';' '-' CTE_INT')' bloque_if_for {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
         | error_control
         ;
 
@@ -255,18 +255,18 @@ asignacion_for: ID ASIGNACION CTE_INT
               | error_asignacion_for
               ;
 
-error_asignacion_for : ASIGNACION CTE_INT {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion del for ");}
-                     | ID  CTE_INT {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '=:' en la asignacion del for ");}
-                     | ID ASIGNACION  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la constante entera de la asignacion del for ");}
+error_asignacion_for : ASIGNACION CTE_INT {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion se la sentencia FOR ");}
+                     | ID  CTE_INT {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '=:' en la asignacion de la sentencia FOR ");}
+                     | ID ASIGNACION  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la constante entera de la asignacion de la sentencia FOR ");}
                      ;
 
 condicion_for: ID comparador expresion_aritmetica
              | error_condicion_for
              ;
 
-error_condicion_for : comparador expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la condicion del for ");}
-                    | ID expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el comparador en la condicion del for ");}
-                    | ID comparador  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la condicion del for ");}
+error_condicion_for : comparador expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la condicion de la sentencia FOR ");}
+                    | ID expresion_aritmetica {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el comparador en la condicion de la sentencia FOR ");}
+                    | ID comparador  {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la condicion de la sentencia FOR ");}
                     ;
 
 salida : OUT '('CADENA')'{System.out.println("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");}
@@ -274,7 +274,7 @@ salida : OUT '('CADENA')'{System.out.println("[Parser | Linea " + Lexico.linea +
        ;
 
 error_salida: OUT CADENA')'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el '(' que encierra la cadena ");}
-            | OUT '('')'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la cadena que quiere imprimir ");}
+            | OUT '('')'{System.out.println("Error sináctico: Linea " + Lexico.linea + " falta la cadena que se quiere imprimir ");}
             | OUT '('CADENA {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' que encierra la cadena ");}
             ;
 %%
