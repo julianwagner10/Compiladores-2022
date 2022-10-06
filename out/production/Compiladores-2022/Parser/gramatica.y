@@ -180,7 +180,7 @@ factor 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó
         | CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
         | CTE_INT {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + $1.sval);}
         | invocacion {System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");}
-        | '-' factor
+        | '-' factor {chequearNegativos();}
         ;
 
 invocacion : ID '(' parametros_reales ')' { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}

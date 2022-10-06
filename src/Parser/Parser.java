@@ -840,7 +840,7 @@ boolean doaction;
       {
       if (yyerrflag==0)
         {
-        //yyerror("syntax error");
+        yyerror("syntax error");
         yynerrs++;
         }
       if (yyerrflag < 3) //low error count?
@@ -1189,6 +1189,10 @@ case 109:
 //#line 182 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");}
 break;
+case 110:
+//#line 183 "gramatica.y"
+{chequearNegativos();}
+break;
 case 111:
 //#line 186 "gramatica.y"
 { System.out.println("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + val_peek(3).sval);}
@@ -1325,7 +1329,7 @@ case 167:
 //#line 278 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' que encierra la cadena ");}
 break;
-//#line 1252 "Parser.java"
+//#line 1256 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####
