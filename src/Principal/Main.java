@@ -46,10 +46,6 @@ public class Main{
         System.out.println("");
 
         Lexico l1 = new Lexico(codigo);
-        /*l1.obtenerToken();
-        l1.obtenerToken();
-        l1.obtenerToken();
-        l1.obtenerToken();*/
 
         Parser p = new Parser(l1);
         System.out.println("Corriendo Parser");

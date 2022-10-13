@@ -1225,6 +1225,10 @@ case 122:
 //#line 205 "gramatica.y"
 {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + val_peek(0).sval);}
 break;
+case 123:
+//#line 206 "gramatica.y"
+{chequearNegativos();}
+break;
 case 124:
 //#line 209 "gramatica.y"
 {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
@@ -1329,7 +1333,7 @@ case 167:
 //#line 278 "gramatica.y"
 {System.out.println("Error sináctico: Linea " + Lexico.linea + " falta el ')' que encierra la cadena ");}
 break;
-//#line 1256 "Parser.java"
+//#line 1260 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

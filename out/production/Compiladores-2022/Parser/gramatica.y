@@ -203,7 +203,7 @@ error_parametros_reales : factor_invocacion factor_invocacion {System.out.printl
 factor_invocacion 	: ID {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó el identificador -> " + $1.sval);}
                     | CTE_FLOTANTE {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante FLOTANTE -> " + $1.sval);}
                     | CTE_INT {System.out.println("[Parser | Linea " + Lexico.linea + "] se leyó la constante INT LARGA -> " + $1.sval);}
-                    | '-' factor_invocacion
+                    | '-' factor_invocacion {chequearNegativos();}
                     ;
 
 seleccion : IF '(' condicion ')' THEN bloque_if_for ENDIF {System.out.println("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
