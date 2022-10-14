@@ -55,29 +55,29 @@ public class Main{
 
         Parser p = new Parser(l1);
         System.out.println("Corriendo Parser");
-        System.out.println("------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Informes Lexicos :");
         System.out.println("");
         p.run();
-        System.out.println("------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Informes Sintacticos :");
         System.out.println("");
         for(String s :informesSintacticos){
             System.out.println(s);
         }
-        System.out.println("------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Errores Lexicos :");
         System.out.println("");
         for(String l :erroresLexicos){
             System.out.println(l);
         }
-        System.out.println("------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Errores Sintacticos :");
         System.out.println("");
         for(String e :erroresSintacticos){
             System.out.println(e);
         }
-        System.out.println("------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Tabla de simbolos ");
         System.out.println("");
         tablaDeSimbolos.mostrarTablasimbolos();

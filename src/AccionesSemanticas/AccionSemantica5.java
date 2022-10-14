@@ -17,6 +17,7 @@ public class AccionSemantica5 extends AccionSemantica { //Accion semantica para 
             System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto la constante FLOTANTE -> "+ buffer);
             return new Token(Lexico.CTE_FLOTANTE,buffer);
         }
+        System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto la constante -> "+ buffer);
         return new Error3().ejecutarAccion();
     }
 }

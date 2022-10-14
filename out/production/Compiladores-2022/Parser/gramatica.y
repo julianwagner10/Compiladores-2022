@@ -10,7 +10,7 @@ import Principal.*;
 %%
 
 programa : ID '{' bloque'}' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
-         | error_programa;
+         | error_programa; {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo programa incorrecto");}
          ;
 
 error_programa : '{'bloque'}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador de programa");}
