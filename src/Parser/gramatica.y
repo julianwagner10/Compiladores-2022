@@ -10,7 +10,7 @@ import Principal.*;
 %%
 
 programa : ID '{' bloque'}' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
-         | error_programa;
+         | error_programa; {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo programa incorrecto");}
          ;
 
 error_programa : '{'bloque'}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador de programa");}
@@ -249,12 +249,13 @@ comparador : '<'
 
 control : FOR '(' asignacion_for';'condicion_for';' '+' CTE_INT')' bloque_if_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
         | FOR '(' asignacion_for';'condicion_for';' '-' CTE_INT')' bloque_if_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
-        | error_control
+        | error_control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control erronea");}
         ;
 
 error_control : FOR '(' asignacion_for';'condicion_for';'  CTE_INT')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
               | FOR '(' asignacion_for';'condicion_for';' '-' ')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
               | FOR '(' asignacion_for';'condicion_for';' '+' ')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
+              | FOR '(' ')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
               ;
 
 asignacion_for: ID ASIGNACION CTE_INT

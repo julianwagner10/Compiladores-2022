@@ -1,6 +1,5 @@
 ControlMalDefinido3{
-for (x 3; id 3 ; -1){
+for (){
 x=:2;
-return 2;
 };
 }
