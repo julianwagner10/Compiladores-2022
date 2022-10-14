@@ -2,10 +2,16 @@ package Principal;
 import Parser.Parser;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main{
 
     private static BufferedReader texto; // Se utiliza para leer texto de un flujo de entrada de caracteres.
     public static TablaSimbolos tablaDeSimbolos = new TablaSimbolos();
+    public static List<String> informesSintacticos = new ArrayList<>();
+    public static List<String> erroresSintacticos = new ArrayList<>();
+    public static List<String> erroresLexicos = new ArrayList<>();
 
     private static StringBuilder obtenerTextoALeer(BufferedReader ubicacion) throws IOException { //Metodo para obtener el texto a leer que contiene excepciones a errores no evitables por parte del programador.
 
@@ -50,9 +56,30 @@ public class Main{
         Parser p = new Parser(l1);
         System.out.println("Corriendo Parser");
         System.out.println("------------------------------------------");
+        System.out.println("Informes Lexicos :");
+        System.out.println("");
         p.run();
-
-        System.out.println("\n TABLA DE SIMBOLOS ");
+        System.out.println("------------------------------------------");
+        System.out.println("Informes Sintacticos :");
+        System.out.println("");
+        for(String s :informesSintacticos){
+            System.out.println(s);
+        }
+        System.out.println("------------------------------------------");
+        System.out.println("Errores Lexicos :");
+        System.out.println("");
+        for(String l :erroresLexicos){
+            System.out.println(l);
+        }
+        System.out.println("------------------------------------------");
+        System.out.println("Errores Sintacticos :");
+        System.out.println("");
+        for(String e :erroresSintacticos){
+            System.out.println(e);
+        }
+        System.out.println("------------------------------------------");
+        System.out.println("Tabla de simbolos ");
+        System.out.println("");
         tablaDeSimbolos.mostrarTablasimbolos();
     }
 }

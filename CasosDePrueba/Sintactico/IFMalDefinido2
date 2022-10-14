@@ -2,7 +2,7 @@ IfMalDefinido2{
 (x>2) then
     {
     x=:2;
-    return x;
+    y=:45;
     }
 end_if;
 }

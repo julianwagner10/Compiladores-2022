@@ -1,5 +1,5 @@
 IfMalDefinido3{
-if() then{
+if(a) then{
     x =: 50;
 }
 end_if;

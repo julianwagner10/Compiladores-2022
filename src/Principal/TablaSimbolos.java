@@ -49,7 +49,7 @@ public class TablaSimbolos {
     public void setSimbolo(String lexema, int id){
 
         if(tablaSimbolos.containsKey(lexema))
-            System.out.println("El lexema "+lexema +" ya existe." );
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> "+ lexema );
         else {
             if (!this.esPalabraReservada(lexema)) {
                 AtributosTablaS at = new AtributosTablaS(id);
