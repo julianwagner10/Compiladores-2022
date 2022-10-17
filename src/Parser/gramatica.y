@@ -23,18 +23,27 @@ bloque : sentencia
        | error_bloque
        ;
 
-error_bloque: error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " no es una sentencia declarativa o ejecutable valida");}
+error_bloque: error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " no es una sentencia válida");}
             ;
 
 sentencia : declaracion
           | ejecucion
           ;
 
+bloque_ejecutable_for: ejecucion_control
+                     | bloque_ejecutable_for ejecucion_control
+                     ;
+
+bloque_ejecutable_if: ejecucion
+                    | bloque_ejecutable_if ejecucion
+                    ;
+/*
 bloque_ejecutable : ejecucion
                   | ejecucion_control
                   | bloque_ejecutable ejecucion
                   | bloque_ejecutable ejecucion_control
                   ;
+*/
 
 declaracion : tipo lista_de_variables ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion
@@ -122,7 +131,13 @@ error_ejecucion : asignacion error{Main.erroresSintacticos.add("Error sináctico
                 | invocacion ';'{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
                 ;
 
-ejecucion_control: BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
+ejecucion_control: asignacion ';'
+                 | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");}
+                 | seleccion ';'
+                 | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
+                 | control ';'
+                 | salida ';'
+                 | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
                  | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
                  | CONTINUE ':' ID ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);}
                  | error_ejecucion_control
@@ -178,9 +193,10 @@ error_termino : termino '*' error{Main.erroresSintacticos.add("Error sináctico:
 
 factor 	: ID
         | CTE_FLOTANTE
-        | CTE_INT
+        | CTE_INT {chequearRangoEnteros();}
         | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");}
-        | '-' factor {chequearNegativos();}
+        | '-' CTE_INT {chequearNegativos();}
+        | '-' CTE_FLOTANTE {chequearNegativos();}
         ;
 
 invocacion : ID '(' parametros_reales ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
@@ -202,33 +218,43 @@ error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSinta
 
 factor_invocacion 	: ID
                     | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);}
-                    | CTE_INT {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);}
-                    | '-' factor_invocacion {chequearNegativos();}
+                    | CTE_INT {chequearRangoEnteros();
+                               Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);}
+                    | '-' CTE_INT {chequearNegativos();}
+                    | '-' CTE_FLOTANTE {chequearNegativos();}
                     ;
 
-seleccion : IF '(' condicion ')' THEN bloque_if_for ENDIF {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
-	      | IF '(' condicion ')' THEN bloque_if_for ELSE bloque_if_for ENDIF {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF con ELSE");}
+seleccion : IF '(' condicion ')' THEN bloque_if ENDIF {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
+	      | IF '(' condicion ')' THEN bloque_if ELSE bloque_if ENDIF {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF con ELSE");}
           | error_seleccion
           ;
 
-error_seleccion: '(' condicion ')' THEN bloque_if_for ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
-               | IF condicion ')' THEN bloque_if_for ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '(' de la sentencia IF ");}
-               | IF '(' ')' THEN bloque_if_for ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la condicion de la sentencia IF ");}
-               | IF '(' condicion  THEN bloque_if_for ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de la sentencia IF ");}
-               | IF '(' condicion ')'  bloque_if_for ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada THEN de la sentencia IF ");}
+error_seleccion: '(' condicion ')' THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
+               | IF condicion ')' THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '(' de la sentencia IF ");}
+               | IF '(' ')' THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la condicion de la sentencia IF ");}
+               | IF '(' condicion  THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de la sentencia IF ");}
+               | IF '(' condicion ')'  bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada THEN de la sentencia IF ");}
                | IF '(' condicion ')' THEN  ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable de la sentencia IF ");}
-               | IF '(' condicion ')' THEN bloque_if_for error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
+               | IF '(' condicion ')' THEN bloque_if error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
                ;
 
-bloque_if_for : ejecucion
-              | ejecucion_control
-              | '{' bloque_ejecutable '}'
-              | error_bloque_if
+bloque_for : ejecucion_control
+              | '{' bloque_ejecutable_for '}'
+              | error_bloque_for
               ;
 
-error_bloque_if : bloque_ejecutable '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
-                | '{' bloque_ejecutable  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
+bloque_if : ejecucion
+              | '{' bloque_ejecutable_if '}'
+              | error_bloque_if
+              ;
+error_bloque_for : bloque_ejecutable_for '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
+                | '{' bloque_ejecutable_for  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
                 ;
+
+error_bloque_if : bloque_ejecutable_if '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
+                | '{' bloque_ejecutable_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
+                ;
+
 
 condicion : expresion_aritmetica comparador expresion_aritmetica
           | error_condicion
@@ -247,18 +273,18 @@ comparador : '<'
            | DISTINTO
            ;
 
-control : FOR '(' asignacion_for';'condicion_for';' '+' CTE_INT')' bloque_if_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
-        | FOR '(' asignacion_for';'condicion_for';' '-' CTE_INT')' bloque_if_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
+control : FOR '(' asignacion_for';'condicion_for';' '+' CTE_INT')' bloque_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
+        | FOR '(' asignacion_for';'condicion_for';' '-' CTE_INT')' bloque_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
         | error_control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control erronea");}
         ;
 
-error_control : FOR '(' asignacion_for';'condicion_for';'  CTE_INT')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
-              | FOR '(' asignacion_for';'condicion_for';' '-' ')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
-              | FOR '(' asignacion_for';'condicion_for';' '+' ')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
-              | FOR '(' ')' bloque_if_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
+error_control : FOR '(' asignacion_for';'condicion_for';'  CTE_INT')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
+              | FOR '(' asignacion_for';'condicion_for';' '-' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
+              | FOR '(' asignacion_for';'condicion_for';' '+' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
+              | FOR '(' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
               ;
 
-asignacion_for: ID ASIGNACION CTE_INT
+asignacion_for: ID ASIGNACION CTE_INT {chequearRangoEnteros();}
               | error_asignacion_for
               ;
 
@@ -310,13 +336,25 @@ public void yyerror(String s){
     //System.out.println("Parser: " + s);
 }
 
+public void chequearRangoEnteros(){
+	String lexema = yylval.sval;
+    Long constante = Long.parseLong(lexema); //Convierto el string dentro del buffer en una constante entera.
+        if((constante >= (-1*Math.pow(2,31))) && (constante <= (Math.pow(2,31) - 1))){
+		    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una constante ENTERA LARGA positiva -> "+constante);
+        }
+        else{
+        	Main.erroresSintacticos.add("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante ENTERA LARGA fuera de rango");
+            Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+        }
+}
+
 public void chequearNegativos(){
 	String lexema = yylval.sval;
 	int id = Main.tablaDeSimbolos.getIdentificador(lexema);
 	if(id == Lexico.CTE_INT){
-		Integer enteroNeg = -1*Integer.parseInt(lexema);
+		Long enteroNeg = -1*Long.parseLong(lexema);
 		if((enteroNeg >= (-Math.pow(2,31))) && (enteroNeg <= (Math.pow(2,31) - 1))){
-		    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una constante ENTERA LARGA son signo negativo -> "+enteroNeg);
+		    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una constante ENTERA LARGA con signo negativo -> "+enteroNeg);
 		    Main.tablaDeSimbolos.modificarSimbolo(lexema, String.valueOf(enteroNeg));
 		}
 		else{
