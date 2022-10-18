@@ -26,6 +26,14 @@ public class TablaSimbolos {
             return null;
     }
 
+    public AtributosTablaS getAtributos(String lexema){
+        if(tablaSimbolos.contains(lexema)){
+            return tablaSimbolos.get(lexema);
+        }
+        else
+            return null;
+    }
+
     public void modificarSimbolo(String lexemaviejo, String lexemaNuevo) {
         tablaSimbolos.put(lexemaNuevo,tablaSimbolos.get(lexemaviejo));
         tablaSimbolos.remove(lexemaviejo);

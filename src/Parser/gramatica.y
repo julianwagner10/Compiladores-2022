@@ -318,17 +318,17 @@ private Lexico lexico;
 public Parser(Lexico lexico)
 {
   this.lexico = lexico;
-
 }
 
 public int yylex(){
    Token token = this.lexico.obtenerToken();
 
-   if(token != null ){
-   	int val = token.getId();
-   	yylval = new ParserVal(token.getLexema());
-   	return val;
-   }
+    if(token != null ){
+        List<AtributosTablaS> atributos = Main.tablaDeSimbolos.getAtributos(token.getLexema());
+        int val = token.getId();
+        yylval = new ParserVal(atributos);
+        return val;
+    }
    return 0;
 }
 

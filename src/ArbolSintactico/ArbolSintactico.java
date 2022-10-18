@@ -9,7 +9,6 @@ public class ArbolSintactico {
     private boolean isHoja;
 
     public ArbolSintactico(AtributosTablaS atributo, boolean isHoja) {
-
         this.atributo = atributo;
         this.isHoja = isHoja;
     }
