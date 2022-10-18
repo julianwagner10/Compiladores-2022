@@ -52,7 +52,7 @@ public class TablaSimbolos {
             System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> "+ lexema );
         else {
             if (!this.esPalabraReservada(lexema)) {
-                AtributosTablaS at = new AtributosTablaS(id);
+                AtributosTablaS at = new AtributosTablaS(id,"","",""); //Los datos vacios  son temporales para evitar errores.
                 tablaSimbolos.put(lexema, at);
             }
         }

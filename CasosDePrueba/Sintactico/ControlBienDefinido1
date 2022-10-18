@@ -1,7 +1,7 @@
 programa{
 
 for (id=:2 ; id>4 ; +2){
-x=:-2147483649;
+x=:214;
 break;
 };
 
