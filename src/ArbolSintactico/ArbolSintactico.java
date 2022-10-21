@@ -2,24 +2,22 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 
-public class ArbolSintactico {
+public abstract class ArbolSintactico {
     private ArbolSintactico hijoIzq = null;
     private ArbolSintactico hijoDer = null;
     private AtributosTablaS atributo;
     private boolean isHoja;
 
-    public ArbolSintactico(AtributosTablaS atributo, boolean isHoja) { //Constructor si es hoja
-        this.atributo = atributo;
-        this.isHoja = isHoja;
-    }
     public ArbolSintactico(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributo) {
         this.hijoIzq = hijoIzq;
         this.hijoDer = hijoDer;
         this.atributo = atributo;
-        this.isHoja = false;
     }
 
-
+    public ArbolSintactico(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
+        this.hijoIzq = hijoIzq;
+        this.hijoDer = hijoDer;
+    }
 
     public ArbolSintactico getHijoIzq() {
         return this.hijoIzq;
@@ -61,12 +59,5 @@ public class ArbolSintactico {
         this.atributo = atributo;
     }
 
-    public boolean isHoja() {
-        return this.isHoja;
-    }
-
-    public void setHoja(boolean hoja) {
-        this.isHoja = hoja;
-    }
 
 }

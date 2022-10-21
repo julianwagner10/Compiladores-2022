@@ -169,9 +169,13 @@ retorno : RETURN expresion_aritmetica
 error_retorno : RETURN {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra reservada RETURN");}
               ;
 
-expresion_aritmetica : termino
-	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");}
-	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");}
+expresion_aritmetica : termino{$$.arbol = $1.arbol}
+	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");
+	                 	                          $$.arbol = new NodoSuma($1.arbol,$3.arbol);
+	                                                    }
+	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");
+	                 	                 	            $$.arbol = new NodoResta($1.arbol,$3.arbol);
+	                                                    }
 	                 | error_expresion_aritmetica
                      ;
 
@@ -179,9 +183,13 @@ error_expresion_aritmetica : expresion_aritmetica '+' error{Main.erroresSintacti
                            | expresion_aritmetica '-' error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '-' ");}
                            ;
 
-termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");}
-	    | termino '/' factor  { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");}
-	    | factor
+termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");
+	                          $$.arbol = new NodoMultiplicacion($1.arbol,$3.arbol);
+                             }
+	    | termino '/' factor  { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");
+	                          $$.arbol = new NodoDivision($1.arbol,$3.arbol);
+	                          }
+	    | factor{$$.arbol = $1.arbol}
 	    | error_termino
         ;
 
@@ -191,19 +199,19 @@ error_termino : termino '*' error{Main.erroresSintacticos.add("Error sináctico:
               | '/' factor {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '/' ");}
               ;
 
-factor 	: ID { $$.arbol = new ArbolSintactico($1,true);}
-        | CTE_FLOTANTE { $$.arbol = new ArbolSintactico($1,true);}
+factor 	: ID {$$.arbol = new NodoHoja(null,null,$1);}
+        | CTE_FLOTANTE {$$.arbol = new NodoHoja(null,null,$1);}
         | CTE_INT {if chequearRangoEnteros()
-                        $$.arbol = new ArbolSintactico($1,true);
-                    }
+                   $$.arbol = new NodoHoja(null,null,$1);
+                   }
         | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
-                      $$.arbol = new ArbolSintactico($1,true);
+                      $$.arbol = new NodoHoja(null,null,$1);
                       }
         | '-' CTE_INT {if chequearNegativos()
-                            $$.arbol = new ArbolSintactico($2,true);
+                       $$.arbol = new NodoHoja(null,null,$2);
                       }
         | '-' CTE_FLOTANTE {if chequearNegativos()
-                                $$.arbol = new ArbolSintactico($2,true);
+                               $$.arbol = new NodoHoja(null,null,$2);
                            }
         ;
 
@@ -224,20 +232,20 @@ parametros_reales : factor_invocacion
 error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
                         ;
 
-factor_invocacion 	: ID { $$.arbol = new ArbolSintactico($1,true);}
+factor_invocacion 	: ID {$$.arbol = new NodoHoja(null,null,$1);}
                     | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);
-                                    $$.arbol = new ArbolSintactico($1,true);
+                                   $$.arbol = new NodoHoja(null,null,$1);
                                    }
                     | CTE_INT {if chequearRangoEnteros() {
                                Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);
-                               $$.arbol = new ArbolSintactico($1,true);
+                               $$.arbol = new NodoHoja(null,null,$1);
                                }
                                }
                     | '-' CTE_INT {if chequearNegativos()
-                                        $$.arbol = new ArbolSintactico($2,true);
+                                            $$.arbol = new NodoHoja(null,null,$2);
                                   }
                     | '-' CTE_FLOTANTE {if chequearNegativos()
-                                            $$.arbol = new ArbolSintactico($2,true);
+                                            $$.arbol = new NodoHoja(null,null,$2);
                                        }
                     ;
 seleccion : IF '(' condicion ')' THEN bloque_if ENDIF {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
