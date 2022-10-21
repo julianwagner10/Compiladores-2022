@@ -191,12 +191,20 @@ error_termino : termino '*' error{Main.erroresSintacticos.add("Error sináctico:
               | '/' factor {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '/' ");}
               ;
 
-factor 	: ID
-        | CTE_FLOTANTE
-        | CTE_INT {chequearRangoEnteros();}
-        | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");}
-        | '-' CTE_INT {chequearNegativos();}
-        | '-' CTE_FLOTANTE {chequearNegativos();}
+factor 	: ID { $$.arbol = new ArbolSintactico($1,true);}
+        | CTE_FLOTANTE { $$.arbol = new ArbolSintactico($1,true);}
+        | CTE_INT {if chequearRangoEnteros()
+                        $$.arbol = new ArbolSintactico($1,true);
+                    }
+        | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
+                      $$.arbol = new ArbolSintactico($1,true);
+                      }
+        | '-' CTE_INT {if chequearNegativos()
+                            $$.arbol = new ArbolSintactico($2,true);
+                      }
+        | '-' CTE_FLOTANTE {if chequearNegativos()
+                                $$.arbol = new ArbolSintactico($2,true);
+                           }
         ;
 
 invocacion : ID '(' parametros_reales ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
@@ -216,14 +224,22 @@ parametros_reales : factor_invocacion
 error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
                         ;
 
-factor_invocacion 	: ID
-                    | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);}
-                    | CTE_INT {chequearRangoEnteros();
-                               Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);}
-                    | '-' CTE_INT {chequearNegativos();}
-                    | '-' CTE_FLOTANTE {chequearNegativos();}
+factor_invocacion 	: ID { $$.arbol = new ArbolSintactico($1,true);}
+                    | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);
+                                    $$.arbol = new ArbolSintactico($1,true);
+                                   }
+                    | CTE_INT {if chequearRangoEnteros() {
+                               Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);
+                               $$.arbol = new ArbolSintactico($1,true);
+                               }
+                               }
+                    | '-' CTE_INT {if chequearNegativos()
+                                        $$.arbol = new ArbolSintactico($2,true);
+                                  }
+                    | '-' CTE_FLOTANTE {if chequearNegativos()
+                                            $$.arbol = new ArbolSintactico($2,true);
+                                       }
                     ;
-
 seleccion : IF '(' condicion ')' THEN bloque_if ENDIF {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
 	      | IF '(' condicion ')' THEN bloque_if ELSE bloque_if ENDIF {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF con ELSE");}
           | error_seleccion
@@ -336,19 +352,21 @@ public void yyerror(String s){
     //System.out.println("Parser: " + s);
 }
 
-public void chequearRangoEnteros(){
+public boolean chequearRangoEnteros(){
 	String lexema = yylval.sval;
     Long constante = Long.parseLong(lexema); //Convierto el string dentro del buffer en una constante entera.
         if((constante >= (-1*Math.pow(2,31))) && (constante <= (Math.pow(2,31) - 1))){
 		    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una constante ENTERA LARGA positiva -> "+constante);
+		    return true;
         }
         else{
         	Main.erroresSintacticos.add("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante ENTERA LARGA fuera de rango");
             Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+            return false;
         }
 }
 
-public void chequearNegativos(){
+public boolean chequearNegativos(){
 	String lexema = yylval.sval;
 	int id = Main.tablaDeSimbolos.getIdentificador(lexema);
 	if(id == Lexico.CTE_INT){
@@ -356,10 +374,12 @@ public void chequearNegativos(){
 		if((enteroNeg >= (-Math.pow(2,31))) && (enteroNeg <= (Math.pow(2,31) - 1))){
 		    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una constante ENTERA LARGA con signo negativo -> "+enteroNeg);
 		    Main.tablaDeSimbolos.modificarSimbolo(lexema, String.valueOf(enteroNeg));
+		    return true;
 		}
 		else{
 		    Main.erroresSintacticos.add("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante ENTERA LARGA fuera de rango");
             Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+            return false;
 		}
 	}
 	else if (id == Lexico.CTE_FLOTANTE) {
@@ -367,10 +387,12 @@ public void chequearNegativos(){
         if ((flotanteNeg > 1.17549435e-38 && flotanteNeg < 3.40282347e+38) || (flotanteNeg > -3.40282347e+38 && flotanteNeg < -1.17549435e-38) || (flotanteNeg == 0.0)){
             Main.tablaDeSimbolos.modificarSimbolo(lexema, String.valueOf(flotanteNeg));
             System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una constante FLOTANTE son signo negativo -> "+flotanteNeg);
+            return true;
         }
         else {
             Main.erroresSintacticos.add("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante FLOTANTE fuera de rango");
             Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+            return false;
 	 	}
 	}
 }

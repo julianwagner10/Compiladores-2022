@@ -8,10 +8,18 @@ public class ArbolSintactico {
     private AtributosTablaS atributo;
     private boolean isHoja;
 
-    public ArbolSintactico(AtributosTablaS atributo, boolean isHoja) {
+    public ArbolSintactico(AtributosTablaS atributo, boolean isHoja) { //Constructor si es hoja
         this.atributo = atributo;
         this.isHoja = isHoja;
     }
+    public ArbolSintactico(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributo) {
+        this.hijoIzq = hijoIzq;
+        this.hijoDer = hijoDer;
+        this.atributo = atributo;
+        this.isHoja = false;
+    }
+
+
 
     public ArbolSintactico getHijoIzq() {
         return this.hijoIzq;
