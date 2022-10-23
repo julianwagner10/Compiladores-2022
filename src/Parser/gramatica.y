@@ -150,8 +150,10 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
-asignacion : ID ASIGNACION expresion_aritmetica
-           | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");}
+asignacion : ID ASIGNACION expresion_aritmetica{$$.arbol= new NodoAsignacion(new NodoHoja(null,null,$1),$3.arbol);}
+           | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
+                                   $$.arbol= new NodoAsignacion(new NodoHoja(null,null,$1),$3.arbol);
+                                   }
            | error_asignacion
            ;
 
@@ -308,7 +310,8 @@ error_control : FOR '(' asignacion_for';'condicion_for';'  CTE_INT')' bloque_for
               | FOR '(' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
               ;
 
-asignacion_for: ID ASIGNACION CTE_INT {chequearRangoEnteros();}
+asignacion_for: ID ASIGNACION CTE_INT {if chequearRangoEnteros()
+                                            $$.arbol= new NodoAsignacion(new NodoHoja(null,null,$1),new NodoHoja(null,null,$3));}
               | error_asignacion_for
               ;
 
