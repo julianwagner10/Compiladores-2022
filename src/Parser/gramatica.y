@@ -38,8 +38,9 @@ bloque_ejecutable_for: ejecucion_control
                      | bloque_ejecutable_for ejecucion_control
                      ;
 
-bloque_ejecutable_if: ejecucion
-                    | bloque_ejecutable_if ejecucion
+bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
+                    | bloque_ejecutable_if ejecucion {AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutableIf");
+                                                      $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                     ;
 /*
 bloque_ejecutable : ejecucion
@@ -114,7 +115,7 @@ tipo : I32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] 
 
 ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");}
-	      | seleccion ';'
+	      | seleccion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';'
 	      | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
 	      | control ';'
@@ -228,12 +229,12 @@ factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTabla
                       $$.arbol = new NodoHoja(null,null,atributosId);
                       }
         | '-' CTE_INT {if (chequearNegativos() == true){
-                       AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                       AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
                        $$.arbol = new NodoHoja(null,null,atributos);
                        }
                       }
         | '-' CTE_FLOTANTE {if (chequearNegativos() ==true){
-                               AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                               AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
                                $$.arbol = new NodoHoja(null,null,atributos);
                                }
                            }
@@ -270,12 +271,12 @@ factor_invocacion 	: ID { AtributosTablaS atributos = Main.tablaDeSimbolos.getAt
                                }
                                }
                     | '-' CTE_INT {if (chequearNegativos()==true){
-                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
                                             $$.arbol = new NodoHoja(null,null,atributos);
                                             }
                                   }
                     | '-' CTE_FLOTANTE {if (chequearNegativos()==true){
-                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
                                             $$.arbol = new NodoHoja(null,null,atributos);
                                             }
                                        }
@@ -349,7 +350,8 @@ error_bloque_for : bloque_ejecutable_for '}' {Main.erroresSintacticos.add("Error
 
 
 condicion : expresion_aritmetica comparador expresion_aritmetica {AtributosTablaS atributos = new AtributosTablaS("Condicion");
-                                                        $$.arbol = new NodoCondicion(new NodoExpresionLogica($1.arbol,$3.arbol,$2.sval),null,atributos);}
+                                                                  AtributosTablaS atributos2 = new AtributosTablaS($2.sval);
+                                                        $$.arbol = new NodoCondicion(new NodoExpresionLogica($1.arbol,$3.arbol,atributos2),null,atributos);}
           | error_condicion
           ;
 

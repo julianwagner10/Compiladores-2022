@@ -84,6 +84,6 @@ public class Main{
 
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Arbol sintáctico ");
-        p.printSyntacticTree();
+        System.out.println(p.printSyntacticTree());
     }
 }

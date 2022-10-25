@@ -1,0 +1,7 @@
+IfBienDefinido{
+if (x>2) then{
+    u=: 3;
+    z=:-25;
+    }
+end_if;
+}

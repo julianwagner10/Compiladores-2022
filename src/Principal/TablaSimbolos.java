@@ -37,6 +37,7 @@ public class TablaSimbolos {
     public void modificarSimbolo(String lexemaviejo, String lexemaNuevo) {
         tablaSimbolos.put(lexemaNuevo,tablaSimbolos.get(lexemaviejo));
         tablaSimbolos.remove(lexemaviejo);
+        tablaSimbolos.get(lexemaNuevo).modificarLexema(lexemaNuevo);
     }
 
     public boolean esPalabraReservada(String lexema) {

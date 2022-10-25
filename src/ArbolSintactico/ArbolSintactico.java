@@ -97,7 +97,12 @@ public abstract class ArbolSintactico {
 
 
     public String getLexeme() {
-        return atributo.getLexema();
+        if (atributo.getLexema().isEmpty()){
+            return operador;
+        }
+        else{
+            return atributo.getLexema();
+        }
     }
     public String getType() {
         return this.atributo.getTipo();

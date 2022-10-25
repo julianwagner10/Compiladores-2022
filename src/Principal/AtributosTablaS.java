@@ -34,4 +34,8 @@ public class AtributosTablaS {
     }
 
     public String getLexema(){return lexema;}
+
+    public void modificarLexema(String lexema){
+        this.lexema = lexema;
+    }
 }
