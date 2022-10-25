@@ -2,6 +2,7 @@ IfBienDefinido{
 if (x>2) then{
     u=: 3;
     z=:-25;
+    y =: 55;
     }
 end_if;
 }

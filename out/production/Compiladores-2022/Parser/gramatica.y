@@ -34,8 +34,9 @@ sentencia : declaracion
           | ejecucion {$$.arbol = $1.arbol;}
           ;
 
-bloque_ejecutable_for: ejecucion_control
-                     | bloque_ejecutable_for ejecucion_control
+bloque_ejecutable_for: ejecucion_control {$$.arbol = $1.arbol;}
+                     | bloque_ejecutable_for ejecucion_control{AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutableFor");
+                                                               $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                      ;
 
 bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
@@ -118,7 +119,7 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | seleccion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';'
 	      | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
-	      | control ';'
+	      | control ';'{$$.arbol = $1.arbol;}
 	      | salida ';'
 	      | error_ejecucion
           ;
@@ -136,14 +137,18 @@ error_ejecucion : asignacion error{Main.erroresSintacticos.add("Error sináctico
                 | invocacion ';'{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
                 ;
 
-ejecucion_control: asignacion ';'
+ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");}
-                 | seleccion ';'
+                 | seleccion ';' {$$.arbol = $1.arbol;}
                  | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
-                 | control ';'
+                 | control ';' {$$.arbol = $1.arbol;}
                  | salida ';'
-                 | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");}
-                 | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");}
+                 | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
+                              AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
+                              $$.arbol = new NodoHoja(null,null,sentenciaBreak);}
+                 | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
+                                AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                                $$.arbol = new NodoHoja(null,null,sentenciaContinue);}
                  | CONTINUE ':' ID ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);}
                  | error_ejecucion_control
                  ;
@@ -339,10 +344,10 @@ error_cuerpo_else :   '{' bloque_ejecutable_if '}'  {Main.erroresSintacticos.add
               ;
 */
 
-bloque_for : ejecucion_control
-              | '{' bloque_ejecutable_for '}'
-              | error_bloque_for
-              ;
+bloque_for : ejecucion_control{ $$.arbol = $1.arbol;}
+           | '{' bloque_ejecutable_for '}' {$$.arbol = $2.arbol;}
+           | error_bloque_for
+           ;
 
 error_bloque_for : bloque_ejecutable_for '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
                 | '{' bloque_ejecutable_for  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
@@ -368,22 +373,38 @@ comparador : '<' {$$ = new ParserVal("<");}
            | DISTINTO {$$ = new ParserVal("=!");}
            ;
 
-control : FOR '(' asignacion_for';'condicion_for';' '+' CTE_INT')' bloque_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
-        | FOR '(' asignacion_for';'condicion_for';' '-' CTE_INT')' bloque_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
+control : FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");
+                                                                              AtributosTablaS lexSentenciaFor = new AtributosTablaS("Sentencia FOR");
+                                                                              AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
+                                                                              AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
+                                                                              ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor($9.arbol,null,lexCuerpoFor);
+                                                                              ArbolSintactico encabezadoFor = new NodoEncabezadoFor(new NodoEncabezadoFor($3.arbol,$5.arbol,lexEncabezadoFor),$7.arbol,lexEncabezadoFor);
+                                                                              $$.arbol = new NodoFor(encabezadoFor,nodoCuerpoFor,lexSentenciaFor);}
         | error_control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control erronea");}
         ;
 
-error_control : FOR '(' asignacion_for';'condicion_for';'  CTE_INT')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
-              | FOR '(' asignacion_for';'condicion_for';' '-' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
-              | FOR '(' asignacion_for';'condicion_for';' '+' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
-              | FOR '(' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
+error_control : FOR '(' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
               ;
+
+incr_decr : '+' CTE_INT {
+                          AtributosTablaS atributos1 = new AtributosTablaS("Incremento");
+                          $$.arbol  = new NodoIncrementoFor(new NodoHoja(null, null, Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
+           | '-' CTE_INT {
+                          AtributosTablaS atributos1 = new AtributosTablaS("Decremento");
+                          $$.arbol  = new NodoDecrementoFor(new NodoHoja(null, null, Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
+           | error_incr_decr
+           ;
+
+error_incr_decr : CTE_INT {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
+                | '-' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
+                | '+' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
+                ;
 
 asignacion_for: ID ASIGNACION CTE_INT {if (chequearRangoEnteros()==true){
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                                            AtributosTablaS atributos2 = new AtributosTablaS("Asignacion");
+                                            AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
                                             AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
-                                            $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributos),new NodoHoja(null,null,atributos3),atributos2);
+                                            $$.arbol= new NodoAsignacionFor(new NodoHoja(null,null,atributos),new NodoHoja(null,null,atributos3),atributos2);
                                             }
                                       }
               | error_asignacion_for
@@ -394,7 +415,10 @@ error_asignacion_for : ASIGNACION CTE_INT {Main.erroresSintacticos.add("Error si
                      | ID ASIGNACION  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera de la asignacion de la sentencia FOR ");}
                      ;
 
-condicion_for: ID comparador expresion_aritmetica
+condicion_for: ID comparador expresion_aritmetica {AtributosTablaS atributos = new AtributosTablaS("CondicionFOR");
+                                                   AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                                   AtributosTablaS atributos3 = new AtributosTablaS($2.sval);
+                                                   $$.arbol = new NodoCondicionFor(new NodoExpresionLogica(new NodoHoja(null,null,atributos2),$3.arbol,atributos3),null,atributos);}
              | error_condicion_for
              ;
 
