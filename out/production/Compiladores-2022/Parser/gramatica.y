@@ -1,6 +1,7 @@
 %{
 package Parser;
 import Principal.*;
+import ArbolSintactico.*;
 %}
 
 %token ID CTE_INT CTE_FLOTANTE MENOR_IGUAL MAYOR_IGUAL DISTINTO CADENA ASIGNACION IF THEN ELSE ENDIF OUT FUN RETURN BREAK DISCARD FOR CONTINUE F32 I32
@@ -9,7 +10,11 @@ import Principal.*;
 
 %%
 
-programa : ID '{' bloque'}' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");}
+programa : ID '{' bloque'}' {
+                                arbolSintactico = $3.arbol;
+                                this.arbolSintactico.printTree(this.arbolSintactico, "Root: ");
+                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");
+                            }
          | error_programa; {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo programa incorrecto");}
          ;
 
@@ -18,8 +23,9 @@ error_programa : '{'bloque'}' {Main.erroresSintacticos.add("Error sináctico: Li
                | ID '{'bloque  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la llave de cierre de bloque de programa");}
                ;
 
-bloque : sentencia
-       | bloque sentencia
+bloque : sentencia {$$.arbol = $1.arbol;}
+       | bloque sentencia {AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
+                           $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
        | error_bloque
        ;
 
@@ -27,7 +33,7 @@ error_bloque: error {Main.erroresSintacticos.add("Error sináctico: Linea " + Le
             ;
 
 sentencia : declaracion
-          | ejecucion
+          | ejecucion {$$.arbol = $1.arbol;}
           ;
 
 bloque_ejecutable_for: ejecucion_control
@@ -108,7 +114,7 @@ tipo : I32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] 
      | F32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó un tipo FLOAT F32");}
      ;
 
-ejecucion : asignacion ';'
+ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");}
 	      | seleccion ';'
 	      | retorno ';'
@@ -150,8 +156,17 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
-asignacion : ID ASIGNACION expresion_aritmetica
-           | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");}
+
+
+asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                                AtributosTablaS atributos = new AtributosTablaS("Asignacion");
+                                                $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
+                                                }
+           | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
+                                   AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                   AtributosTablaS atributos = new AtributosTablaS("Asignacion");
+                                   $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
+                                   }
            | error_asignacion
            ;
 
@@ -169,9 +184,13 @@ retorno : RETURN expresion_aritmetica
 error_retorno : RETURN {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra reservada RETURN");}
               ;
 
-expresion_aritmetica : termino
-	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");}
-	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");}
+expresion_aritmetica : termino{$$.arbol = $1.arbol;}
+	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");
+	                 	                          $$.arbol = new NodoSuma($1.arbol,$3.arbol);
+	                                                    }
+	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");
+	                 	                 	            $$.arbol = new NodoResta($1.arbol,$3.arbol);
+	                                                    }
 	                 | error_expresion_aritmetica
                      ;
 
@@ -179,9 +198,13 @@ error_expresion_aritmetica : expresion_aritmetica '+' error{Main.erroresSintacti
                            | expresion_aritmetica '-' error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '-' ");}
                            ;
 
-termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");}
-	    | termino '/' factor  { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");}
-	    | factor
+termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");
+	                          $$.arbol = new NodoMultiplicacion($1.arbol,$3.arbol);
+                             }
+	    | termino '/' factor  { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");
+	                          $$.arbol = new NodoDivision($1.arbol,$3.arbol);
+	                          }
+	    | factor{$$.arbol = $1.arbol;}
 	    | error_termino
         ;
 
@@ -191,12 +214,31 @@ error_termino : termino '*' error{Main.erroresSintacticos.add("Error sináctico:
               | '/' factor {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '/' ");}
               ;
 
-factor 	: ID
-        | CTE_FLOTANTE
-        | CTE_INT {chequearRangoEnteros();}
-        | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");}
-        | '-' CTE_INT {chequearNegativos();}
-        | '-' CTE_FLOTANTE {chequearNegativos();}
+factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+              $$.arbol = new NodoHoja(null,null,atributos);
+              }
+        | CTE_FLOTANTE {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                        $$.arbol = new NodoHoja(null,null,atributos);
+                       }
+        | CTE_INT {if (chequearRangoEnteros() == true){
+                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                        $$.arbol = new NodoHoja(null,null,atributos);
+                        }
+                   }
+        | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
+                      AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                      $$.arbol = new NodoHoja(null,null,atributosId);
+                      }
+        | '-' CTE_INT {if (chequearNegativos() == true){
+                       AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                       $$.arbol = new NodoHoja(null,null,atributos);
+                       }
+                      }
+        | '-' CTE_FLOTANTE {if (chequearNegativos() ==true){
+                               AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                               $$.arbol = new NodoHoja(null,null,atributos);
+                               }
+                           }
         ;
 
 invocacion : ID '(' parametros_reales ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
@@ -216,47 +258,100 @@ parametros_reales : factor_invocacion
 error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
                         ;
 
-factor_invocacion 	: ID
-                    | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);}
-                    | CTE_INT {chequearRangoEnteros();
-                               Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);}
-                    | '-' CTE_INT {chequearNegativos();}
-                    | '-' CTE_FLOTANTE {chequearNegativos();}
+factor_invocacion 	: ID { AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                          $$.arbol = new NodoHoja(null,null,atributos);
+                          }
+                    | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);
+                                   AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                   $$.arbol = new NodoHoja(null,null,atributos);
+                                   }
+                    | CTE_INT {if (chequearRangoEnteros() == true) {
+                               Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);
+                               AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                               $$.arbol = new NodoHoja(null,null,atributos);
+                               }
+                               }
+                    | '-' CTE_INT {if (chequearNegativos()==true){
+                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                                            $$.arbol = new NodoHoja(null,null,atributos);
+                                            }
+                                  }
+                    | '-' CTE_FLOTANTE {if (chequearNegativos()==true){
+                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                                            $$.arbol = new NodoHoja(null,null,atributos);
+                                            }
+                                       }
                     ;
-
-seleccion : IF '(' condicion ')' THEN bloque_if ENDIF {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");}
-	      | IF '(' condicion ')' THEN bloque_if ELSE bloque_if ENDIF {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF con ELSE");}
+seleccion : IF '(' condicion ')' cuerpo_if {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");
+                                            AtributosTablaS atributos = new AtributosTablaS("IF");
+                                            $$.arbol = new NodoIf($3.arbol,$5.arbol,atributos);}
           | error_seleccion
           ;
 
-error_seleccion: '(' condicion ')' THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
-               | IF condicion ')' THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '(' de la sentencia IF ");}
-               | IF '(' ')' THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la condicion de la sentencia IF ");}
-               | IF '(' condicion  THEN bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de la sentencia IF ");}
-               | IF '(' condicion ')'  bloque_if ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada THEN de la sentencia IF ");}
-               | IF '(' condicion ')' THEN  ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable de la sentencia IF ");}
-               | IF '(' condicion ')' THEN bloque_if error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
+error_seleccion: '(' condicion ')' cuerpo_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
+               | IF condicion ')' cuerpo_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '(' de la sentencia IF ");}
+               | IF '(' ')' cuerpo_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la condicion de la sentencia IF ");}
+               | IF '(' condicion  cuerpo_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de la sentencia IF ");}
+               | IF '(' condicion ')' error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable de la sentencia IF ");}
                ;
+
+cuerpo_if : THEN cuerpo_then ENDIF {AtributosTablaS atributos = new AtributosTablaS("CuerpoIf");
+                                    $$.arbol = new NodoCuerpoIf($2.arbol,null,atributos);
+                                    }
+          | THEN cuerpo_then cuerpo_else ENDIF {AtributosTablaS atributos = new AtributosTablaS("CuerpoIf");
+                                                $$.arbol = new NodoCuerpoIf($2.arbol,$3.arbol,atributos);
+                                                }
+          | error_cuerpo_if
+          ;
+
+error_cuerpo_if: error cuerpo_then cuerpo_else ENDIF {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
+               | THEN cuerpo_then {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
+               | THEN cuerpo_then cuerpo_else  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
+               ;
+
+
+cuerpo_then: ejecucion {AtributosTablaS atributos = new AtributosTablaS("Then");
+                        $$.arbol = new NodoElse($1.arbol,null,atributos);}
+           | '{' bloque_ejecutable_if '}'{AtributosTablaS atributos = new AtributosTablaS("Then");
+                                          $$.arbol = new NodoElse($2.arbol,null,atributos);}
+           | error_cuerpo_then
+           ;
+
+cuerpo_else: ELSE ejecucion {AtributosTablaS atributos = new AtributosTablaS("Else");
+                             $$.arbol = new NodoElse($2.arbol,null,atributos);}
+           | ELSE '{' bloque_ejecutable_if '}' {AtributosTablaS atributos = new AtributosTablaS("Else");
+                                                $$.arbol = new NodoElse($3.arbol,null,atributos);}
+           | error_cuerpo_else
+           ;
+
+error_cuerpo_then : bloque_ejecutable_if '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
+                | '{' bloque_ejecutable_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
+                ;
+
+error_cuerpo_else :   '{' bloque_ejecutable_if '}'  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el la palabra reservada ELSE antes de las sentencias ejecutables ");}
+                | ELSE bloque_ejecutable_if '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
+                | ELSE '{' bloque_ejecutable_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
+                ;
+
+
+/*bloque_if : ejecucion
+              | '{' bloque_ejecutable_if '}'
+              | error_bloque_if
+              ;
+*/
 
 bloque_for : ejecucion_control
               | '{' bloque_ejecutable_for '}'
               | error_bloque_for
               ;
 
-bloque_if : ejecucion
-              | '{' bloque_ejecutable_if '}'
-              | error_bloque_if
-              ;
 error_bloque_for : bloque_ejecutable_for '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
                 | '{' bloque_ejecutable_for  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
                 ;
 
-error_bloque_if : bloque_ejecutable_if '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
-                | '{' bloque_ejecutable_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
-                ;
 
-
-condicion : expresion_aritmetica comparador expresion_aritmetica
+condicion : expresion_aritmetica comparador expresion_aritmetica {AtributosTablaS atributos = new AtributosTablaS("Condicion");
+                                                        $$.arbol = new NodoCondicion(new NodoExpresionLogica($1.arbol,$3.arbol,$2.sval),null,atributos);}
           | error_condicion
           ;
 
@@ -265,12 +360,12 @@ error_condicion : comparador expresion_aritmetica {Main.erroresSintacticos.add("
                 | expresion_aritmetica error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " condicion mal declarada ");}
                 ;
 
-comparador : '<'
-           | '>'
-           | '='
-           | MAYOR_IGUAL
-           | MENOR_IGUAL
-           | DISTINTO
+comparador : '<' {$$ = new ParserVal("<");}
+           | '>' {$$ = new ParserVal(">");}
+           | '=' {$$ = new ParserVal("=");}
+           | MAYOR_IGUAL {$$ = new ParserVal(">=");}
+           | MENOR_IGUAL {$$ = new ParserVal("<=");}
+           | DISTINTO {$$ = new ParserVal("=!");}
            ;
 
 control : FOR '(' asignacion_for';'condicion_for';' '+' CTE_INT')' bloque_for {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");}
@@ -284,7 +379,13 @@ error_control : FOR '(' asignacion_for';'condicion_for';'  CTE_INT')' bloque_for
               | FOR '(' ')' bloque_for {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
               ;
 
-asignacion_for: ID ASIGNACION CTE_INT {chequearRangoEnteros();}
+asignacion_for: ID ASIGNACION CTE_INT {if (chequearRangoEnteros()==true){
+                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                            AtributosTablaS atributos2 = new AtributosTablaS("Asignacion");
+                                            AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
+                                            $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributos),new NodoHoja(null,null,atributos3),atributos2);
+                                            }
+                                      }
               | error_asignacion_for
               ;
 
@@ -313,12 +414,11 @@ error_salida: OUT CADENA')'{Main.erroresSintacticos.add("Error sináctico: Linea
 %%
 
 private Lexico lexico;
-
+private ArbolSintactico arbolSintactico;
 
 public Parser(Lexico lexico)
 {
   this.lexico = lexico;
-
 }
 
 public int yylex(){
@@ -336,19 +436,21 @@ public void yyerror(String s){
     //System.out.println("Parser: " + s);
 }
 
-public void chequearRangoEnteros(){
+public boolean chequearRangoEnteros(){
 	String lexema = yylval.sval;
     Long constante = Long.parseLong(lexema); //Convierto el string dentro del buffer en una constante entera.
         if((constante >= (-1*Math.pow(2,31))) && (constante <= (Math.pow(2,31) - 1))){
 		    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una constante ENTERA LARGA positiva -> "+constante);
+		    return true;
         }
         else{
         	Main.erroresSintacticos.add("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante ENTERA LARGA fuera de rango");
             Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+            return false;
         }
 }
 
-public void chequearNegativos(){
+public boolean chequearNegativos(){
 	String lexema = yylval.sval;
 	int id = Main.tablaDeSimbolos.getIdentificador(lexema);
 	if(id == Lexico.CTE_INT){
@@ -356,10 +458,12 @@ public void chequearNegativos(){
 		if((enteroNeg >= (-Math.pow(2,31))) && (enteroNeg <= (Math.pow(2,31) - 1))){
 		    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una constante ENTERA LARGA con signo negativo -> "+enteroNeg);
 		    Main.tablaDeSimbolos.modificarSimbolo(lexema, String.valueOf(enteroNeg));
+		    return true;
 		}
 		else{
 		    Main.erroresSintacticos.add("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante ENTERA LARGA fuera de rango");
             Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+            return false;
 		}
 	}
 	else if (id == Lexico.CTE_FLOTANTE) {
@@ -367,11 +471,26 @@ public void chequearNegativos(){
         if ((flotanteNeg > 1.17549435e-38 && flotanteNeg < 3.40282347e+38) || (flotanteNeg > -3.40282347e+38 && flotanteNeg < -1.17549435e-38) || (flotanteNeg == 0.0)){
             Main.tablaDeSimbolos.modificarSimbolo(lexema, String.valueOf(flotanteNeg));
             System.out.println("[Parser | Linea " + Lexico.linea + "] se detecto una constante FLOTANTE son signo negativo -> "+flotanteNeg);
+            return true;
         }
         else {
             Main.erroresSintacticos.add("Error sintáctico: Linea " + Lexico.linea + " se detectó una constante FLOTANTE fuera de rango");
             Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+            return false;
 	 	}
 	}
+	return false;
+}
+
+public String printSyntacticTree(){
+	if(this.arbolSintactico != null){
+		this.arbolSintactico.printTree(this.arbolSintactico, "Root: ");
+		return this.arbolSintactico.getPrintTree();
+	}
+	return "xd";
+}
+
+public ArbolSintactico returnTree(){
+	return this.arbolSintactico;
 }
 

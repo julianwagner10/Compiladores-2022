@@ -1,18 +1,22 @@
 package Principal;
 
 public class AtributosTablaS {
+    private String lexema;
     private int identificador;
     private String tipo ="";
     private String uso = "";
     private String ambito = "";
 
-    public AtributosTablaS(int id, String tipo, String uso, String ambito){
+    public AtributosTablaS(int id, String tipo, String uso, String ambito, String lexema){
         this.identificador = id;
         this.tipo = tipo;
         this.uso = uso;
         this.ambito = ambito;
+        this.lexema = lexema;
     }
-
+    public AtributosTablaS(String lexema){
+        this.lexema = lexema;
+    }
     public int getIdentificador(){
         return this.identificador;
     }
@@ -28,4 +32,6 @@ public class AtributosTablaS {
     public String getAmbito() {
         return ambito;
     }
+
+    public String getLexema(){return lexema;}
 }

@@ -81,5 +81,9 @@ public class Main{
         System.out.println("Tabla de simbolos ");
         System.out.println("");
         tablaDeSimbolos.mostrarTablasimbolos();
+
+        System.out.println("------------------------------------------------------------------------------------");
+        System.out.println("Arbol sintáctico ");
+        p.printSyntacticTree();
     }
 }

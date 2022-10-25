@@ -1,7 +1,8 @@
 ControlConEtiquetaBienDef{
 etiqueta : for (id=:2 ; id>4 ; +2){
     if(x<z)then
-        continue : etiqueta;
+        x=:2;
     end_if;
+    continue : etiqueta;
     };
 }
