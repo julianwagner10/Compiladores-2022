@@ -43,13 +43,6 @@ bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
                     | bloque_ejecutable_if ejecucion {AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutableIf");
                                                       $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                     ;
-/*
-bloque_ejecutable : ejecucion
-                  | ejecucion_control
-                  | bloque_ejecutable ejecucion
-                  | bloque_ejecutable ejecucion_control
-                  ;
-*/
 
 declaracion : tipo lista_de_variables ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
             | funcion
@@ -120,7 +113,7 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';'
 	      | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
 	      | control ';'{$$.arbol = $1.arbol;}
-	      | salida ';'
+	      | salida ';' {$$.arbol = $1.arbol;}
 	      | error_ejecucion
           ;
 
@@ -142,7 +135,7 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | seleccion ';' {$$.arbol = $1.arbol;}
                  | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
                  | control ';' {$$.arbol = $1.arbol;}
-                 | salida ';'
+                 | salida ';' {$$.arbol = $1.arbol;}
                  | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                               AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
                               $$.arbol = new NodoHoja(null,null,sentenciaBreak);}
@@ -427,7 +420,11 @@ error_condicion_for : comparador expresion_aritmetica {Main.erroresSintacticos.a
                     | ID comparador  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la condicion de la sentencia FOR ");}
                     ;
 
-salida : OUT '('CADENA')'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");}
+salida : OUT '('CADENA')'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");
+                          AtributosTablaS lexSalida = new AtributosTablaS("Sentencia de Impresion por Pantalla");
+                          AtributosTablaS lexCadena = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
+                          $$.arbol = new NodoSalida(new NodoHoja(null,null,lexCadena),null,lexSalida);
+                          }
        | error_salida
        ;
 
