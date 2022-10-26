@@ -110,7 +110,7 @@ tipo : I32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] 
 ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");}
 	      | seleccion ';'{$$.arbol = $1.arbol;}
-	      | retorno ';'
+	      | retorno ';' {$$.arbol = $1.arbol;}
 	      | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
 	      | control ';'{$$.arbol = $1.arbol;}
 	      | salida ';' {$$.arbol = $1.arbol;}
@@ -153,8 +153,6 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
-
-
 asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                                                 AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                                 $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
@@ -174,7 +172,9 @@ error_asignacion : ID error expresion_aritmetica {Main.erroresSintacticos.add("E
                  | ASIGNACION control {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
                  ;
 
-retorno : RETURN expresion_aritmetica
+retorno : RETURN expresion_aritmetica { AtributosTablaS retorno = new AtributosTablaS("RETURN");
+                                        $$.arbol = new NodoRetorno($2.arbol,null,retorno);
+                                      }
         | error_retorno
         ;
 
@@ -183,10 +183,10 @@ error_retorno : RETURN {Main.erroresSintacticos.add("Error sináctico: Linea " +
 
 expresion_aritmetica : termino{$$.arbol = $1.arbol;}
 	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");
-	                 	                          $$.arbol = new NodoSuma($1.arbol,$3.arbol);
+	                 	                                  $$.arbol = new NodoSuma($1.arbol,$3.arbol);
 	                                                    }
 	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");
-	                 	                 	            $$.arbol = new NodoResta($1.arbol,$3.arbol);
+	                 	                 	              $$.arbol = new NodoResta($1.arbol,$3.arbol);
 	                                                    }
 	                 | error_expresion_aritmetica
                      ;
@@ -330,13 +330,6 @@ error_cuerpo_else :   '{' bloque_ejecutable_if '}'  {Main.erroresSintacticos.add
                 | ELSE '{' bloque_ejecutable_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
                 ;
 
-
-/*bloque_if : ejecucion
-              | '{' bloque_ejecutable_if '}'
-              | error_bloque_if
-              ;
-*/
-
 bloque_for : ejecucion_control{ $$.arbol = $1.arbol;}
            | '{' bloque_ejecutable_for '}' {$$.arbol = $2.arbol;}
            | error_bloque_for
@@ -349,7 +342,7 @@ error_bloque_for : bloque_ejecutable_for '}' {Main.erroresSintacticos.add("Error
 
 condicion : expresion_aritmetica comparador expresion_aritmetica {AtributosTablaS atributos = new AtributosTablaS("Condicion");
                                                                   AtributosTablaS atributos2 = new AtributosTablaS($2.sval);
-                                                        $$.arbol = new NodoCondicion(new NodoExpresionLogica($1.arbol,$3.arbol,atributos2),null,atributos);}
+                                                                  $$.arbol = new NodoCondicion(new NodoExpresionLogica($1.arbol,$3.arbol,atributos2),null,atributos);}
           | error_condicion
           ;
 
