@@ -26,18 +26,12 @@ public class TablaSimbolos {
             return null;
     }
 
-    public AtributosTablaS getAtributos(String lexema){
-        if(tablaSimbolos.contains(lexema)){
-            return tablaSimbolos.get(lexema);
-        }
-        else
-            return null;
-    }
-
     public void modificarSimbolo(String lexemaviejo, String lexemaNuevo) {
-        tablaSimbolos.put(lexemaNuevo,tablaSimbolos.get(lexemaviejo));
+        AtributosTablaS atributos = tablaSimbolos.get(lexemaviejo);
+        atributos.modificarLexema(lexemaNuevo);
         tablaSimbolos.remove(lexemaviejo);
-        tablaSimbolos.get(lexemaNuevo).modificarLexema(lexemaNuevo);
+        tablaSimbolos.put(lexemaNuevo,atributos);
+
     }
 
     public boolean esPalabraReservada(String lexema) {
@@ -67,6 +61,17 @@ public class TablaSimbolos {
         }
     }
 
+    public void setSimbolo(String lexema, int id,String tipo){
+
+        if(tablaSimbolos.containsKey(lexema))
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> "+ lexema );
+        else {
+            if (!this.esPalabraReservada(lexema)) {
+                AtributosTablaS at = new AtributosTablaS(id,tipo,"","",lexema); //Los datos vacios  son temporales para evitar errores.
+                tablaSimbolos.put(lexema, at);
+            }
+        }
+    }
     public void mostrarTablasimbolos(){
         Enumeration iterator = tablaSimbolos.keys();
         while(iterator.hasMoreElements()){

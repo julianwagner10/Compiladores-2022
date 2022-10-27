@@ -10,8 +10,14 @@ public class Main{
     private static BufferedReader texto; // Se utiliza para leer texto de un flujo de entrada de caracteres.
     public static TablaSimbolos tablaDeSimbolos = new TablaSimbolos();
     public static List<String> informesSintacticos = new ArrayList<>();
+
+    public static List<String> informesSemanticos = new ArrayList<>();
+
     public static List<String> erroresSintacticos = new ArrayList<>();
     public static List<String> erroresLexicos = new ArrayList<>();
+
+    public static List<String> erroresSemanticos = new ArrayList<>();
+
 
     private static StringBuilder obtenerTextoALeer(BufferedReader ubicacion) throws IOException { //Metodo para obtener el texto a leer que contiene excepciones a errores no evitables por parte del programador.
 
@@ -66,6 +72,12 @@ public class Main{
             System.out.println(s);
         }
         System.out.println("------------------------------------------------------------------------------------");
+        System.out.println("Informes Semanticos :");
+        System.out.println("");
+        for(String s :informesSemanticos){
+            System.out.println(s);
+        }
+        System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Errores Lexicos :");
         System.out.println("");
         for(String l :erroresLexicos){
@@ -75,6 +87,13 @@ public class Main{
         System.out.println("Errores Sintacticos :");
         System.out.println("");
         for(String e :erroresSintacticos){
+            System.out.println(e);
+        }
+
+        System.out.println("------------------------------------------------------------------------------------");
+        System.out.println("Errores Semánticos :");
+        System.out.println("");
+        for(String e :erroresSemanticos){
             System.out.println(e);
         }
         System.out.println("------------------------------------------------------------------------------------");

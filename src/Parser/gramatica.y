@@ -2,6 +2,8 @@
 package Parser;
 import Principal.*;
 import ArbolSintactico.*;
+import java.util.ArrayList;
+
 %}
 
 %token ID CTE_INT CTE_FLOTANTE MENOR_IGUAL MAYOR_IGUAL DISTINTO CADENA ASIGNACION IF THEN ELSE ENDIF OUT FUN RETURN BREAK DISCARD FOR CONTINUE F32 I32
@@ -44,7 +46,24 @@ bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
                                                       $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                     ;
 
-declaracion : tipo lista_de_variables ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una declaracion de variable/s");}
+declaracion : tipo lista_de_variables ';'{  String tipoVar = $1.sval;
+					                        lista_variables = (ArrayList<String>)$2.obj;
+                                            for(String lexema : lista_variables){
+                                                    String nuevoLexema = lexema + "." + ambito;
+                                                    if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
+                                                        Main.tablaDeSimbolos.modificarSimbolo(lexema, nuevoLexema);
+                                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                                                        atributos.setUso("variable");
+                                                        atributos.setTipo(tipoVar);
+                                                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
+                                                    } else {
+                                                        Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la variable " + lexema + " ya fue declarada en este ambito");
+                                                        Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+                                                        }
+                                                }
+                                            lista_variables.clear();
+                                            Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una variable de tipo "+tipoVar+ " en el ámbito "+ambito);
+                                            }
             | funcion
             | error_declaracion
             ;
@@ -54,8 +73,15 @@ error_declaracion : tipo lista_de_variables error {Main.erroresSintacticos.add("
                   | tipo  ';' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador de la variable en la declaracion");}
                   ;
 
-lista_de_variables : ID {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $1.sval);}
-      		       | lista_de_variables ',' ID {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo una lista de variables con identificador -> " + $3.sval);}
+lista_de_variables : ID {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $1.sval);
+                        lista_variables.add($1.sval);
+                        $$ = new ParserVal(lista_variables);
+                                }
+      		       | lista_de_variables ',' ID {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo una lista de variables con identificador -> " + $3.sval);
+                                         lista_variables = (ArrayList<String>) $1.obj;
+                                         lista_variables.add($3.sval);
+                                         $$ = new ParserVal(lista_variables);
+                                         }
                    | error_lista_de_variables
                    ;
 
@@ -73,7 +99,7 @@ error_funcion : declaracion_fun  bloque '}' {Main.erroresSintacticos.add("Error 
               | declaracion_fun '{' '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el bloque de sentencias de la funcion");}
               ;
 
-declaracion_fun : FUN ID lista_de_parametros ':' tipo
+declaracion_fun : FUN ID lista_de_parametros ':' tipo{ambito = ambito + "."+ $2.sval;}
                 | error_declaracion_fun
                 ;
 
@@ -429,10 +455,15 @@ error_salida: OUT CADENA')'{Main.erroresSintacticos.add("Error sináctico: Linea
 
 private Lexico lexico;
 private ArbolSintactico arbolSintactico;
+private String ambito;
+private ArrayList<String> lista_variables;
 
 public Parser(Lexico lexico)
 {
   this.lexico = lexico;
+  this.ambito = "main";
+  this.lista_variables = new ArrayList<String>();
+
 }
 
 public int yylex(){

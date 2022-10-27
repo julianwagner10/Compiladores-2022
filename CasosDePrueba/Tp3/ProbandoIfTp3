@@ -1,4 +1,5 @@
 IfBienDefinido{
+f32 varf32,z;
 if (x>2) then{
     u=: 3;
     z=:-25;

@@ -38,4 +38,8 @@ public class AtributosTablaS {
     public void modificarLexema(String lexema){
         this.lexema = lexema;
     }
+
+    public void setUso(String uso){this.uso=uso;}
+
+    public void setTipo(String tipo){this.tipo=tipo;}
 }
