@@ -8,6 +8,9 @@ fun f1(i32 y):i32{
     else
         y=: x;
     end_if;
-    }
+
     return x;
+    }
+discard f1(45);
+
 }

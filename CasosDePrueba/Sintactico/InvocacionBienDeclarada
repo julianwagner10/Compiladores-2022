@@ -1,3 +1,5 @@
 InvocacionBienDef{
 discard f1 (z,y) ;
+discard f2 (x);
+discard f3();
 }

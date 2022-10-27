@@ -103,7 +103,7 @@ declaracion_fun : FUN ID lista_de_parametros ':' tipo{ambito = ambito + "."+ $2.
                 | error_declaracion_fun
                 ;
 
-error_declaracion_fun :  ID lista_de_parametros ':' tipo {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada fun en la declaracion");}
+error_declaracion_fun : ID lista_de_parametros ':' tipo {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada fun en la declaracion");}
                       | FUN lista_de_parametros ':' tipo {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta identificador de funcion en la declaracion");}
                       | FUN ID ':' tipo {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta lista de parametros de funcion en la declaracion");}
                       | FUN ID lista_de_parametros tipo {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ':' previo al tipo que devuelve la funcion en la declaracion");}
@@ -134,10 +134,17 @@ tipo : I32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] 
      ;
 
 ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
-	      | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");}
+	      | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
+	                                AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
+	                                $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+	                                }
 	      | seleccion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';' {$$.arbol = $1.arbol;}
-	      | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
+	      | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
+	                           AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
+	                           AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+	                           $$.arbol = new NodoEtiquetado(new NodoHoja(null,null,lexID),$3.arbol,lexEtiqueta);
+	                           }
 	      | control ';'{$$.arbol = $1.arbol;}
 	      | salida ';' {$$.arbol = $1.arbol;}
 	      | error_ejecucion
@@ -157,18 +164,28 @@ error_ejecucion : asignacion error{Main.erroresSintacticos.add("Error sináctico
                 ;
 
 ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
-                 | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");}
+                 | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
+                                           AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
+                                           $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+                                           }
                  | seleccion ';' {$$.arbol = $1.arbol;}
-                 | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);}
+                 | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
+                                      AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
+                                      AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                      $$.arbol = new NodoEtiquetado(new NodoHoja(null,null,lexID),$3.arbol,lexEtiqueta);
+                                      }
                  | control ';' {$$.arbol = $1.arbol;}
                  | salida ';' {$$.arbol = $1.arbol;}
                  | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                               AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
                               $$.arbol = new NodoHoja(null,null,sentenciaBreak);}
                  | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
-                                AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                                AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue");
                                 $$.arbol = new NodoHoja(null,null,sentenciaContinue);}
-                 | CONTINUE ':' ID ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);}
+                 | CONTINUE ':' ID ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);
+                                        AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue con etiquetado");
+                                        AtributosTablaS controlEtiquetado = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
+                                        $$.arbol = new NodoEtiquetado(new NodoHoja(null,null,controlEtiquetado),null,sentenciaContinue);}
                  | error_ejecucion_control
                  ;
 
@@ -264,8 +281,14 @@ factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTabla
                            }
         ;
 
-invocacion : ID '(' parametros_reales ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
-           | ID '('  ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);}
+invocacion : ID '(' parametros_reales ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
+                                            AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
+                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                            $$.arbol = new NodoInvocacion(new NodoHoja(null,null,lexID),$3.arbol,lexInvocacion);}
+           | ID '('  ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
+                           AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
+                           AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                           $$.arbol = new NodoInvocacion(new NodoHoja(null,null,lexID),null,lexInvocacion);}
            | error_invocacion
            ;
 
@@ -273,8 +296,12 @@ error_invocacion : ID '(' parametros_reales error {Main.erroresSintacticos.add("
                  | ID '(' error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
                  ;
 
-parametros_reales : factor_invocacion
-                  | factor_invocacion  ','  factor_invocacion
+parametros_reales : factor_invocacion {AtributosTablaS lexParam = new AtributosTablaS("Un Parametro");
+                                       $$.arbol = new NodoParam($1.arbol,null,lexParam);
+                                       }
+                  | factor_invocacion  ','  factor_invocacion {AtributosTablaS lexParam = new AtributosTablaS("Dos Parametros");
+                                                               $$.arbol = new NodoParam($1.arbol,$3.arbol,lexParam);
+                                                               }
                   | error_parametros_reales
                   ;
 
