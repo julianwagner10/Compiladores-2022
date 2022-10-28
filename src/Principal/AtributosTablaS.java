@@ -7,6 +7,8 @@ public class AtributosTablaS {
     private String uso = "";
     private String ambito = "";
 
+    private int orden;
+
     public AtributosTablaS(int id, String tipo, String uso, String ambito, String lexema){
         this.identificador = id;
         this.tipo = tipo;
@@ -35,6 +37,7 @@ public class AtributosTablaS {
 
     public String getLexema(){return lexema;}
 
+    public int getOrden(){return this.orden;}
     public void modificarLexema(String lexema){
         this.lexema = lexema;
     }
@@ -42,4 +45,6 @@ public class AtributosTablaS {
     public void setUso(String uso){this.uso=uso;}
 
     public void setTipo(String tipo){this.tipo=tipo;}
+
+    public void setOrden(int orden){this.orden=orden;}
 }

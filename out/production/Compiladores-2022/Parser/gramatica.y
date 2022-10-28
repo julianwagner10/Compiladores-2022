@@ -90,7 +90,9 @@ error_lista_de_variables : lista_de_variables ID {Main.erroresSintacticos.add("E
                          | lista_de_variables ',' error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador despues de la coma");}
                          ;
 
-funcion : declaracion_fun '{'bloque'}' {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");}
+funcion : declaracion_fun '{'bloque'}' {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");
+								ambito = ambito.substring(0,ambito.lastIndexOf("."));
+                            }
         | error_funcion
         ;
 
@@ -99,7 +101,28 @@ error_funcion : declaracion_fun  bloque '}' {Main.erroresSintacticos.add("Error 
               | declaracion_fun '{' '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el bloque de sentencias de la funcion");}
               ;
 
-declaracion_fun : FUN ID lista_de_parametros ':' tipo{ambito = ambito + "."+ $2.sval;}
+declaracion_fun : FUN ID lista_de_parametros ':' tipo{
+                    lista_parametros = (ArrayList<String>)$3.obj;
+                                if(!lista_parametros.isEmpty()){
+                                    String nuevoLexema = $2.sval + "." + ambito;
+                                    if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
+                                        Main.tablaDeSimbolos.modificarSimbolo($2.sval, nuevoLexema);
+                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                                        atributos.setUso("nombreProcedimiento");
+                                        //atributos.setCantParametros(lista_parametros.size());
+                                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
+                                        int posicion = 1;
+                                        for(String parametro : lista_parametros){
+                                            Main.tablaDeSimbolos.modificarSimbolo(parametro, parametro +"."+ambito);
+                                            Main.tablaDeSimbolos.getAtributosTablaS(parametro +"."+ambito).setOrden(posicion);
+                                            posicion++;
+                                        }
+                                    } else {
+                                        Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " el procedimiento "+ $2.sval + " ya fue declarado en este ambito");
+                                        }
+                                }
+                                ambito = ambito + "."+ $2.sval;
+                                }
                 | error_declaracion_fun
                 ;
 
@@ -111,8 +134,16 @@ error_declaracion_fun : ID lista_de_parametros ':' tipo {Main.erroresSintacticos
                       ;
 
 lista_de_parametros : '(' ')'
-                    | '('parametro')'
-                    | '(' parametro ',' parametro ')'
+                    | '('parametro')'{lista_parametros.clear();
+                                     			     lista_parametros.add($2.sval);
+                                     			     $$ = new ParserVal(lista_parametros);}
+                    | '(' parametro ',' parametro ')'{lista_parametros.clear();
+                                                     		    			if(!$2.sval.equals($4.sval)){
+                                                     						lista_parametros.add($1.sval);
+                                                     						lista_parametros.add($3.sval);
+                                                     					} else
+                                                     						Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " no puede haber dos parametros con el mismo ID");
+                                                     					$$ = new ParserVal(lista_parametros);}
                     | error_lista_de_parametros
                     ;
 
@@ -121,7 +152,11 @@ error_lista_de_parametros : parametro')' {Main.erroresSintacticos.add("Error sin
                           | '(' parametro ',' parametro ',' parametro')'{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " el número máximo de parámetros permitidos es 2");}
                           ;
 
-parametro : tipo ID
+parametro : tipo ID{      AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($2.sval);
+                   		  atributos.setUso("nombreParametro");
+                   		  atributos.setTipo($1.sval);
+                   		  Main.tablaDeSimbolos.setAtributosDeSimbolo($2.sval, atributos);
+                   		  $$ = new ParserVal($2.sval);} //copia valor
           | error_parametro
           ;
 
@@ -129,8 +164,10 @@ error_parametro : tipo {Main.erroresSintacticos.add("Error sináctico: Linea " +
                 | error ID {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el tipo del parametro");}
                 ;
 
-tipo : I32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó un tipo INT LARGO I32");}
-     | F32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó un tipo FLOAT F32");}
+tipo : I32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó un tipo INT LARGO I32");
+            $$ = new ParserVal ("INT");}
+     | F32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó un tipo FLOAT F32");
+            $$ = new ParserVal ("FLOAT");}
      ;
 
 ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
@@ -484,12 +521,14 @@ private Lexico lexico;
 private ArbolSintactico arbolSintactico;
 private String ambito;
 private ArrayList<String> lista_variables;
+private ArrayList<String> lista_parametros;
 
 public Parser(Lexico lexico)
 {
   this.lexico = lexico;
   this.ambito = "main";
   this.lista_variables = new ArrayList<String>();
+  this.lista_parametros = new ArrayList<String>();
 
 }
 
