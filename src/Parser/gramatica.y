@@ -103,26 +103,28 @@ error_funcion : declaracion_fun  bloque '}' {Main.erroresSintacticos.add("Error 
 
 declaracion_fun : FUN ID lista_de_parametros ':' tipo{
                     lista_parametros = (ArrayList<String>)$3.obj;
-                                if(!lista_parametros.isEmpty()){
-                                    String nuevoLexema = $2.sval + "." + ambito;
-                                    if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
-                                        Main.tablaDeSimbolos.modificarSimbolo($2.sval, nuevoLexema);
-                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
-                                        atributos.setUso("nombreProcedimiento");
-                                        //atributos.setCantParametros(lista_parametros.size());
-                                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
-                                        int posicion = 1;
-                                        for(String parametro : lista_parametros){
-                                            Main.tablaDeSimbolos.modificarSimbolo(parametro, parametro +"."+ambito);
-                                            Main.tablaDeSimbolos.getAtributosTablaS(parametro +"."+ambito).setOrden(posicion);
-                                            posicion++;
-                                        }
-                                    } else {
-                                        Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " el procedimiento "+ $2.sval + " ya fue declarado en este ambito");
-                                        }
-                                }
-                                ambito = ambito + "."+ $2.sval;
-                                }
+                    String nuevoLexema = $2.sval + "." + ambito;
+                    if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
+                        Main.tablaDeSimbolos.modificarSimbolo($2.sval, nuevoLexema);
+                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                        atributos.setUso("nombreFuncion");
+                        atributos.setTipo($5.sval);
+                        //atributos.setCantParametros(lista_parametros.size());
+                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
+                        if(!lista_parametros.isEmpty()){
+                            int posicion = 1;
+                            for(String parametro : lista_parametros){
+                                Main.tablaDeSimbolos.modificarSimbolo(parametro, parametro +"."+ambito);
+                                Main.tablaDeSimbolos.getAtributosTablaS(parametro +"."+ambito).setOrden(posicion);
+                                posicion++;
+                            }
+                        }
+                        Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una funcion declarada con nombre "+$2.sval+ " en el ámbito "+ambito+", con tipo de retorno " + Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
+                    } else {
+                        Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " la funcion "+ $2.sval + " ya fue declarada en este ambito");
+                        }
+                    ambito = ambito + "."+ $2.sval;
+                    }
                 | error_declaracion_fun
                 ;
 
@@ -133,7 +135,8 @@ error_declaracion_fun : ID lista_de_parametros ':' tipo {Main.erroresSintacticos
                       | FUN ID lista_de_parametros ':' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion en la declaracion");}
                       ;
 
-lista_de_parametros : '(' ')'
+lista_de_parametros : '(' ')' {lista_parametros.clear();
+                              $$ = new ParserVal(lista_parametros);}
                     | '('parametro')'{lista_parametros.clear();
                                      			     lista_parametros.add($2.sval);
                                      			     $$ = new ParserVal(lista_parametros);}
