@@ -629,22 +629,3 @@ public ArbolSintactico returnTree(){
 	return this.arbolSintactico;
 }
 
-/*
-public boolean verificarParametros(String proc){
-	int orden = 1;
-	for(Pair p : lista_param_invocacion){
-		String parametroFormal = p.getKey() + "." + proc;
-		String parametroReal = (String)p.getValue();
-		if(!Main.tSimbolos.existeLexema(parametroFormal)){ //el usuario lo escribio mal en la invocacion
-			Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " no se reconoce el parametro formal "+ p.getKey());
-			return false;}
-		if(Main.tSimbolos.getDatosTabla(parametroFormal).getOrden() != orden){
-			Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " los parametros no estan en el orden correcto");
-			return false;}
-		if(Main.tSimbolos.getDatosTabla(parametroFormal).getTipo() != Main.tSimbolos.getDatosTabla(parametroReal).getTipo()){
-			Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " los tipos de los parametros reales y formales no son iguales");
-			return false;}
-		orden++;
-	}
-	return true;
-}*/
