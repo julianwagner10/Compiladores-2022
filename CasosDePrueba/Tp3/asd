@@ -1,0 +1,6 @@
+Programa{
+
+i32 x;
+f32 y;
+x=:y;
+}

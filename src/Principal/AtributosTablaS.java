@@ -3,7 +3,7 @@ package Principal;
 public class AtributosTablaS {
     private String lexema;
     private int identificador;
-    private String tipo ="";
+    private String tipo =null;
     private String uso = "";
     private String ambito = "";
 

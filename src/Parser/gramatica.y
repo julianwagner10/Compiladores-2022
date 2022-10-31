@@ -46,16 +46,18 @@ bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
                                                       $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                     ;
 
+
 declaracion : tipo lista_de_variables ';'{  String tipoVar = $1.sval;
+                                            System.out.println("tipo de la variable"+tipoVar);
+
 					                        lista_variables = (ArrayList<String>)$2.obj;
                                             for(String lexema : lista_variables){
                                                     String nuevoLexema = lexema + "." + ambito;
                                                     if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
                                                         Main.tablaDeSimbolos.modificarSimbolo(lexema, nuevoLexema);
-                                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
-                                                        atributos.setUso("variable");
-                                                        atributos.setTipo(tipoVar);
-                                                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
+                                                        Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).setTipo(tipoVar);
+                                                        System.out.println("Tipo del lexema "+nuevoLexema + " tipo "+Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
+                                                        Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).setUso("variable");
                                                     } else {
                                                         Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la variable " + lexema + " ya fue declarada en este ambito");
                                                         Main.tablaDeSimbolos.eliminarSimbolo(lexema);
@@ -236,9 +238,17 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
-asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                                 AtributosTablaS atributos = new AtributosTablaS("Asignacion");
-                                                $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
+                                                System.out.println("LEXEMA DEL ID"+atributosId.getLexema());
+                                                System.out.println("TIPO DEL ID"+atributosId.getTipo());
+                                                NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
+                                                if (nodoA.getType()!=null){
+                                                $$.arbol= nodoA;
+                                                }
+                                                else{
+                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");
+                                                }
                                                 }
            | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);

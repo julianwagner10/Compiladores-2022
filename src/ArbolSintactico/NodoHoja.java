@@ -8,4 +8,5 @@ public class NodoHoja extends ArbolSintactico{
         super(hijoIzq,hijoDer,atributo);
     }
 
+
 }

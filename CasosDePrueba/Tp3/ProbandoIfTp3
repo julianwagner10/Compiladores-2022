@@ -1,9 +1,9 @@
 IfBienDefinido{
-f32 varf32,z;
+i32 y;
+f32 x,z;
 if (x>2) then{
-    u=: 3;
-    z=:-25;
-    y =: 55;
+    y=: x;
+    z=: y;
     }
 end_if;
 }

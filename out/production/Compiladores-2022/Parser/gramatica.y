@@ -46,16 +46,18 @@ bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
                                                       $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                     ;
 
+
 declaracion : tipo lista_de_variables ';'{  String tipoVar = $1.sval;
+                                            System.out.println("tipo de la variable"+tipoVar);
+
 					                        lista_variables = (ArrayList<String>)$2.obj;
                                             for(String lexema : lista_variables){
                                                     String nuevoLexema = lexema + "." + ambito;
                                                     if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
                                                         Main.tablaDeSimbolos.modificarSimbolo(lexema, nuevoLexema);
-                                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
-                                                        atributos.setUso("variable");
-                                                        atributos.setTipo(tipoVar);
-                                                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
+                                                        Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).setTipo(tipoVar);
+                                                        System.out.println("Tipo del lexema "+nuevoLexema + " tipo "+Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
+                                                        Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).setUso("variable");
                                                     } else {
                                                         Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la variable " + lexema + " ya fue declarada en este ambito");
                                                         Main.tablaDeSimbolos.eliminarSimbolo(lexema);
@@ -103,26 +105,28 @@ error_funcion : declaracion_fun  bloque '}' {Main.erroresSintacticos.add("Error 
 
 declaracion_fun : FUN ID lista_de_parametros ':' tipo{
                     lista_parametros = (ArrayList<String>)$3.obj;
-                                if(!lista_parametros.isEmpty()){
-                                    String nuevoLexema = $2.sval + "." + ambito;
-                                    if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
-                                        Main.tablaDeSimbolos.modificarSimbolo($2.sval, nuevoLexema);
-                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
-                                        atributos.setUso("nombreProcedimiento");
-                                        //atributos.setCantParametros(lista_parametros.size());
-                                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
-                                        int posicion = 1;
-                                        for(String parametro : lista_parametros){
-                                            Main.tablaDeSimbolos.modificarSimbolo(parametro, parametro +"."+ambito);
-                                            Main.tablaDeSimbolos.getAtributosTablaS(parametro +"."+ambito).setOrden(posicion);
-                                            posicion++;
-                                        }
-                                    } else {
-                                        Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " el procedimiento "+ $2.sval + " ya fue declarado en este ambito");
-                                        }
-                                }
-                                ambito = ambito + "."+ $2.sval;
-                                }
+                    String nuevoLexema = $2.sval + "." + ambito;
+                    if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
+                        Main.tablaDeSimbolos.modificarSimbolo($2.sval, nuevoLexema);
+                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                        atributos.setUso("nombreFuncion");
+                        atributos.setTipo($5.sval);
+                        //atributos.setCantParametros(lista_parametros.size());
+                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
+                        if(!lista_parametros.isEmpty()){
+                            int posicion = 1;
+                            for(String parametro : lista_parametros){
+                                Main.tablaDeSimbolos.modificarSimbolo(parametro, parametro +"."+ambito);
+                                Main.tablaDeSimbolos.getAtributosTablaS(parametro +"."+ambito).setOrden(posicion);
+                                posicion++;
+                            }
+                        }
+                        Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una funcion declarada con nombre "+$2.sval+ " en el ámbito "+ambito+", con tipo de retorno " + Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
+                    } else {
+                        Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " la funcion "+ $2.sval + " ya fue declarada en este ambito");
+                        }
+                    ambito = ambito + "."+ $2.sval;
+                    }
                 | error_declaracion_fun
                 ;
 
@@ -133,7 +137,8 @@ error_declaracion_fun : ID lista_de_parametros ':' tipo {Main.erroresSintacticos
                       | FUN ID lista_de_parametros ':' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion en la declaracion");}
                       ;
 
-lista_de_parametros : '(' ')'
+lista_de_parametros : '(' ')' {lista_parametros.clear();
+                              $$ = new ParserVal(lista_parametros);}
                     | '('parametro')'{lista_parametros.clear();
                                      			     lista_parametros.add($2.sval);
                                      			     $$ = new ParserVal(lista_parametros);}
@@ -233,9 +238,17 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
-asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                                 AtributosTablaS atributos = new AtributosTablaS("Asignacion");
-                                                $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
+                                                System.out.println("LEXEMA DEL ID"+atributosId.getLexema());
+                                                System.out.println("TIPO DEL ID"+atributosId.getTipo());
+                                                NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
+                                                if (nodoA.getType()!=null){
+                                                $$.arbol= nodoA;
+                                                }
+                                                else{
+                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");
+                                                }
                                                 }
            | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
@@ -605,3 +618,22 @@ public ArbolSintactico returnTree(){
 	return this.arbolSintactico;
 }
 
+/*
+public boolean verificarParametros(String proc){
+	int orden = 1;
+	for(Pair p : lista_param_invocacion){
+		String parametroFormal = p.getKey() + "." + proc;
+		String parametroReal = (String)p.getValue();
+		if(!Main.tSimbolos.existeLexema(parametroFormal)){ //el usuario lo escribio mal en la invocacion
+			Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " no se reconoce el parametro formal "+ p.getKey());
+			return false;}
+		if(Main.tSimbolos.getDatosTabla(parametroFormal).getOrden() != orden){
+			Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " los parametros no estan en el orden correcto");
+			return false;}
+		if(Main.tSimbolos.getDatosTabla(parametroFormal).getTipo() != Main.tSimbolos.getDatosTabla(parametroReal).getTipo()){
+			Main.listaErrores.add("Error semántico: Linea " + Lexico.linea + " los tipos de los parametros reales y formales no son iguales");
+			return false;}
+		orden++;
+	}
+	return true;
+}*/

@@ -107,4 +107,8 @@ public abstract class ArbolSintactico {
     public String getType() {
         return this.atributo.getTipo();
     }
+
+    public void setTipo(String tipo){
+        this.atributo.setTipo(tipo);
+    }
 }
