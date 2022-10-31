@@ -185,7 +185,7 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
 	                           AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
 	                           AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-	                           $$.arbol = new NodoEtiquetado(new NodoHoja(null,null,lexID),$3.arbol,lexEtiqueta);
+	                           $$.arbol = new NodoEtiquetado(new NodoHoja(lexID),$3.arbol,lexEtiqueta);
 	                           }
 	      | control ';'{$$.arbol = $1.arbol;}
 	      | salida ';' {$$.arbol = $1.arbol;}
@@ -214,20 +214,20 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
                                       AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
                                       AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                                      $$.arbol = new NodoEtiquetado(new NodoHoja(null,null,lexID),$3.arbol,lexEtiqueta);
+                                      $$.arbol = new NodoEtiquetado(new NodoHoja(lexID),$3.arbol,lexEtiqueta);
                                       }
                  | control ';' {$$.arbol = $1.arbol;}
                  | salida ';' {$$.arbol = $1.arbol;}
                  | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                               AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
-                              $$.arbol = new NodoHoja(null,null,sentenciaBreak);}
+                              $$.arbol = new NodoHoja(sentenciaBreak);}
                  | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
                                 AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue");
-                                $$.arbol = new NodoHoja(null,null,sentenciaContinue);}
+                                $$.arbol = new NodoHoja(sentenciaContinue);}
                  | CONTINUE ':' ID ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);
                                         AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue con etiquetado");
                                         AtributosTablaS controlEtiquetado = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
-                                        $$.arbol = new NodoEtiquetado(new NodoHoja(null,null,controlEtiquetado),null,sentenciaContinue);}
+                                        $$.arbol = new NodoEtiquetado(new NodoHoja(controlEtiquetado),null,sentenciaContinue);}
                  | error_ejecucion_control
                  ;
 
@@ -240,10 +240,8 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
 
 asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                                 AtributosTablaS atributos = new AtributosTablaS("Asignacion");
-                                                System.out.println("LEXEMA DEL ID"+atributosId.getLexema());
-                                                System.out.println("TIPO DEL ID"+atributosId.getTipo());
-                                                NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
-                                                if (nodoA.getType()!=null){
+                                                NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
+                                                if (nodoA.getTipo()!=null){
                                                 $$.arbol= nodoA;
                                                 }
                                                 else{
@@ -253,7 +251,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Ma
            | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                                    AtributosTablaS atributos = new AtributosTablaS("Asignacion");
-                                   $$.arbol= new NodoAsignacion(new NodoHoja(null,null,atributosId),$3.arbol,atributos);
+                                   $$.arbol= new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                    }
            | error_asignacion
            ;
@@ -276,10 +274,13 @@ error_retorno : RETURN {Main.erroresSintacticos.add("Error sináctico: Linea " +
 
 expresion_aritmetica : termino{$$.arbol = $1.arbol;}
 	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");
-	                 	                                  $$.arbol = new NodoSuma($1.arbol,$3.arbol);
-	                                                    }
+	                 	                                 AtributosTablaS atributos = new AtributosTablaS("+");
+	                 	                                 $$.arbol = new NodoSuma($1.arbol,$3.arbol,atributos);
+	                 	                                 }
+
 	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");
-	                 	                 	              $$.arbol = new NodoResta($1.arbol,$3.arbol);
+	                 	                 	              AtributosTablaS atributos = new AtributosTablaS("-");
+	                 	                 	              $$.arbol = new NodoResta($1.arbol,$3.arbol,atributos);
 	                                                    }
 	                 | error_expresion_aritmetica
                      ;
@@ -289,10 +290,13 @@ error_expresion_aritmetica : expresion_aritmetica '+' error{Main.erroresSintacti
                            ;
 
 termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");
-	                          $$.arbol = new NodoMultiplicacion($1.arbol,$3.arbol);
+	                          AtributosTablaS atributos = new AtributosTablaS("*");
+
+	                          $$.arbol = new NodoMultiplicacion($1.arbol,$3.arbol,atributos);
                              }
 	    | termino '/' factor  { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");
-	                          $$.arbol = new NodoDivision($1.arbol,$3.arbol);
+	                          AtributosTablaS atributos = new AtributosTablaS("/");
+	                          $$.arbol = new NodoDivision($1.arbol,$3.arbol,atributos);
 	                          }
 	    | factor{$$.arbol = $1.arbol;}
 	    | error_termino
@@ -305,28 +309,28 @@ error_termino : termino '*' error{Main.erroresSintacticos.add("Error sináctico:
               ;
 
 factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-              $$.arbol = new NodoHoja(null,null,atributos);
+              $$.arbol = new NodoHoja(atributos);
               }
         | CTE_FLOTANTE {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                        $$.arbol = new NodoHoja(null,null,atributos);
+                        $$.arbol = new NodoHoja(atributos);
                        }
         | CTE_INT {if (chequearRangoEnteros() == true){
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                        $$.arbol = new NodoHoja(null,null,atributos);
+                        $$.arbol = new NodoHoja(atributos);
                         }
                    }
         | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
                       AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                      $$.arbol = new NodoHoja(null,null,atributosId);
+                      $$.arbol = new NodoHoja(atributosId);
                       }
         | '-' CTE_INT {if (chequearNegativos() == true){
                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
-                       $$.arbol = new NodoHoja(null,null,atributos);
+                       $$.arbol = new NodoHoja(atributos);
                        }
                       }
         | '-' CTE_FLOTANTE {if (chequearNegativos() ==true){
                                AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
-                               $$.arbol = new NodoHoja(null,null,atributos);
+                               $$.arbol = new NodoHoja(atributos);
                                }
                            }
         ;
@@ -334,11 +338,11 @@ factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTabla
 invocacion : ID '(' parametros_reales ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                                             AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
                                             AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                                            $$.arbol = new NodoInvocacion(new NodoHoja(null,null,lexID),$3.arbol,lexInvocacion);}
+                                            $$.arbol = new NodoInvocacion(new NodoHoja(lexID),$3.arbol,lexInvocacion);}
            | ID '('  ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                            AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                           $$.arbol = new NodoInvocacion(new NodoHoja(null,null,lexID),null,lexInvocacion);}
+                           $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);}
            | error_invocacion
            ;
 
@@ -359,26 +363,26 @@ error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSinta
                         ;
 
 factor_invocacion 	: ID { AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                          $$.arbol = new NodoHoja(null,null,atributos);
+                          $$.arbol = new NodoHoja(atributos);
                           }
                     | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);
                                    AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                                   $$.arbol = new NodoHoja(null,null,atributos);
+                                   $$.arbol = new NodoHoja(atributos);
                                    }
                     | CTE_INT {if (chequearRangoEnteros() == true) {
                                Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);
                                AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                               $$.arbol = new NodoHoja(null,null,atributos);
+                               $$.arbol = new NodoHoja(atributos);
                                }
                                }
                     | '-' CTE_INT {if (chequearNegativos()==true){
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
-                                            $$.arbol = new NodoHoja(null,null,atributos);
+                                            $$.arbol = new NodoHoja(atributos);
                                             }
                                   }
                     | '-' CTE_FLOTANTE {if (chequearNegativos()==true){
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
-                                            $$.arbol = new NodoHoja(null,null,atributos);
+                                            $$.arbol = new NodoHoja(atributos);
                                             }
                                        }
                     ;
@@ -477,10 +481,10 @@ error_control : FOR '(' ')' bloque_for {Main.erroresSintacticos.add("Error siná
 
 incr_decr : '+' CTE_INT {
                           AtributosTablaS atributos1 = new AtributosTablaS("Incremento");
-                          $$.arbol  = new NodoIncrementoFor(new NodoHoja(null, null, Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
+                          $$.arbol  = new NodoIncrementoFor(new NodoHoja(Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
            | '-' CTE_INT {
                           AtributosTablaS atributos1 = new AtributosTablaS("Decremento");
-                          $$.arbol  = new NodoDecrementoFor(new NodoHoja(null, null, Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
+                          $$.arbol  = new NodoDecrementoFor(new NodoHoja(Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
            | error_incr_decr
            ;
 
@@ -490,14 +494,21 @@ error_incr_decr : CTE_INT {Main.erroresSintacticos.add("Error sináctico: Linea 
                 ;
 
 asignacion_for: ID ASIGNACION CTE_INT {if (chequearRangoEnteros()==true){
-                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                             AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
                                             AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
-                                            $$.arbol= new NodoAsignacionFor(new NodoHoja(null,null,atributos),new NodoHoja(null,null,atributos3),atributos2);
+                                            NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
+                                            if (nodoA.getTipo()!=null){
+                                            $$.arbol= nodoA;
                                             }
+                                            else{
+                                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");
+                                            }
+                                      }
                                       }
               | error_asignacion_for
               ;
+
 
 error_asignacion_for : ASIGNACION CTE_INT {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion se la sentencia FOR ");}
                      | ID  CTE_INT {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '=:' en la asignacion de la sentencia FOR ");}
@@ -507,7 +518,7 @@ error_asignacion_for : ASIGNACION CTE_INT {Main.erroresSintacticos.add("Error si
 condicion_for: ID comparador expresion_aritmetica {AtributosTablaS atributos = new AtributosTablaS("CondicionFOR");
                                                    AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                                                    AtributosTablaS atributos3 = new AtributosTablaS($2.sval);
-                                                   $$.arbol = new NodoCondicionFor(new NodoExpresionLogica(new NodoHoja(null,null,atributos2),$3.arbol,atributos3),null,atributos);}
+                                                   $$.arbol = new NodoCondicionFor(new NodoExpresionLogica(new NodoHoja(atributos2),$3.arbol,atributos3),null,atributos);}
              | error_condicion_for
              ;
 
@@ -519,7 +530,7 @@ error_condicion_for : comparador expresion_aritmetica {Main.erroresSintacticos.a
 salida : OUT '('CADENA')'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");
                           AtributosTablaS lexSalida = new AtributosTablaS("Sentencia de Impresion por Pantalla");
                           AtributosTablaS lexCadena = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
-                          $$.arbol = new NodoSalida(new NodoHoja(null,null,lexCadena),null,lexSalida);
+                          $$.arbol = new NodoSalida(new NodoHoja(lexCadena),null,lexSalida);
                           }
        | error_salida
        ;

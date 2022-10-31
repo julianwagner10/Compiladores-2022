@@ -4,9 +4,8 @@ import Principal.AtributosTablaS;
 
 public class NodoHoja extends ArbolSintactico{
 
-    public NodoHoja(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributo){
-        super(hijoIzq,hijoDer,atributo);
+    public NodoHoja(AtributosTablaS atributo){
+        super(null,null,atributo);
     }
-
 
 }

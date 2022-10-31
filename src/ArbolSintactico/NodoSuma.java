@@ -2,10 +2,10 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 
-public class NodoSuma extends ArbolSintactico{
+public class NodoSuma extends NodoOperacion{
 
-    public NodoSuma(ArbolSintactico hijoIzq, ArbolSintactico hijoDer){
-        super(hijoIzq,hijoDer);
+    public NodoSuma(ArbolSintactico hijoIzq, ArbolSintactico hijoDer,AtributosTablaS atributos){
+        super(hijoIzq,hijoDer,atributos);
     }
 
 }

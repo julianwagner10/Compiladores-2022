@@ -69,11 +69,11 @@ public abstract class ArbolSintactico {
 
     public void printTree(ArbolSintactico nodo, String hijo) {
         if (nodo != null) {
-            if (nodo.isLeaf()) {
+            if (nodo.esHoja()) {
                 this.printTree += tab(cant, hijo+nodo.atributo.getLexema(), nodo.atributo.getTipo(), nodo.atributo.getUso());
                 return;
             }
-            this.printTree += tab(cant, hijo+nodo.getLexeme(), nodo.getType(), nodo.atributo.getUso()); // mostrar datos del nodo
+            this.printTree += tab(cant, hijo+nodo.getLexeme(), nodo.getTipo(), nodo.atributo.getUso()); // mostrar datos del nodo
             cant++;
             printTree(nodo.getHijoIzq(), "Hijo izquierdo: "); //recorre subarbol izquierdo
             printTree(nodo.getHijoDer(), "Hijo derecho: "); //recorre subarbol derecho
@@ -87,7 +87,7 @@ public abstract class ArbolSintactico {
         return lexeme + '\n';
     }
 
-    public boolean isLeaf(){
+    public boolean esHoja(){
         return (this.getHijoIzq() == null && this.getHijoDer() == null);
     }
 
@@ -104,7 +104,7 @@ public abstract class ArbolSintactico {
             return atributo.getLexema();
         }
     }
-    public String getType() {
+    public String getTipo() {
         return this.atributo.getTipo();
     }
 

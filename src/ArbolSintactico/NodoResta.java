@@ -1,9 +1,11 @@
 package ArbolSintactico;
 
-public class NodoResta extends ArbolSintactico{
+import Principal.AtributosTablaS;
 
-    public NodoResta(ArbolSintactico hijoIzq, ArbolSintactico hijoDer){
-        super(hijoIzq,hijoDer);
+public class NodoResta extends NodoOperacion{
+
+    public NodoResta(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos){
+        super(hijoIzq,hijoDer,atributos);
     }
 
 }
