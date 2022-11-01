@@ -11,15 +11,15 @@ public class NodoAsignacion extends ArbolSintactico{
 
     public void chequearCompatiblidadTipo(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         String tipoIzq = hijoIzq.getTipo();
+        System.out.println("Tipo de hijo izq"+tipoIzq);
         String tipoDer = hijoDer.getTipo();
-        System.out.printf("Tipo de hijo izq"+tipoIzq);
-        System.out.printf("tipo der"+tipoDer);
+        System.out.println("tipo der"+tipoDer);
         if (tipoIzq.equals(tipoDer))
             super.setTipo(tipoIzq);
         else{
-            if (tipoIzq.equals("FLOAT")){
-                super.setTipo("FLOAT");
-                hijoDer.setTipo("FLOAT");
+            if (tipoIzq.equals("f32")){
+                super.setTipo("f32");
+                hijoDer.setTipo("f32");
             }else{
                 super.setTipo(null);
             }

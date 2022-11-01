@@ -3,7 +3,7 @@ package Principal;
 public class AtributosTablaS {
     private String lexema;
     private int identificador;
-    private String tipo =null;
+    private String tipo = null;
     private String uso = "";
     private String ambito = "";
 
@@ -24,7 +24,7 @@ public class AtributosTablaS {
     }
 
     public String getTipo() {
-        return tipo;
+        return this.tipo;
     }
 
     public String getUso() {

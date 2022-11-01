@@ -11,7 +11,8 @@ public class TablaSimbolos {
     }
 
     public void eliminarSimbolo(String lexema) {
-        tablaSimbolos.remove(lexema);
+        if(this.tablaSimbolos.contains(lexema))
+            this.tablaSimbolos.remove(lexema);
     }
 
     public boolean existeLexema(String lexema) {
@@ -30,7 +31,6 @@ public class TablaSimbolos {
         atributos.modificarLexema(lexemaNuevo);
         tablaSimbolos.remove(lexemaviejo);
         tablaSimbolos.put(lexemaNuevo, atributos);
-
 
     }
 

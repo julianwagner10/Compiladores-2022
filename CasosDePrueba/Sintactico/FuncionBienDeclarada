@@ -1,9 +1,9 @@
 FuncionBienDeclarada{
-fun f1(i32 y):i32{
+fun f1(i32 y,i32 z):i32{
     i32 x;
     if(x<y)then{
         x =:y;
-        y=: y + 2;
+        y =: y+2;
     }
     else
         y=: x;
@@ -11,6 +11,5 @@ fun f1(i32 y):i32{
 
     return x;
     }
-discard f1(45);
-
+discard f1(22,23);
 }
