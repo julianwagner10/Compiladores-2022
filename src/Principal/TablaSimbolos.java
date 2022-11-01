@@ -3,9 +3,9 @@ package Principal;
 import java.util.*;
 
 public class TablaSimbolos {
-    private static Hashtable<String,AtributosTablaS> tablaSimbolos;
+    private static Hashtable<String, AtributosTablaS> tablaSimbolos;
 
-    public TablaSimbolos(){
+    public TablaSimbolos() {
 
         tablaSimbolos = new Hashtable<>();
     }
@@ -18,11 +18,10 @@ public class TablaSimbolos {
         return (tablaSimbolos.containsKey(lexema));
     }
 
-    public Integer getIdentificador(String lexema){
-        if(tablaSimbolos.containsKey(lexema)){
+    public Integer getIdentificador(String lexema) {
+        if (tablaSimbolos.containsKey(lexema)) {
             return tablaSimbolos.get(lexema).getIdentificador();
-        }
-        else
+        } else
             return null;
     }
 
@@ -30,7 +29,8 @@ public class TablaSimbolos {
         AtributosTablaS atributos = tablaSimbolos.get(lexemaviejo);
         atributos.modificarLexema(lexemaNuevo);
         tablaSimbolos.remove(lexemaviejo);
-        tablaSimbolos.put(lexemaNuevo,atributos);
+        tablaSimbolos.put(lexemaNuevo, atributos);
+
 
     }
 
@@ -45,37 +45,38 @@ public class TablaSimbolos {
         return false;
     }
 
-    public void setAtributosDeSimbolo(String nuevoLexema, AtributosTablaS atributos){
-        this.tablaSimbolos.replace(nuevoLexema,atributos);
+    public void setAtributosDeSimbolo(String nuevoLexema, AtributosTablaS atributos) {
+        this.tablaSimbolos.replace(nuevoLexema, atributos);
     }
 
-    public void setSimbolo(String lexema, int id){
+    public void setSimbolo(String lexema, int id) {
 
-        if(tablaSimbolos.containsKey(lexema))
-            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> "+ lexema );
+        if (tablaSimbolos.containsKey(lexema))
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> " + lexema);
         else {
             if (!this.esPalabraReservada(lexema)) {
-                AtributosTablaS at = new AtributosTablaS(id,"","","",lexema); //Los datos vacios  son temporales para evitar errores.
+                AtributosTablaS at = new AtributosTablaS(id, "", "", "", lexema); //Los datos vacios  son temporales para evitar errores.
                 tablaSimbolos.put(lexema, at);
             }
         }
     }
 
-    public void setSimbolo(String lexema, int id,String tipo){
+    public void setSimbolo(String lexema, int id, String tipo) {
 
-        if(tablaSimbolos.containsKey(lexema))
-            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> "+ lexema );
+        if (tablaSimbolos.containsKey(lexema))
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> " + lexema);
         else {
             if (!this.esPalabraReservada(lexema)) {
-                AtributosTablaS at = new AtributosTablaS(id,tipo,"","",lexema); //Los datos vacios  son temporales para evitar errores.
+                AtributosTablaS at = new AtributosTablaS(id, tipo, "", "", lexema); //Los datos vacios  son temporales para evitar errores.
                 tablaSimbolos.put(lexema, at);
             }
         }
     }
-    public void mostrarTablasimbolos(){
+
+    public void mostrarTablasimbolos() {
         Enumeration iterator = tablaSimbolos.keys();
-        while(iterator.hasMoreElements()){
-            String lexema = (String)iterator.nextElement();
+        while (iterator.hasMoreElements()) {
+            String lexema = (String) iterator.nextElement();
             if (!esPalabraReservada(lexema)) {
                 AtributosTablaS ats = tablaSimbolos.get(lexema);
                 System.out.print("Id:" + ats.getIdentificador() + " Lexema: " + lexema);
@@ -84,9 +85,21 @@ public class TablaSimbolos {
         }
     }
 
-    public AtributosTablaS getAtributosTablaS(String lexema){
-        if(tablaSimbolos.containsKey(lexema))
+    public AtributosTablaS getAtributosTablaS(String lexema) {
+        if (tablaSimbolos.containsKey(lexema))
             return tablaSimbolos.get(lexema);
-    return null;
+        return null;
+    }
+
+
+    public String chequearAmbito(String id, String ambito) {
+        String aux = id + "." + ambito;
+        while (!aux.equals(id)) { //Hasta que no desgloce todo el ambito
+            if (tablaSimbolos.containsKey(aux)) {
+                return aux;
+            }
+            aux = aux.substring(0, aux.lastIndexOf("."));
+        }
+        return null;
     }
 }

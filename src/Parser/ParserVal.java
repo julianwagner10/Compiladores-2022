@@ -31,7 +31,7 @@ public String sval;
  * object value of this 'union'
  */
 public Object obj;
- public ArbolSintactico arbol;
+public ArbolSintactico arbol;
 //#############################################
 //## C O N S T R U C T O R S
 //#############################################

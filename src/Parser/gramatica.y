@@ -55,17 +55,18 @@ declaracion : tipo lista_de_variables ';'{  String tipoVar = $1.sval;
                                                     String nuevoLexema = lexema + "." + ambito;
                                                     if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
                                                         Main.tablaDeSimbolos.modificarSimbolo(lexema, nuevoLexema);
-                                                        Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).setTipo(tipoVar);
-                                                        System.out.println("Tipo del lexema "+nuevoLexema + " tipo "+Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
-                                                        Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).setUso("variable");
+                                                        AtributosTablaS atributosT = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                                                        atributosT.setTipo(tipoVar);
+                                                        atributosT.setUso("variable");
+                                                        Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema,atributosT);
                                                     } else {
                                                         Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la variable " + lexema + " ya fue declarada en este ambito");
                                                         Main.tablaDeSimbolos.eliminarSimbolo(lexema);
                                                         }
                                                 }
                                             lista_variables.clear();
-                                            Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una variable de tipo "+tipoVar+ " en el ámbito "+ambito);
                                             }
+
             | funcion
             | error_declaracion
             ;
@@ -111,7 +112,6 @@ declaracion_fun : FUN ID lista_de_parametros ':' tipo{
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
                         atributos.setUso("nombreFuncion");
                         atributos.setTipo($5.sval);
-                        //atributos.setCantParametros(lista_parametros.size());
                         Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
                         if(!lista_parametros.isEmpty()){
                             int posicion = 1;
@@ -238,7 +238,8 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
-asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+asignacion : ID ASIGNACION expresion_aritmetica{  Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
+AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                                 AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                                 NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                                 if (nodoA.getTipo()!=null){
@@ -249,7 +250,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{AtributosTablaS atributosId = Ma
                                                 }
                                                 }
            | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
-                                   AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                   AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                    AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                    $$.arbol= new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                    }
@@ -308,7 +309,7 @@ error_termino : termino '*' error{Main.erroresSintacticos.add("Error sináctico:
               | '/' factor {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '/' ");}
               ;
 
-factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
               $$.arbol = new NodoHoja(atributos);
               }
         | CTE_FLOTANTE {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
@@ -320,7 +321,7 @@ factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTabla
                         }
                    }
         | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
-                      AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                      AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                       $$.arbol = new NodoHoja(atributosId);
                       }
         | '-' CTE_INT {if (chequearNegativos() == true){
@@ -337,11 +338,11 @@ factor 	: ID {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTabla
 
 invocacion : ID '(' parametros_reales ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                                             AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
-                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                             $$.arbol = new NodoInvocacion(new NodoHoja(lexID),$3.arbol,lexInvocacion);}
            | ID '('  ')' { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                            AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
-                           AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                           AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                            $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);}
            | error_invocacion
            ;
@@ -362,7 +363,7 @@ parametros_reales : factor_invocacion {AtributosTablaS lexParam = new AtributosT
 error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
                         ;
 
-factor_invocacion 	: ID { AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+factor_invocacion 	: ID { AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                           $$.arbol = new NodoHoja(atributos);
                           }
                     | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);
@@ -622,7 +623,7 @@ public String printSyntacticTree(){
 		this.arbolSintactico.printTree(this.arbolSintactico, "Root: ");
 		return this.arbolSintactico.getPrintTree();
 	}
-	return "xd";
+	return "";
 }
 
 public ArbolSintactico returnTree(){

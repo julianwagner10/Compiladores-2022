@@ -1,6 +1,7 @@
-Programa{
+FuncionBienDeclarada{
+fun f1():i32{
+    i32 x,y;
+    x=:2;
+    }
 
-i32 x;
-f32 y;
-x=: y;
 }
