@@ -1,10 +1,10 @@
-ControlConEtiquetaBienDef{
+ControlConEtiqueta{
 i32 id,x,z;
 
 etiqueta : for (id=:2 ; idx>4 ; +2){
                 if(x<z)then
                     x=:2;
                 end_if;
-                continue : etiqueta;
+                continue : etiquetaaaaaaaaaaaa;
            };
 }
