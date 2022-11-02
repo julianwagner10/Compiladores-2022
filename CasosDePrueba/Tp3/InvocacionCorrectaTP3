@@ -1,2 +1,15 @@
-InvocacionCorrectaTp3{
+InvocacionCorrecta{
+fun f1(i32 y,i32 z):i32{
+    i32 x;
+    if(x<y)then{
+        x =:y;
+        y =: y+2;
+    }
+    else
+        y=: x;
+    end_if;
+
+    return x;
+    }
+discard f1(22);
 }

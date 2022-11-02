@@ -178,8 +178,10 @@ tipo : I32 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] 
 
 ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
-	                                AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
-	                                $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+	                                if($2.arbol != null){
+	                                    AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
+	                                    $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+	                                }
 	                                }
 	      | seleccion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';' {$$.arbol = $1.arbol;}
@@ -208,8 +210,10 @@ error_ejecucion : asignacion error{Main.erroresSintacticos.add("Error sináctico
 
 ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
-                                           AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
-                                           $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+                                           if($2.arbol != null){
+                                               AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
+                                               $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+                                           }
                                            }
                  | seleccion ';' {$$.arbol = $1.arbol;}
                  | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
@@ -356,28 +360,53 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
 invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                             if(ambitoCheck != null){
                                                 if ($3.arbol !=null){
-                                                if(lista_parametros.size() == lista_parametros_reales.size()){
-                                                    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
-                                                    AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
-                                                    AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                                                    $$.arbol = new NodoInvocacion(new NodoHoja(lexID),$3.arbol,lexInvocacion);
+                                                    if(lista_parametros.size() == lista_parametros_reales.size()){
+                                                        int pos = 0;
+                                                        int nroDeNoCoincidencias = 0;
+                                                        for(String paramR : lista_parametros_reales){
+                                                            String tipoParamR = Main.tablaDeSimbolos.getAtributosTablaS(paramR).getTipo();
+                                                            System.out.println("Tipo parametro real: "+tipoParamR);
+                                                            String parametro = lista_parametros.get(pos);
+                                                            String tipoParam = Main.tablaDeSimbolos.getAtributosTablaS(parametro).getTipo();
+                                                            System.out.println("Tipo parametro comun: "+tipoParam);
+                                                            if(!tipoParamR.equals(tipoParam))
+                                                                nroDeNoCoincidencias++;
+                                                            }
+                                                            pos++;
+                                                        if(nroDeNoCoincidencias == 0){
+                                                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
+                                                            AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
+                                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                                            $$.arbol = new NodoInvocacion(new NodoHoja(lexID),$3.arbol,lexInvocacion);
+                                                        }
+                                                        else{
+                                                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] el tipo de los parametros invocados no coinciden con los de la funcion a invocar");
+                                                            $$.arbol = null;
+                                                        }
+                                                    }
+                                                    else{
+                                                        Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] se quiere invocar a una funcion con un numero incorrecto de parametros ");
+                                                        $$.arbol = null;
+                                                    }
                                                 }
-                                                else
-                                                    Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] se quiere invocar a una funcion con un numero incorrecto de parametros ");
-                                            }}
+                                            }
                                             else
                                                 Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
                                             }
-           | ID '('  ')' {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
-                          if(ambitoCheck != null){
-                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
-                            AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
-                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                            $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);
+           | ID '('  ')' {  String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
+                            if(ambitoCheck != null){
+                                if(lista_parametros.size() == lista_parametros_reales.size()){
+                                    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
+                                    AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
+                                    AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                    $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);
+                                }
+                                else
+                                    Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] flatan el/los parametros en la invocacion ");
                             }
-                          else
+                            else
                               Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
-                          }
+                         }
            | error_invocacion
            ;
 
