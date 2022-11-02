@@ -1,6 +1,5 @@
 programa{
 i32 x;
-f32 y;
-y=:x;
+y=:z;
 
 }

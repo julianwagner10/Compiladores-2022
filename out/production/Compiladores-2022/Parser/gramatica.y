@@ -241,6 +241,7 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
 
 asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                                 if(ambitoCheck != null){
+                                                    if ($3.arbol!=null){
                                                     Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
                                                     AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                                     AtributosTablaS atributos = new AtributosTablaS("Asignacion");
@@ -252,7 +253,10 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                                         Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");
                                                     }
                                                 }
+                                                }else
+                                                Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
                                                 }
+
            | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                    AtributosTablaS atributos = new AtributosTablaS("Asignacion");
@@ -319,8 +323,10 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                   atributos.setTipo(tipoId);
                   $$.arbol = new NodoHoja(atributos);
               }
-              else
-                  System.out.println("No existe");
+              else{
+                    Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
+                    $$.arbol = null;
+                    }
               }
         | CTE_FLOTANTE {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                         $$.arbol = new NodoHoja(atributos);
@@ -349,6 +355,7 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
 
 invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                             if(ambitoCheck != null){
+                                                if ($3.arbol !=null){
                                                 if(lista_parametros.size() == lista_parametros_reales.size()){
                                                     Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                                                     AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
@@ -357,7 +364,7 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                                 }
                                                 else
                                                     Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] se quiere invocar a una funcion con un numero incorrecto de parametros ");
-                                            }
+                                            }}
                                             else
                                                 Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
                                             }
@@ -366,8 +373,8 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                             AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
                             AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                            $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);}
-                          }
+                            $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);
+                            }
                           else
                               Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
                           }
@@ -378,14 +385,21 @@ error_invocacion : ID '(' parametros_reales error {Main.erroresSintacticos.add("
                  | ID '(' error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
                  ;
 
-parametros_reales : factor_invocacion {AtributosTablaS lexParam = new AtributosTablaS("Un Parametro");
+parametros_reales : factor_invocacion {if($1.arbol !=null){
+                                       AtributosTablaS lexParam = new AtributosTablaS("Un Parametro");
                                        $$.arbol = new NodoParam($1.arbol,null,lexParam);
                                        }
-                  | factor_invocacion  ','  factor_invocacion {AtributosTablaS lexParam = new AtributosTablaS("Dos Parametros");
+                                       else
+                                       $$.arbol = null;
+                                       }
+                  | factor_invocacion  ','  factor_invocacion {if($1.arbol !=null && $3.arbol!=null){
+                                                               AtributosTablaS lexParam = new AtributosTablaS("Dos Parametros");
                                                                lista_parametros_reales.clear();
                                                                lista_parametros_reales.add($1.sval);
                                                                lista_parametros_reales.add($3.sval);
                                                                $$.arbol = new NodoParam($1.arbol,$3.arbol,lexParam);
+                                                               }else
+                                                               $$.arbol = null;
                                                                }
                   | error_parametros_reales
                   ;
@@ -393,10 +407,16 @@ parametros_reales : factor_invocacion {AtributosTablaS lexParam = new AtributosT
 error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
                         ;
 
-factor_invocacion 	: ID { AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                           lista_parametros_reales.clear();
-                           lista_parametros_reales.add($1.sval);
+factor_invocacion 	: ID { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
+                      if(ambitoCheck != null){
+                          AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                          lista_parametros_reales.clear();
+                          lista_parametros_reales.add($1.sval);
                           $$.arbol = new NodoHoja(atributos);
+                          }else{
+                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
+                            $$.arbol = null;
+                          }
                           }
                     | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);
                                     lista_parametros_reales.clear();
@@ -530,18 +550,19 @@ error_incr_decr : CTE_INT {Main.erroresSintacticos.add("Error sináctico: Linea 
                 | '+' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
                 ;
 
-asignacion_for: ID ASIGNACION CTE_INT {if (chequearRangoEnteros()==true){
-                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                                            AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
-                                            AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
-                                            NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
-                                            if (nodoA.getTipo()!=null){
-                                            $$.arbol= nodoA;
+asignacion_for: ID ASIGNACION CTE_INT {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
+                                            if(ambitoCheck != null){
+                                                if (chequearRangoEnteros()==true){
+                                                    AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                                    AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
+                                                    AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
+                                                    NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
+                                                    if (nodoA.getTipo()!=null){
+                                                        $$.arbol= nodoA;
+                                            }else{Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");}
                                             }
-                                            else{
-                                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");
                                             }
-                                      }
+                                            else{Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);}
                                       }
               | error_asignacion_for
               ;
