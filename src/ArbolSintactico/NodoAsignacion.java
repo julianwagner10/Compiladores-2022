@@ -11,9 +11,7 @@ public class NodoAsignacion extends ArbolSintactico{
 
     public void chequearCompatiblidadTipo(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         String tipoIzq = hijoIzq.getTipo();
-        System.out.println("Tipo de hijo izq"+tipoIzq);
         String tipoDer = hijoDer.getTipo();
-        System.out.println("tipo der"+tipoDer);
         if (tipoIzq.equals(tipoDer))
             super.setTipo(tipoIzq);
         else{

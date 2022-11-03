@@ -459,6 +459,8 @@ parametros_reales : factor_invocacion { if($1.arbol !=null){
                   ;
 
 error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
+                        | factor_invocacion  ','  factor_invocacion ','  factor_invocacion {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el numero maximo de parametros soportados es de dos ");}
+                        | factor_invocacion  ','  factor_invocacion ','  factor_invocacion ','  factor_invocacion {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el numero maximo de parametros soportados es de dos ");}
                         ;
 
 factor_invocacion 	: ID { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
