@@ -1,6 +1,5 @@
 FuncionBienDeclarada{
 f32 z;
-i32 z;
 fun f1(i32 x):i32{
     x=:2;
     }

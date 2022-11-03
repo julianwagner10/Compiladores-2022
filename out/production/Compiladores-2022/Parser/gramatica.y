@@ -185,13 +185,19 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	                                }
 	      | seleccion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';' {$$.arbol = $1.arbol;}
-	      | ID ':' control';' {if($3.arbol != null){
+	      | ID ':' control';' {   if ($3.arbol!=null){
+	                                String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
+                                   if(ambitoCheck != null){
                                    Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
+                                   AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                   //atributos.setTipo($1.sval);
                                    AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
-                                   AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                                   $$.arbol = new NodoEtiquetado(new NodoHoja(lexID),$3.arbol,lexEtiqueta);
-	                           }
-	                           }
+                                   $$.arbol = new NodoEtiquetado(new NodoHoja(atributos),$3.arbol,lexEtiqueta);
+                                }else
+                                Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$1.sval+"' en algun ambito alcanzable");
+                                }else
+                                Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " sentencia de control mal definida");
+                                }
 	      | control ';'{$$.arbol = $1.arbol;}
 	      | salida ';' {$$.arbol = $1.arbol;}
 	      | error_ejecucion
@@ -218,11 +224,19 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                                            }
                                            }
                  | seleccion ';' {$$.arbol = $1.arbol;}
-                 | ID ':' control';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
-                                      AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
-                                      AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
-                                      $$.arbol = new NodoEtiquetado(new NodoHoja(lexID),$3.arbol,lexEtiqueta);
-                                      }
+                 | ID ':' control';' {   if ($3.arbol!=null){
+                                        String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
+                                         if(ambitoCheck != null){
+                                         Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
+                                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                         //atributos.setTipo($1.sval);
+                                         AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
+                                         $$.arbol = new NodoEtiquetado(new NodoHoja(atributos),$3.arbol,lexEtiqueta);
+                                      }else
+                                      Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$1.sval+"' en algun ambito alcanzable");
+                                      }else
+                                      Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " sentencia de control mal definida");
+                                     }
                  | control ';' {$$.arbol = $1.arbol;}
                  | salida ';' {$$.arbol = $1.arbol;}
                  | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
@@ -231,17 +245,20 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
                                 AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue");
                                 $$.arbol = new NodoHoja(sentenciaContinue);}
-                 | CONTINUE ':' ID ';' {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
-                                        if(ambitoCheck != null){
-                                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);
+                 | CONTINUE ':' ID ';' {//String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
+                                        //if(ambitoCheck != null){
+                                            Main.tablaDeSimbolos.modificarSimbolo($3.sval,$3.sval+"."+ambito);
+                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($3.sval+"."+ambito);
+                                            //atributos.setTipo($1.sval);
+                                            Main.tablaDeSimbolos.setAtributosDeSimbolo($3.sval+"."+ambito, atributos);
                                             AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue con etiquetado");
-                                            AtributosTablaS controlEtiquetado = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
-                                            $$.arbol = new NodoEtiquetado(new NodoHoja(controlEtiquetado),null,sentenciaContinue);
-                                        }
+                                            $$.arbol = new NodoEtiquetado(new NodoHoja(atributos),null,sentenciaContinue);
+                                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);
+                                      /* }
                                         else{
-                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"'en algun ambito alcanzable");
+                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
                                             $$.arbol = null;
-                                        }
+                                        }*/
                                         }
                  | error_ejecucion_control
                  ;

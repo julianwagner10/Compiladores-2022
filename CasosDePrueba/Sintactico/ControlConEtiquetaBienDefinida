@@ -1,10 +1,10 @@
 ControlConEtiquetaBienDef{
 i32 id,x,z;
 
-etiqueta : for (id=:2 ; idx>4 ; +2){
+etiqueta : for (id=:2 ; id>4 ; +3){
                 if(x<z)then
                     x=:2;
                 end_if;
-                continue : etiqueta;
+                continue : etiquet;
            };
 }
