@@ -1,7 +1,7 @@
 package ArbolSintactico;
 
 import Principal.AtributosTablaS;
-
+import Assembler.Assembler;
 public abstract class ArbolSintactico {
     private ArbolSintactico hijoIzq = null;
     private ArbolSintactico hijoDer = null;
@@ -27,6 +27,7 @@ public abstract class ArbolSintactico {
         this.hijoDer = hijoDer;
     }
 
+    public  abstract String generarCodigoAssembler();
     public ArbolSintactico getHijoIzq() {
         return this.hijoIzq;
     }
@@ -111,4 +112,6 @@ public abstract class ArbolSintactico {
     public void setTipo(String tipo){
         this.atributo.setTipo(tipo);
     }
+
+
 }
