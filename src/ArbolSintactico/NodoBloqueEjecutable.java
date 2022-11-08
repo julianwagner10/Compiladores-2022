@@ -8,4 +8,9 @@ public class NodoBloqueEjecutable extends ArbolSintactico{
         super(hijoIzq,hijoDer,atributos);
     }
 
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
+
 }

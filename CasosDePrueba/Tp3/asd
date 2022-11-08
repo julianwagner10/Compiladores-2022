@@ -1,7 +1,4 @@
 FuncionBienDeclarada{
 f32 z;
-fun f1(i32 x):i32{
-    x=:2;
-    }
-discard f1(z);
+z=:2.3 + 2.4;
 }

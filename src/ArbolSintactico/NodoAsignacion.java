@@ -9,6 +9,19 @@ public class NodoAsignacion extends ArbolSintactico{
         chequearCompatiblidadTipo(hijoIzq,hijoDer);
     }
 
+    @Override
+    public String generarCodigoAssembler() {
+        String assembler = "";
+        if (this.getTipo().equals("i32")) {
+            return null;
+        }else{
+        assembler += "FLD _" + this.getHijoDer().getLexema()+ '\n';
+        assembler += "FSTP _" + this.getHijoIzq().getLexema() + '\n';
+        this.eliminarHijos(this);
+        return assembler;
+        }
+    }
+
     public void chequearCompatiblidadTipo(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         String tipoIzq = hijoIzq.getTipo();
         String tipoDer = hijoDer.getTipo();

@@ -10,4 +10,9 @@ public class NodoRetorno extends ArbolSintactico{
     public NodoRetorno(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         super(hijoIzq, hijoDer);
     }
+
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
 }

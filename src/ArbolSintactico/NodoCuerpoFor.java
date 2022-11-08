@@ -10,4 +10,9 @@ public class NodoCuerpoFor extends ArbolSintactico{
     public NodoCuerpoFor(ArbolSintactico hijoIzq,ArbolSintactico hijoDer) {
         super(hijoIzq, hijoDer);
     }
+
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
 }

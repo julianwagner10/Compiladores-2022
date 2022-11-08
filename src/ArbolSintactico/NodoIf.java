@@ -7,4 +7,9 @@ public class NodoIf extends ArbolSintactico {
     public NodoIf(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos) {
         super(hijoIzq, hijoDer, atributos);
     }
+
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
 }

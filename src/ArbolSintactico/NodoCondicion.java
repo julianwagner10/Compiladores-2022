@@ -7,4 +7,9 @@ public class NodoCondicion extends ArbolSintactico {
     public NodoCondicion(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos) {
         super(hijoIzq, hijoDer, atributos);
     }
+
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
 }

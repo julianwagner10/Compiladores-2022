@@ -10,4 +10,9 @@ public class NodoEncabezadoFor extends ArbolSintactico{
     public NodoEncabezadoFor(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         super(hijoIzq, hijoDer);
     }
+
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
 }

@@ -72,7 +72,17 @@ public class TablaSimbolos {
             }
         }
     }
+    public void setSimbolo(String lexema, int id, String tipo,String uso) {
 
+        if (tablaSimbolos.containsKey(lexema))
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> " + lexema);
+        else {
+            if (!this.esPalabraReservada(lexema)) {
+                AtributosTablaS at = new AtributosTablaS(id, tipo, uso, "", lexema); //Los datos vacios  son temporales para evitar errores.
+                tablaSimbolos.put(lexema, at);
+            }
+        }
+    }
     public void mostrarTablasimbolos() {
         Enumeration iterator = tablaSimbolos.keys();
         while (iterator.hasMoreElements()) {
@@ -102,4 +112,38 @@ public class TablaSimbolos {
         }
         return null;
     }
+
+    public String generarCodigoAssembler(){
+        String assembler ="";
+        String value = "";
+        int counter = 0;
+        for(String key : this.tablaSimbolos.keySet()) {
+                AtributosTablaS atributos = this.tablaSimbolos.get(key);
+                String lexema = atributos.getLexema();
+                switch (atributos.getIdentificador()) {
+                    case (Lexico.ID):
+                        if(atributos.getTipo().equals("i32")){
+                            assembler += "_" + lexema + " DD ?"  + '\n'; //32 bits
+                        }
+                        if(atributos.getTipo().equals("f32")) {
+                            assembler += "_" + lexema + " DQ ?"  + '\n'; //32 bits
+                        }
+                        break;
+                    case (Lexico.CADENA):
+                        assembler = assembler + "_" + lexema + " DB " + lexema + ", 0 \n";
+                        break;
+
+                    case (Lexico.CTE_INT):
+                        assembler = assembler + "_" + lexema + " DD " + lexema + '\n';
+                        break;
+
+                    case (Lexico.CTE_FLOTANTE):
+                        assembler += "_" + lexema + " DQ " + lexema + '\n'; //64 bits
+                        break;
+
+            }
+        }
+        return assembler;
+    }
+
 }

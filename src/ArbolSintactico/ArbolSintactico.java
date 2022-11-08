@@ -11,6 +11,8 @@ public abstract class ArbolSintactico {
     private int cant = 0;
     private String printTree = "";
 
+    public static int contador = 0;
+
     public ArbolSintactico(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributo) {
         this.hijoIzq = hijoIzq;
         this.hijoDer = hijoDer;
@@ -41,27 +43,11 @@ public abstract class ArbolSintactico {
     }
 
     public void setHijoIzq(ArbolSintactico hijoIzq) {
-        if(this.hijoIzq == null)
-            this.hijoIzq = hijoIzq;
-        else{
-            ArbolSintactico aux = this.hijoIzq;
-            while(aux.hijoIzq != null){
-                aux = aux.hijoIzq;
-            }
-            aux.hijoIzq = hijoIzq;
-        }
+        this.hijoIzq = hijoIzq;
     }
 
     public void setHijoDer(ArbolSintactico hijoDer) {
-        if(this.hijoDer == null)
-            this.hijoDer = hijoDer;
-        else{
-            ArbolSintactico aux = this.hijoDer;
-            while(aux.hijoDer != null){
-                aux = aux.hijoDer;
-            }
-            aux.hijoDer = hijoDer;
-        }
+        this.hijoDer = hijoDer;
     }
 
     public void setAtributo(AtributosTablaS atributo) {
@@ -74,7 +60,7 @@ public abstract class ArbolSintactico {
                 this.printTree += tab(cant, hijo+nodo.atributo.getLexema(), nodo.atributo.getTipo(), nodo.atributo.getUso());
                 return;
             }
-            this.printTree += tab(cant, hijo+nodo.getLexeme(), nodo.getTipo(), nodo.atributo.getUso()); // mostrar datos del nodo
+            this.printTree += tab(cant, hijo+nodo.getLexema(), nodo.getTipo(), nodo.atributo.getUso()); // mostrar datos del nodo
             cant++;
             printTree(nodo.getHijoIzq(), "Hijo izquierdo: "); //recorre subarbol izquierdo
             printTree(nodo.getHijoDer(), "Hijo derecho: "); //recorre subarbol derecho
@@ -97,7 +83,7 @@ public abstract class ArbolSintactico {
     }
 
 
-    public String getLexeme() {
+    public String getLexema() {
         if (atributo.getLexema().isEmpty()){
             return operador;
         }
@@ -113,5 +99,13 @@ public abstract class ArbolSintactico {
         this.atributo.setTipo(tipo);
     }
 
+    public void eliminarHijos(ArbolSintactico raiz){
+        raiz.setHijoIzq(null);
+        raiz.setHijoDer(null);
+    }
+
+    public void reemplazarAtributos(ArbolSintactico raiz, AtributosTablaS atributos){
+        this.atributo = atributos;
+    }
 
 }

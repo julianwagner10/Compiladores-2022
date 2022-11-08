@@ -10,4 +10,9 @@ public class NodoDecrementoFor extends ArbolSintactico{
     public NodoDecrementoFor(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         super(hijoIzq, hijoDer);
     }
+
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
 }

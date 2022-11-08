@@ -1,4 +1,6 @@
 package Principal;
+import ArbolSintactico.ArbolSintactico;
+import Assembler.Assembler;
 import Parser.Parser;
 
 import java.io.*;
@@ -104,5 +106,10 @@ public class Main{
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Arbol sintáctico ");
         System.out.println(p.printSyntacticTree());
+
+        ArbolSintactico arbol = p.returnTree();
+        Assembler assembler = new Assembler(arbol);
+        assembler.generarCodigoAssembler();
     }
+
 }

@@ -9,6 +9,11 @@ public class NodoOperacion extends ArbolSintactico{
         chequearCompatiblidadTipo(hijoIzq,hijoDer);
     }
 
+    @Override
+    public String generarCodigoAssembler() {
+        return null;
+    }
+
     public void chequearCompatiblidadTipo(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         String tipoIzq = hijoIzq.getTipo();
         String tipoDer = hijoDer.getTipo();

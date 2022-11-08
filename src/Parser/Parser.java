@@ -1062,7 +1062,7 @@ case 7:
 //#line 28 "gramatica.y"
 { if(val_peek(0).arbol != null){
                                 AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
-                                yyval.arbol = new NodoBloqueEjecutable(val_peek(1).arbol,val_peek(0).arbol,atributos);
+                                yyval.arbol = new NodoBloqueEjecutable(val_peek(0).arbol,val_peek(1).arbol,atributos);
                             }
                            }
 break;
