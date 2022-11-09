@@ -24,10 +24,6 @@ public abstract class ArbolSintactico {
         this.hijoDer = hijoDer;
         this.operador = operador;
     }
-    public ArbolSintactico(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
-        this.hijoIzq = hijoIzq;
-        this.hijoDer = hijoDer;
-    }
 
     public  abstract String generarCodigoAssembler();
     public ArbolSintactico getHijoIzq() {
@@ -95,6 +91,10 @@ public abstract class ArbolSintactico {
         return this.atributo.getTipo();
     }
 
+    public String getUso(){
+        return this.atributo.getUso();
+    }
+
     public void setTipo(String tipo){
         this.atributo.setTipo(tipo);
     }
@@ -111,6 +111,24 @@ public abstract class ArbolSintactico {
     public String  getLexemaReemplazado(){
         this.atributo.setLexema(this.atributo.getLexema().replace('.','_'));
         return this.atributo.getLexema();
+    }
+
+    public String getCondicionDeSalto(String comparador) {
+        switch (comparador) {
+            case "<":
+                return "JGE";
+            case "<=":
+                return "JG";
+            case "==":
+                return "JNE";
+            case "!=":
+                return "JE";
+            case ">":
+                return "JLE";
+            case ">=":
+                return "JL";
+        }
+        return null;
     }
 
 }

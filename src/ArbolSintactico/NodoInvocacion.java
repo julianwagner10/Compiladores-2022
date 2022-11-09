@@ -9,10 +9,6 @@ public class NodoInvocacion extends ArbolSintactico{
         super(hijoIzq, hijoDer, atributo);
     }
 
-    public NodoInvocacion(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
-        super(hijoIzq, hijoDer);
-    }
-
     @Override
     public String generarCodigoAssembler() {
         return null;

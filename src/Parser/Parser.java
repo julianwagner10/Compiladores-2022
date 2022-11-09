@@ -1127,14 +1127,14 @@ case 22:
 //#line 79 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + val_peek(0).sval);
                         lista_variables.add(val_peek(0).sval);
-                        Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval).setUso("nombreVariable");
+                        Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval).setUso("Variable");
                         yyval = new ParserVal(lista_variables);
                                 }
 break;
 case 23:
 //#line 84 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo una lista de variables ");
-      		                                    Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval).setUso("nombreVariable");
+      		                                    Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval).setUso("Variable");
                                                 lista_variables = (ArrayList<String>) val_peek(2).obj;
                                                 lista_variables.add(val_peek(0).sval);
                                                 yyval = new ParserVal(lista_variables);
@@ -1464,7 +1464,7 @@ case 87:
                                                     if (val_peek(0).arbol!=null){
                                                         Main.tablaDeSimbolos.eliminarSimbolo(val_peek(2).sval);
                                                         AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
-                                                        Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idAsginacion");
+                                                        Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                         AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                                         NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),val_peek(0).arbol,atributos);
                                                     if (nodoA.getTipo()!=null){
@@ -1482,7 +1482,7 @@ case 88:
 //#line 295 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito);
-                                   Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito).setUso("idAsginacionDeControl");
+                                   Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito).setUso("Variable");
                                    AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                    yyval.arbol= new NodoAsignacion(new NodoHoja(atributosId),val_peek(0).arbol,atributos);
                                    }
@@ -1582,7 +1582,7 @@ case 112:
 {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(0).sval,ambito);
               if(ambitoCheck != null){
                   AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
-                  Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("ifFactor");
+                  Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                   String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                   atributos.setTipo(tipoId);
                   yyval.arbol = new NodoHoja(atributos);
@@ -1734,7 +1734,7 @@ case 129:
 { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(0).sval,ambito);
                       if(ambitoCheck != null){
                           AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval+"."+ambito);
-                          Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idFactorInvocacion");
+                          Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                           lista_parametros_reales.clear();
                           lista_parametros_reales.add(val_peek(0).sval);
                           yyval.arbol = new NodoHoja(atributos);
@@ -1995,7 +1995,7 @@ case 185:
                                             if(tipoId.equals("i32")){
                                                 if (chequearRangoEnteros()==true){
                                                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito);
-                                                    Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idAsignacionFor");
+                                                    Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                     AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
                                                     AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval);
                                                     NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
@@ -2038,7 +2038,7 @@ case 190:
 //#line 665 "gramatica.y"
 {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(2).sval,ambito);
                                                    if(ambitoCheck != null){
-                                                       Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idCondicionFor");
+                                                       Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                        AtributosTablaS atributos = new AtributosTablaS("CondicionFOR");
                                                        AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval);
                                                        AtributosTablaS atributos3 = new AtributosTablaS(val_peek(1).sval);

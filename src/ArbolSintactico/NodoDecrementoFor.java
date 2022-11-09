@@ -7,10 +7,6 @@ public class NodoDecrementoFor extends ArbolSintactico{
         super(hijoIzq, hijoDer, atributo);
     }
 
-    public NodoDecrementoFor(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
-        super(hijoIzq, hijoDer);
-    }
-
     @Override
     public String generarCodigoAssembler() {
         return null;

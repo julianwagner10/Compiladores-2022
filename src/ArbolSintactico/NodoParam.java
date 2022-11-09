@@ -7,10 +7,6 @@ public class NodoParam extends ArbolSintactico{
         super(hijoIzq, hijoDer, atributo);
     }
 
-    public NodoParam(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
-        super(hijoIzq, hijoDer);
-    }
-
     @Override
     public String generarCodigoAssembler() {
         return null;

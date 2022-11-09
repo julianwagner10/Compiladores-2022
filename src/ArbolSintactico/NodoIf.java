@@ -2,7 +2,11 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 
+import java.util.Stack;
+
 public class NodoIf extends ArbolSintactico {
+
+    public static Stack<String> etiquetaDeSalto = new Stack<>();
 
     public NodoIf(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos) {
         super(hijoIzq, hijoDer, atributos);
@@ -10,6 +14,7 @@ public class NodoIf extends ArbolSintactico {
 
     @Override
     public String generarCodigoAssembler() {
-        return null;
+        String assembler = "";
+        return assembler;
     }
 }

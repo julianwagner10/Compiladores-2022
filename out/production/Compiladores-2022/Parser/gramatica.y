@@ -78,11 +78,11 @@ error_declaracion : tipo lista_de_variables error {Main.erroresSintacticos.add("
 
 lista_de_variables : ID {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + $1.sval);
                         lista_variables.add($1.sval);
-                        Main.tablaDeSimbolos.getAtributosTablaS($1.sval).setUso("nombreVariable");
+                        Main.tablaDeSimbolos.getAtributosTablaS($1.sval).setUso("Variable");
                         $$ = new ParserVal(lista_variables);
                                 }
       		       | lista_de_variables ',' ID {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo una lista de variables ");
-      		                                    Main.tablaDeSimbolos.getAtributosTablaS($3.sval).setUso("nombreVariable");
+      		                                    Main.tablaDeSimbolos.getAtributosTablaS($3.sval).setUso("Variable");
                                                 lista_variables = (ArrayList<String>) $1.obj;
                                                 lista_variables.add($3.sval);
                                                 $$ = new ParserVal(lista_variables);
@@ -278,7 +278,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                                     if ($3.arbol!=null){
                                                         Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
                                                         AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
-                                                        Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idAsginacion");
+                                                        Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                         AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                                         NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                                     if (nodoA.getTipo()!=null){
@@ -294,7 +294,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
 
            | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                                   Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito).setUso("idAsginacionDeControl");
+                                   Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito).setUso("Variable");
                                    AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                    $$.arbol= new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                    }
@@ -355,7 +355,7 @@ error_termino : termino '*' error{Main.erroresSintacticos.add("Error sináctico:
 factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
               if(ambitoCheck != null){
                   AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
-                  Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("ifFactor");
+                  Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                   String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                   atributos.setTipo(tipoId);
                   $$.arbol = new NodoHoja(atributos);
@@ -474,7 +474,7 @@ error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSinta
 factor_invocacion 	: ID { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                       if(ambitoCheck != null){
                           AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                          Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idFactorInvocacion");
+                          Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                           lista_parametros_reales.clear();
                           lista_parametros_reales.add($1.sval);
                           $$.arbol = new NodoHoja(atributos);
@@ -628,7 +628,7 @@ asignacion_for: ID ASIGNACION CTE_INT { String ambitoCheck = Main.tablaDeSimbolo
                                             if(tipoId.equals("i32")){
                                                 if (chequearRangoEnteros()==true){
                                                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                                                    Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idAsignacionFor");
+                                                    Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                     AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
                                                     AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
                                                     NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
@@ -664,7 +664,7 @@ error_asignacion_for : ASIGNACION CTE_INT {Main.erroresSintacticos.add("Error si
 
 condicion_for: ID comparador expresion_aritmetica {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                                    if(ambitoCheck != null){
-                                                       Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idCondicionFor");
+                                                       Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                        AtributosTablaS atributos = new AtributosTablaS("CondicionFOR");
                                                        AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                                                        AtributosTablaS atributos3 = new AtributosTablaS($2.sval);

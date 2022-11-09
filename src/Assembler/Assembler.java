@@ -10,17 +10,16 @@ public class Assembler {
 
     private String assemblerData = "";
     private String assemblerCode = "";
-
     private String assemblerHeader = "";
 
 
-    private static final int limiteSuperiorint = 65535;
-    private static final int limiteInferiorint = 0;
-    private static final double limiteInferiorDoublePositivo = 2.2250738585272014d-308;
-    private static final double limiteSuperiorDoublePositivo = 1.7976931348623157d+308;
-    private static final double limiteInferiorDoubleNegativo = -1.7976931348623157d+308;
-    private static final double limiteSuperiorDoubleNegativo = -2.2250738585072014d-308;
-    private static final double limiteDoubleCero = 0.0;
+    private static final long limiteSuperiorint = 2147483647;
+    private static final long limiteInferiorint = -2147483648;
+    private static final float limiteInferiorDoublePositivo = 1.17549435f-38;
+    private static final float limiteSuperiorDoublePositivo = 3.40282347f+38;
+    private static final float limiteInferiorDoubleNegativo = -1.17549435f-38;
+    private static final float limiteSuperiorDoubleNegativo = -3.40282347f+38;
+    private static final float limiteDoubleCero = 0.0f;
 
     public Assembler(ArbolSintactico arbol){
         this.arbol = arbol;
@@ -33,17 +32,19 @@ public class Assembler {
         "includelib \\masm32\\lib\\user32.lib" + '\n' + ".STACK 200h" + '\n';
 
         this.assemblerData += ".data" + '\n';
-        this.assemblerData += "_errorCero" + " DB " + "\"Error division\", 0" + '\n';
-        this.assemblerData += "_errorNegativo" + " DB " + "\"Error resta\" , 0" + '\n';
-        this.assemblerData += "_ceroDOUBLE DQ 0.0" + '\n';
-        this.assemblerData += "_ceroULONGINT DD 0" + '\n';
+        this.assemblerData += "_errorOverflowInt" + " DB " + "\"Error suma enteros\", 0" + '\n';
+        this.assemblerData += "_errorOverflowFloat" + " DB " + "\"Error suma flotante\" , 0" + '\n';
+        this.assemblerData += "_errorRecursionPropia" + " DB " + "\"Error en invocacion a funcion\" , 0" + '\n';
 
         this.assemblerCode += ".code" + '\n';
-        this.assemblerCode += "Error_Resta_Negativa:"+ '\n';
-        this.assemblerCode += "invoke MessageBox, NULL, addr _errorNegativo, addr _errorNegativo, MB_OK"+ '\n';
+        this.assemblerCode += "Error_Suma_Enteros:"+ '\n';
+        this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowInt, _errorOverflowInt, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
-        this.assemblerCode += "Error_Division_Cero:"+ '\n';
-        this.assemblerCode += "invoke MessageBox, NULL, addr _errorCero, addr _errorCero, MB_OK"+ '\n';
+        this.assemblerCode += "Error_Suma_Flotantes:"+ '\n';
+        this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowFloat, addr _errorOverflowFloat, MB_OK"+ '\n';
+        this.assemblerCode += "invoke ExitProcess, 0" + '\n';
+        this.assemblerCode += "Error_Invocacion_Funcion:"+ '\n';
+        this.assemblerCode += "invoke MessageBox, NULL, addr _errorRecursionPropia, addr _errorRecursionPropia, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
 
 
@@ -74,23 +75,6 @@ public class Assembler {
 
         bw.close();
 
-    }
-    private String getCondicionDeSalto(String comparador) {
-        switch (comparador) {
-            case "<":
-                return "JL";
-            case "<=":
-                return "JLE";
-            case "==":
-                return "JE";
-            case "!=":
-                return "JNE";
-            case ">":
-                return "JG";
-            case ">=":
-                return "JGE";
-        }
-        return null;
     }
 
     public void getMostLeftTree(ArbolSintactico raiz) {

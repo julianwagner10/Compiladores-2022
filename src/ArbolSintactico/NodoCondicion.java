@@ -10,6 +10,10 @@ public class NodoCondicion extends ArbolSintactico {
 
     @Override
     public String generarCodigoAssembler() {
-        return null;
+        String assembler = "";
+
+
+
+        return assembler;
     }
 }

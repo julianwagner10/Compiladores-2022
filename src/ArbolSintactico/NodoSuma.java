@@ -38,7 +38,7 @@ public class NodoSuma extends NodoOperacion {
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");
 
-            assembler += "FLD _" + lexemaIzq+ '\n';
+            assembler += "FLD " + lexemaIzq+ '\n';
             assembler += "FADD " + lexemaDer+ '\n';
 
             String auxVar = "_var" + this.contador;
