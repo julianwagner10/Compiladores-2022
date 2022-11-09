@@ -98,10 +98,7 @@ public class Main{
         for(String e :erroresSemanticos){
             System.out.println(e);
         }
-        System.out.println("------------------------------------------------------------------------------------");
-        System.out.println("Tabla de simbolos ");
-        System.out.println("");
-        tablaDeSimbolos.mostrarTablasimbolos();
+
 
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Arbol sintáctico ");
@@ -110,6 +107,12 @@ public class Main{
         ArbolSintactico arbol = p.returnTree();
         Assembler assembler = new Assembler(arbol);
         assembler.generarCodigoAssembler();
+
+
+        System.out.println("------------------------------------------------------------------------------------");
+        System.out.println("Tabla de simbolos ");
+        System.out.println("");
+        tablaDeSimbolos.mostrarTablasimbolos();
     }
 
 }

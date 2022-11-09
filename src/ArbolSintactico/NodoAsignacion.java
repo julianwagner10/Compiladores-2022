@@ -13,13 +13,15 @@ public class NodoAsignacion extends ArbolSintactico{
     public String generarCodigoAssembler() {
         String assembler = "";
         if (this.getTipo().equals("i32")) {
-            return null;
+            assembler += "MOV EBX, " + this.getHijoDer().getLexema() + '\n';
+            assembler += "MOV " + this.getHijoIzq().getLexema() + ", " + "EBX" + '\n';
         }else{
-        assembler += "FLD _" + this.getHijoDer().getLexema()+ '\n';
-        assembler += "FSTP _" + this.getHijoIzq().getLexema() + '\n';
+            assembler += "FLD " + this.getHijoDer().getLexema()+ '\n';
+            assembler += "FSTP " + this.getHijoIzq().getLexema() + '\n';
+
+        }
         this.eliminarHijos(this);
         return assembler;
-        }
     }
 
     public void chequearCompatiblidadTipo(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {

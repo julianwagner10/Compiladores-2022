@@ -47,4 +47,8 @@ public class AtributosTablaS {
     public void setTipo(String tipo){this.tipo=tipo;}
 
     public void setOrden(int orden){this.orden=orden;}
+
+    public void setLexema(String lexema){
+        this.lexema=lexema;
+    }
 }
