@@ -2,18 +2,15 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 
-public class NodoCondicion extends ArbolSintactico {
+public class NodoCondicionIf extends ArbolSintactico {
 
-    public NodoCondicion(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos) {
+    public NodoCondicionIf(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos) {
         super(hijoIzq, hijoDer, atributos);
     }
 
     @Override
     public String generarCodigoAssembler() {
         String assembler = "";
-
-
-
         return assembler;
     }
 }

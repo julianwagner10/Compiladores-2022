@@ -131,4 +131,22 @@ public abstract class ArbolSintactico {
         return null;
     }
 
+    public String getCondicionDeSaltoSinSigno(String comparador) { //Metodo declarado para obtener las bifurcaciones despues de una comparacion entre flotantes.
+        switch (comparador) {
+            case "<":
+                return "JAE";
+            case "<=":
+                return "JA";
+            case "==":
+                return "JNE";
+            case "!=":
+                return "JE";
+            case ">":
+                return "JBE";
+            case ">=":
+                return "JB";
+        }
+        return null;
+    }
+
 }

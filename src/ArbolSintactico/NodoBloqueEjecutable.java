@@ -10,7 +10,8 @@ public class NodoBloqueEjecutable extends ArbolSintactico{
 
     @Override
     public String generarCodigoAssembler() {
-        return null;
+        String assembler = "";
+        return assembler;
     }
 
 }

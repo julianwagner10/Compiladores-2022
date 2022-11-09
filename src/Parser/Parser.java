@@ -1833,22 +1833,22 @@ break;
 case 147:
 //#line 539 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Then");
-                        yyval.arbol = new NodoElse(val_peek(0).arbol,null,atributos);}
+                        yyval.arbol = new NodoCuerpoThen(val_peek(0).arbol,null,atributos);}
 break;
 case 148:
 //#line 541 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Then");
-                                          yyval.arbol = new NodoElse(val_peek(1).arbol,null,atributos);}
+                                          yyval.arbol = new NodoCuerpoThen(val_peek(1).arbol,null,atributos);}
 break;
 case 150:
 //#line 546 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Else");
-                             yyval.arbol = new NodoElse(val_peek(0).arbol,null,atributos);}
+                             yyval.arbol = new NodoCuerpoElse(val_peek(0).arbol,null,atributos);}
 break;
 case 151:
 //#line 548 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Else");
-                                                yyval.arbol = new NodoElse(val_peek(1).arbol,null,atributos);}
+                                                yyval.arbol = new NodoCuerpoElse(val_peek(1).arbol,null,atributos);}
 break;
 case 153:
 //#line 553 "gramatica.y"
@@ -1890,7 +1890,7 @@ case 163:
 //#line 572 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Condicion");
                                                                   AtributosTablaS atributos2 = new AtributosTablaS(val_peek(1).sval);
-                                                                  yyval.arbol = new NodoCondicion(new NodoExpresionLogica(val_peek(2).arbol,val_peek(0).arbol,atributos2),null,atributos);}
+                                                                  yyval.arbol = new NodoCondicionIf(new NodoExpresionLogica(val_peek(2).arbol,val_peek(0).arbol,atributos2),null,atributos);}
 break;
 case 165:
 //#line 578 "gramatica.y"

@@ -537,16 +537,16 @@ error_cuerpo_if: error cuerpo_then cuerpo_else ENDIF {Main.erroresSintacticos.ad
 
 
 cuerpo_then: ejecucion {AtributosTablaS atributos = new AtributosTablaS("Then");
-                        $$.arbol = new NodoElse($1.arbol,null,atributos);}
+                        $$.arbol = new NodoCuerpoThen($1.arbol,null,atributos);}
            | '{' bloque_ejecutable_if '}'{AtributosTablaS atributos = new AtributosTablaS("Then");
-                                          $$.arbol = new NodoElse($2.arbol,null,atributos);}
+                                          $$.arbol = new NodoCuerpoThen($2.arbol,null,atributos);}
            | error_cuerpo_then
            ;
 
 cuerpo_else: ELSE ejecucion {AtributosTablaS atributos = new AtributosTablaS("Else");
-                             $$.arbol = new NodoElse($2.arbol,null,atributos);}
+                             $$.arbol = new NodoCuerpoElse($2.arbol,null,atributos);}
            | ELSE '{' bloque_ejecutable_if '}' {AtributosTablaS atributos = new AtributosTablaS("Else");
-                                                $$.arbol = new NodoElse($3.arbol,null,atributos);}
+                                                $$.arbol = new NodoCuerpoElse($3.arbol,null,atributos);}
            | error_cuerpo_else
            ;
 
@@ -571,7 +571,7 @@ error_bloque_for : bloque_ejecutable_for '}' {Main.erroresSintacticos.add("Error
 
 condicion : expresion_aritmetica comparador expresion_aritmetica {AtributosTablaS atributos = new AtributosTablaS("Condicion");
                                                                   AtributosTablaS atributos2 = new AtributosTablaS($2.sval);
-                                                                  $$.arbol = new NodoCondicion(new NodoExpresionLogica($1.arbol,$3.arbol,atributos2),null,atributos);}
+                                                                  $$.arbol = new NodoCondicionIf(new NodoExpresionLogica($1.arbol,$3.arbol,atributos2),null,atributos);}
           | error_condicion
           ;
 

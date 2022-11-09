@@ -9,6 +9,7 @@ public class NodoEtiquetado extends ArbolSintactico{
 
     @Override
     public String generarCodigoAssembler() {
-        return null;
+        String assembler ="";
+        return assembler;
     }
 }

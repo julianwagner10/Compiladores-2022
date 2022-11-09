@@ -1,9 +1,8 @@
 IfBienDefinido{
-i32 y;
-f32 x,z;
-if (x>2) then{
+f32 y;
+f32 x ;
+if (x>2.5) then{
     y=: x;
-    z=: y;
     }
 end_if;
 }

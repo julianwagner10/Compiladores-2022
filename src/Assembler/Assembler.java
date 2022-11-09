@@ -46,6 +46,7 @@ public class Assembler {
         this.assemblerCode += "Error_Invocacion_Funcion:"+ '\n';
         this.assemblerCode += "invoke MessageBox, NULL, addr _errorRecursionPropia, addr _errorRecursionPropia, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
+        this.assemblerCode += '\n';
 
 
         if(this.arbol != null)
