@@ -32,11 +32,20 @@ public class Assembler {
         "includelib \\masm32\\lib\\user32.lib" + '\n' + ".STACK 200h" + '\n';
 
         this.assemblerData += ".data" + '\n';
+        this.assemblerData += "_limiteSuperiorInt DD " + limiteSuperiorint + '\n';
+        this.assemblerData += "_limiteInferiorInt DD " + limiteInferiorint + '\n';
+        this.assemblerData += "_limiteInferiorDoublePositivo DQ " + limiteInferiorDoublePositivo + '\n';
+        this.assemblerData += "_limiteSuperiorDoublePositivo DQ " + limiteSuperiorDoublePositivo + '\n';
+        this.assemblerData += "_limiteInferiorDoubleNegativo DQ " + limiteInferiorDoubleNegativo + '\n';
+        this.assemblerData += "_limiteSuperiorDoubleNegativo DQ " + limiteSuperiorDoubleNegativo + '\n';
+
+
         this.assemblerData += "_errorOverflowInt" + " DB " + "\"Error suma enteros\", 0" + '\n';
         this.assemblerData += "_errorOverflowFloat" + " DB " + "\"Error suma flotante\" , 0" + '\n';
         this.assemblerData += "_errorRecursionPropia" + " DB " + "\"Error en invocacion a funcion\" , 0" + '\n';
 
         this.assemblerCode += ".code" + '\n';
+
         this.assemblerCode += "Error_Suma_Enteros:"+ '\n';
         this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowInt, _errorOverflowInt, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
@@ -47,11 +56,13 @@ public class Assembler {
         this.assemblerCode += "invoke MessageBox, NULL, addr _errorRecursionPropia, addr _errorRecursionPropia, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
         this.assemblerCode += '\n';
+        this.assemblerCode += "start:" + '\n';
+
 
 
         if(this.arbol != null)
             this.getMostLeftTree(this.arbol);
-        this.assemblerCode += "invoke ExitProcess, 0" + '\n' + "END START";
+        this.assemblerCode += "invoke ExitProcess, 0" + '\n' + "end start";
 
         this.assemblerData += Main.tablaDeSimbolos.generarCodigoAssembler();
 
@@ -70,9 +81,9 @@ public class Assembler {
                 + "include \\masm32\\include\\user32.inc" + '\n'
                 + "includelib \\masm32\\lib\\kernel32.lib" + '\n'
                 + "includelib \\masm32\\lib\\user32.lib" + '\n'
-                + '\n' + ".data" + '\n');
+                );
 
-        bw.write(this.assemblerData + "\n.code\nstart: \n" + this.assemblerCode + "invoke ExitProcess, 0\nend start");
+        bw.write(this.assemblerData  + this.assemblerCode);
 
         bw.close();
 

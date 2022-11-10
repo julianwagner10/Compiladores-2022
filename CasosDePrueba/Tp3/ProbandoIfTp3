@@ -1,8 +1,13 @@
 IfBienDefinido{
-f32 y;
-f32 x ;
-if (x>2.5) then{
+i32 y;
+i32 x;
+x=:30;
+y=:2;
+if (x>25) then{
     y=: x;
+    }
+    else{
+    y=:20;
     }
 end_if;
 }

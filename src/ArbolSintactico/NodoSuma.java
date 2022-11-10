@@ -16,12 +16,12 @@ public class NodoSuma extends NodoOperacion {
     public String generarCodigoAssembler() {
         String assembler = "";
         if (this.getTipo().equals("i32")) {
-            assembler += "MOV EBX, _" + this.getHijoIzq().getLexema() + '\n';
-            assembler += "ADD EBX, _" + this.getHijoDer().getLexema() + '\n';
-           // assembler += "CMP EBX, _limiteSuperiorINT" + '\n'; // Comparo que no exceda el rango.
-           // assembler += "JA " + "LabelOverflowSuma" + '\n'; // Si excede salto.
+            assembler += "MOV EBX, _" + this.getHijoIzq().getLexema().replace('.','_')+ '\n';
+            assembler += "ADD EBX, _" + this.getHijoDer().getLexema().replace('.','_') + '\n';
+            assembler += "CMP EBX, _limiteSuperiorInt" + '\n'; // Comparo que no exceda el rango.
+            assembler += "JA " + "Error_Suma_Enteros" + '\n'; // Si excede salto.
             String auxVar = "_var" + this.contador;
-            assembler += "MOV " + auxVar + ", EBX" + '\n';// Muevo a la variable.
+            assembler += "MOV _" + auxVar + ", EBX" + '\n';// Muevo a la variable.
 
             Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "Variable");
 
@@ -38,11 +38,22 @@ public class NodoSuma extends NodoOperacion {
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");
 
-            assembler += "FLD " + lexemaIzq+ '\n';
-            assembler += "FADD " + lexemaDer+ '\n';
+            assembler += "FLD _" + lexemaIzq+ '\n';
+            assembler += "FADD _" + lexemaDer+ '\n';
+
+            assembler += "FCOMP " + "_limiteSuperiorDoublePositivo" + '\n'; //Comparo el lexema de la der con el valor guardado en ST, y se extrae el valor en ST.
+
+            String auxVarComp = "_var" + this.contador;     //Necesito la variable aux para guardar la palabra de estado en la memoria
+            //Estas tres instrucciones se hacen luego de hacer una comparacion en el coprocesador.
+            assembler += "FSTSW _"+auxVarComp + '\n';       //Almaceno la palabra de estado en la memoria.
+            assembler += "MOV AX, _" + auxVarComp + '\n';   //Copio el contenido en el registro AX
+            assembler += "SAHF" + '\n';                 //Almacena en los 8 bits menos significativos, del registro de indicadores, el valor del registro AH.
+
+            assembler += "JA " + "_errorOverflowFloat" + '\n'; // Si excede salto.
+
 
             String auxVar = "_var" + this.contador;
-            assembler += "FSTP " + auxVar+ '\n';
+            assembler += "FSTP _" + auxVar+ '\n';
             Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");
 
             this.eliminarHijos(this);

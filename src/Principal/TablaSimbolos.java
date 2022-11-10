@@ -123,22 +123,22 @@ public class TablaSimbolos {
                 switch (atributos.getIdentificador()) {
                     case (Lexico.ID):
                         if(atributos.getTipo().equals("i32")){
-                            assembler += "_" + lexema + " DD ?"  + '\n'; //32 bits
+                            assembler += "_" + lexema.replace('.','_') + " DD ?"  + '\n'; //32 bits
                         }
                         if(atributos.getTipo().equals("f32")) {
-                            assembler += "_" + lexema + " DQ ?"  + '\n'; //32 bits
+                            assembler += "_" + lexema.replace('.','_') + " DQ ?"  + '\n'; //32 bits
                         }
                         break;
                     case (Lexico.CADENA):
-                        assembler = assembler + "_" + lexema + " DB " + lexema + ", 0 \n";
+                        assembler = assembler + "_" + lexema.replace('.','_') + " DB " + lexema + ", 0 \n";
                         break;
 
                     case (Lexico.CTE_INT):
-                        assembler = assembler + "_" + lexema + " DD " + lexema + '\n';
+                        assembler = assembler + "_" + lexema.replace('.','_') + " DD " + lexema + '\n';
                         break;
 
                     case (Lexico.CTE_FLOTANTE):
-                        assembler += "_" + lexema + " DQ " + lexema + '\n'; //64 bits
+                        assembler += "_" + lexema.replace('.','_') + " DQ " + lexema + '\n'; //64 bits
                         break;
 
             }

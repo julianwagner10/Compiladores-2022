@@ -25,10 +25,15 @@ error_programa : '{'bloque'}' {Main.erroresSintacticos.add("Error sináctico: Li
                ;
 
 bloque : sentencia {$$.arbol = $1.arbol;}
-       | bloque sentencia { if($2.arbol != null){
-                                AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
-                                $$.arbol = new NodoBloqueEjecutable($2.arbol,$1.arbol,atributos);
-                            }
+       | bloque sentencia {     if($2.arbol != null){
+                                        if ($1.arbol !=null){
+                                        AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
+                                        $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);
+                                    }else{
+                                         AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
+                                         $$.arbol = new NodoBloqueEjecutable($2.arbol,$1.arbol,atributos);
+                                    }
+                                }
                            }
        | error_bloque
        ;
