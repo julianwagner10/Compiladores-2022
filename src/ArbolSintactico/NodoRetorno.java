@@ -9,6 +9,6 @@ public class NodoRetorno extends ArbolSintactico{
 
     @Override
     public String generarCodigoAssembler() {
-        return null;
+        return "" + '\n';
     }
 }

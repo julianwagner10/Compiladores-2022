@@ -9,7 +9,13 @@ public class NodoCuerpoFor extends ArbolSintactico{
 
     @Override
     public String generarCodigoAssembler() {
-        String assembler ="";
+
+        String assembler = "";
+        String label = NodoFor.etiquetaDeSalto.pop();
+        String label1 = NodoFor.etiquetaDeSalto.pop();
+        assembler += "JMP " + label1 + '\n';
+        NodoFor.etiquetaDeSalto.push(label);
         return assembler;
+
     }
 }

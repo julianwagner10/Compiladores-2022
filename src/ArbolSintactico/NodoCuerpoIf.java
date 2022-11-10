@@ -2,8 +2,11 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 
+import java.util.Stack;
+
 public class NodoCuerpoIf extends ArbolSintactico {
 
+    public static Stack<String> etiquetaDeSalto = new Stack<>();
     public NodoCuerpoIf(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos) {
         super(hijoIzq, hijoDer, atributos);
     }

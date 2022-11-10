@@ -12,6 +12,7 @@ public abstract class ArbolSintactico {
     private String printTree = "";
 
     public static int contador = 0;
+    String id;
 
     public ArbolSintactico(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributo) {
         this.hijoIzq = hijoIzq;
@@ -148,5 +149,10 @@ public abstract class ArbolSintactico {
         }
         return null;
     }
+
+    public void setId(String id){
+        this.id = id.replace(".","_");
+    }
+
 
 }

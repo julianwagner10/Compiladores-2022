@@ -1,4 +1,8 @@
-FuncionBienDeclarada{
-i32 x;
-x =: 2147483646 + 27;
+programa{
+i32 id,x;
+
+for (id=:2 ; id>4 ; -2){
+x=:214;
+out('salida con cadena de una linea');
+};
 }

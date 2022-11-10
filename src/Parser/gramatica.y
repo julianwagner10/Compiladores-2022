@@ -599,6 +599,9 @@ control : FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {if
                                                                                   AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
                                                                                   AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
                                                                                   ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor($9.arbol,null,lexCuerpoFor);
+                                                                                  String IdAIncrementar = $3.arbol.getHijoIzq().getLexema();
+                                                                                  $5.arbol.getHijoIzq().setId(IdAIncrementar);
+                                                                                  $7.arbol.setId(IdAIncrementar);
                                                                                   ArbolSintactico encabezadoFor = new NodoEncabezadoFor(new NodoEncabezadoFor($3.arbol,$5.arbol,lexEncabezadoFor),$7.arbol,lexEncabezadoFor);
                                                                                   $$.arbol = new NodoFor(encabezadoFor,nodoCuerpoFor,lexSentenciaFor);
                                                                                 }
@@ -636,7 +639,7 @@ asignacion_for: ID ASIGNACION CTE_INT { String ambitoCheck = Main.tablaDeSimbolo
                                                     Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                     AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
                                                     AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
-                                                    NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
+                                                    NodoAsignacionFor nodoA = new NodoAsignacionFor(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
                                                     if (nodoA.getTipo()!=null){
                                                         $$.arbol= nodoA;
                                                     }else{
@@ -671,9 +674,9 @@ condicion_for: ID comparador expresion_aritmetica {String ambitoCheck = Main.tab
                                                    if(ambitoCheck != null){
                                                        Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                        AtributosTablaS atributos = new AtributosTablaS("CondicionFOR");
-                                                       AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                                       AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                                        AtributosTablaS atributos3 = new AtributosTablaS($2.sval);
-                                                       $$.arbol = new NodoCondicionFor(new NodoExpresionLogica(new NodoHoja(atributos2),$3.arbol,atributos3),null,atributos);
+                                                       $$.arbol = new NodoCondicionFor(new NodoComparacionFor(new NodoHoja(atributos2),$3.arbol,atributos3),null,atributos);
                                                    }
                                                    else{
                                                        Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no existe el id "+ $1.sval +" en ningun ambito alcanzable. Imposible determinar rango de control");

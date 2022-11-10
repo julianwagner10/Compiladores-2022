@@ -2,9 +2,9 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 
-public class NodoAsignacion extends ArbolSintactico{
+public class NodoAsignacionFor extends ArbolSintactico{
 
-    public NodoAsignacion(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos){
+    public NodoAsignacionFor(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos){
         super(hijoIzq,hijoDer,atributos);
         chequearCompatiblidadTipo(hijoIzq,hijoDer);
     }
@@ -14,14 +14,13 @@ public class NodoAsignacion extends ArbolSintactico{
         String assembler = "";
         String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
         String lexemaDer = this.getHijoDer().getLexemaReemplazado();
-        if (this.getTipo().equals("i32")) {
-            assembler += "MOV EBX, _" + lexemaDer + '\n';
-            assembler += "MOV _" + lexemaIzq + ", " + "EBX" + '\n';
-        }else{
-            assembler += "FLD _" + lexemaDer+ '\n';
-            assembler += "FSTP _" + lexemaIzq + '\n';
+        assembler += "MOV EBX, _" + lexemaDer + '\n';
+        assembler += "MOV _" + lexemaIzq + ", " + "EBX" + '\n';
 
-        }
+        String label = "FOR_INICIO " + ++contador;
+        NodoFor.etiquetaDeSalto.push(label);
+        assembler += label + ":" + '\n';
+
         this.eliminarHijos(this);
         return assembler;
     }
