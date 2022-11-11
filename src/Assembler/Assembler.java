@@ -15,11 +15,10 @@ public class Assembler {
 
     private static final long limiteSuperiorint = 2147483647;
     private static final long limiteInferiorint = -2147483648;
-    private static final float limiteInferiorDoublePositivo = 1.17549435f-38;
-    private static final float limiteSuperiorDoublePositivo = 3.40282347f+38;
-    private static final float limiteInferiorDoubleNegativo = -1.17549435f-38;
-    private static final float limiteSuperiorDoubleNegativo = -3.40282347f+38;
-    private static final float limiteDoubleCero = 0.0f;
+    private static final float limiteInferiorFloatPositivo = 1.17549435f-38;
+    private static final float limiteSuperiorFloatPositivo = 3.40282347f+38;
+    private static final float limiteInferiorFloatNegativo = -1.17549435f-38;
+    private static final float limiteSuperiorFloatNegativo = -3.40282347f+38;
 
     public Assembler(ArbolSintactico arbol){
         this.arbol = arbol;
@@ -34,10 +33,10 @@ public class Assembler {
         this.assemblerData += ".data" + '\n';
         this.assemblerData += "_limiteSuperiorInt DD " + limiteSuperiorint + '\n';
         this.assemblerData += "_limiteInferiorInt DD " + limiteInferiorint + '\n';
-        this.assemblerData += "_limiteInferiorDoublePositivo DQ " + limiteInferiorDoublePositivo + '\n';
-        this.assemblerData += "_limiteSuperiorDoublePositivo DQ " + limiteSuperiorDoublePositivo + '\n';
-        this.assemblerData += "_limiteInferiorDoubleNegativo DQ " + limiteInferiorDoubleNegativo + '\n';
-        this.assemblerData += "_limiteSuperiorDoubleNegativo DQ " + limiteSuperiorDoubleNegativo + '\n';
+        this.assemblerData += "_limiteInferiorDoublePositivo DQ " + limiteInferiorFloatPositivo + '\n';
+        this.assemblerData += "_limiteSuperiorDoublePositivo DQ " + limiteSuperiorFloatPositivo + '\n';
+        this.assemblerData += "_limiteInferiorDoubleNegativo DQ " + limiteInferiorFloatNegativo + '\n';
+        this.assemblerData += "_limiteSuperiorDoubleNegativo DQ " + limiteSuperiorFloatNegativo + '\n';
 
 
         this.assemblerData += "_errorOverflowInt" + " DB " + "\"Error suma enteros\", 0" + '\n';

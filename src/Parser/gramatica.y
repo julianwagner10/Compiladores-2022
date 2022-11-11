@@ -41,7 +41,7 @@ bloque : sentencia {$$.arbol = $1.arbol;}
 error_bloque: error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " no es una sentencia válida");}
             ;
 
-sentencia : declaracion
+sentencia : declaracion {$$.arbol = $1.arbol;}
           | ejecucion {$$.arbol = $1.arbol;}
           ;
 
@@ -72,7 +72,7 @@ declaracion : tipo lista_de_variables ';'{  String tipoVar = $1.sval;
                                                 }
                                             lista_variables.clear();
                                             }
-            | funcion
+            | funcion {$$.arbol = $1.arbol;}
             | error_declaracion
             ;
 
@@ -101,7 +101,10 @@ error_lista_de_variables : lista_de_variables ID {Main.erroresSintacticos.add("E
                          ;
 
 funcion : declaracion_fun '{'bloque'}' {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");
-								        ambito = ambito.substring(0,ambito.lastIndexOf("."));
+								        {$$.arbol = $3.arbol;}
+								        if(!ambito.equals("main")){
+                                        	ambito = ambito.substring(0,ambito.lastIndexOf("."));
+                                        }
                             }
         | error_funcion
         ;
@@ -626,7 +629,7 @@ incr_decr : '+' CTE_INT {
 error_incr_decr : CTE_INT {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
                 | '-' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
                 | '+' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
-                | CTE_FLOTANTE {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el incremento debe ser un numero entero");}
+                | '+' CTE_FLOTANTE {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el incremento debe ser un numero entero");}
                 | '-' CTE_FLOTANTE {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el decremento debe ser un numero entero");}
                 ;
 

@@ -12,6 +12,16 @@ fun f1(i32 y):i32{
         end_if;
         return y;
     }
-    return x;
+    fun f3(f32 w):f32{
+        i32 t;
+        if(w<y)then{
+            y=: y + 2;
+            w =:y;
+        }
+        end_if;
+        return w;
     }
+    return x;
+}
+
 }
