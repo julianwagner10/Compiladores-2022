@@ -196,19 +196,6 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	                                }
 	      | seleccion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';' {$$.arbol = $1.arbol;}
-	      | ID ':' control';' { if ($3.arbol!=null){
-	                                String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
-                                    if(ambitoCheck != null){
-                                        Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
-                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                                        Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito).setUso("nombreEtiqueta");
-                                        AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
-                                        $$.arbol = new NodoEtiquetado(new NodoHoja(atributos),$3.arbol,lexEtiqueta);
-                                    }else
-                                        Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$1.sval+"' en algun ambito alcanzable");
-                                }else
-                                    Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " sentencia de control mal definida");
-                                }
 	      | control ';'{$$.arbol = $1.arbol;}
 	      | salida ';' {$$.arbol = $1.arbol;}
 	      | error_ejecucion
@@ -217,9 +204,6 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 error_ejecucion : asignacion error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la asignacion");}
                 | seleccion error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
                 | control error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia de control");}
-                | ':' control ';' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta de la sentencia de control");}
-                | ID ':' ';' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la sentencia de control en la etiqueta");}
-                | ID control ';' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ':' en la etiqueta");}
                 | salida error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
                 | retorno error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
                 | DISCARD ';'{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
@@ -235,19 +219,6 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                                            }
                                            }
                  | seleccion ';' {$$.arbol = $1.arbol;}
-                 | ID ':' control';' {  if ($3.arbol!=null){
-                                            String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
-                                            if(ambitoCheck != null){
-                                                Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
-                                                AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                                                Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito).setUso("nombreEtiqueta");
-                                                AtributosTablaS lexEtiqueta = new AtributosTablaS("Etiqueta");
-                                                $$.arbol = new NodoEtiquetado(new NodoHoja(atributos),$3.arbol,lexEtiqueta);
-                                            }else
-                                                Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$1.sval+"' en algun ambito alcanzable");
-                                        }else
-                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " sentencia de control mal definida");
-                                     }
                  | control ';' {$$.arbol = $1.arbol;}
                  | salida ';' {$$.arbol = $1.arbol;}
                  | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
@@ -256,21 +227,16 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
                                 AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
                               $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
-                 | CONTINUE ':' ID ';' {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
+                 | CONTINUE ':' ID ';' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
+
                                         if(ambitoCheck != null){
-                                            Main.tablaDeSimbolos.modificarSimbolo($3.sval,$3.sval+"."+ambito);
-                                            AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($3.sval+"."+ambito);
-                                            Main.tablaDeSimbolos.getAtributosTablaS($3.sval+"."+ambito).setUso("referenciaAEtiqueta");
-                                            Main.tablaDeSimbolos.setAtributosDeSimbolo($3.sval+"."+ambito, atributos);
-                                            AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue con etiquetado");
-                                            $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);
-                                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);
-                                        }
-                                        else{
-                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
-                                            $$.arbol = null;
-                                        }
-                                        }
+                                        Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
+                                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                        AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
+                                        $$.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
+                                    }else
+                                        Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
+                             }
                  | error_ejecucion_control
                  ;
 
@@ -280,6 +246,25 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ';' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta en la sentencia CONTINUE");}
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
+
+etiqueta : ID ':' {
+                             String nuevoLexema = $1.sval + "." + ambito;
+                             if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
+                                 Main.tablaDeSimbolos.modificarSimbolo($1.sval, nuevoLexema);
+                                 AtributosTablaS atributosT = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                                 atributosT.setUso("nombreEtiqueta");
+                                 Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema,atributosT);
+                                 $$ = new ParserVal(nuevoLexema);
+                             } else {
+                                 Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la etiqueta " + $1.sval + " ya fue declarada en este ambito");
+                                 Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
+                                 }
+                     }
+
+
+
+
+
 
 asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                                 if(ambitoCheck != null){
@@ -597,15 +582,31 @@ comparador : '<' {$$ = new ParserVal("<");}
            ;
 
 control : FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {if(($3.arbol != null)&&($5.arbol != null)&&($7.arbol != null)){
+                                                                                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");
+                                                                                            AtributosTablaS lexSentenciaFor = new AtributosTablaS("Sentencia FOR");
+                                                                                            AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
+                                                                                            AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
+                                                                                            ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor($9.arbol,null,lexCuerpoFor);
+                                                                                            String IdAIncrementar = $3.arbol.getHijoIzq().getLexema();
+                                                                                            $5.arbol.getHijoIzq().setId(IdAIncrementar);
+                                                                                            $7.arbol.setId(IdAIncrementar);
+                                                                                            ArbolSintactico encabezadoFor = new NodoEncabezadoFor(new NodoEncabezadoFor($3.arbol,$5.arbol,lexEncabezadoFor),$7.arbol,lexEncabezadoFor);
+                                                                                            $$.arbol = new NodoFor(encabezadoFor,nodoCuerpoFor,lexSentenciaFor);
+                                                                                          }
+                                                                                          else
+                                                                                              $$.arbol = null;
+                                                                                        }
+           |etiqueta FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {if(($4.arbol != null)&&($6.arbol != null)&&($8.arbol != null)){
                                                                                   Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");
                                                                                   AtributosTablaS lexSentenciaFor = new AtributosTablaS("Sentencia FOR");
                                                                                   AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
                                                                                   AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
-                                                                                  ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor($9.arbol,null,lexCuerpoFor);
-                                                                                  String IdAIncrementar = $3.arbol.getHijoIzq().getLexema();
-                                                                                  $5.arbol.getHijoIzq().setId(IdAIncrementar);
-                                                                                  $7.arbol.setId(IdAIncrementar);
-                                                                                  ArbolSintactico encabezadoFor = new NodoEncabezadoFor(new NodoEncabezadoFor($3.arbol,$5.arbol,lexEncabezadoFor),$7.arbol,lexEncabezadoFor);
+                                                                                  ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor($10.arbol,null,lexCuerpoFor);
+                                                                                  String IdAIncrementar = $4.arbol.getHijoIzq().getLexema();
+                                                                                  $4.arbol.setId($1.sval);
+                                                                                  $6.arbol.getHijoIzq().setId(IdAIncrementar);
+                                                                                  $8.arbol.setId(IdAIncrementar);
+                                                                                  ArbolSintactico encabezadoFor = new NodoEncabezadoFor(new NodoEncabezadoFor($4.arbol,$6.arbol,lexEncabezadoFor),$8.arbol,lexEncabezadoFor);
                                                                                   $$.arbol = new NodoFor(encabezadoFor,nodoCuerpoFor,lexSentenciaFor);
                                                                                 }
                                                                                 else

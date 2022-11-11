@@ -1,9 +1,9 @@
 programa{
 i32 id,x;
 
-for (id=:2 ; id>4 ; -2){
+outer:for (id=:2 ; id>4 ; -2){
     x=:214;
-    continue;
+    continue:outer;
     x=:10;
 };
 }

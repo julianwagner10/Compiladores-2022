@@ -16,8 +16,11 @@ public class NodoAsignacionFor extends ArbolSintactico{
         String lexemaDer = this.getHijoDer().getLexemaReemplazado();
         assembler += "MOV EBX, _" + lexemaDer + '\n';
         assembler += "MOV _" + lexemaIzq + ", " + "EBX" + '\n';
-
-        String label = "FOR_INICIO " + ++contador;
+        String label;
+        if (this.id!=null)
+            label = this.id ;
+        else
+            label = "FOR_INICIO " + ++contador;
         NodoFor.etiquetaDeSalto.push(label);
         assembler += label + ":" + '\n';
 

@@ -28,7 +28,8 @@ public class NodoContinueBreak extends ArbolSintactico{
                 NodoFor.etiquetaDeSalto.push(label1);
                 break;
             case ("continue con etiquetado"):
-                assembler += "JMP " + this.getHijoIzq().getLexema() + '\n';
+                assembler += "JMP " + this.getHijoDer().getLexemaReemplazado() + '\n';
+                this.setId(this.getHijoDer().getLexema());
                 break;
         }
         return assembler;
