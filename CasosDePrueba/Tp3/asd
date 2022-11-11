@@ -3,7 +3,9 @@ i32 id,x;
 
 outer:for (id=:2 ; id>4 ; -2){
     x=:214;
-    continue:outer;
+    if(x>2){
+    break;
+};
     x=:10;
 };
 }

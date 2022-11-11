@@ -1,10 +1,8 @@
-ControlConEtiqueta{
-i32 id,x,z;
+IfMalDefinido2{
+i32 x;
+if (x>2) then
 
-etiqueta : for (id=:2 ; id>4 ; +2){
-                if(x<z)then
-                    x=:2;
-                end_if;
-                continue : etiqueta;
-           };
+    break;
+
+end_if;
 }

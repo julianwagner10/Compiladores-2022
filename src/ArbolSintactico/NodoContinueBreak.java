@@ -15,17 +15,21 @@ public class NodoContinueBreak extends ArbolSintactico{
         System.out.println("Entre a nodo continue break");
         switch (this.getHijoIzq().getLexema()) {
             case ("break"):
-                System.out.println("entre por el lado del break");
-                label = NodoFor.etiquetaDeSalto.pop();
-                assembler += "JMP " + label + '\n';
-                NodoFor.etiquetaDeSalto.push(label);
+                if(!NodoFor.etiquetaDeSalto.empty()) {
+                    System.out.println("entre por el lado del break");
+                    label = NodoFor.etiquetaDeSalto.pop();
+                    assembler += "JMP " + label + '\n';
+                    NodoFor.etiquetaDeSalto.push(label);
+                }
                 break;
             case ("continue"):
-                label = NodoFor.etiquetaDeSalto.pop();
-                label1 = NodoFor.etiquetaDeSalto.pop();
-                assembler += "JMP " + label1 + '\n';
-                NodoFor.etiquetaDeSalto.push(label);
-                NodoFor.etiquetaDeSalto.push(label1);
+                if(!NodoFor.etiquetaDeSalto.empty()) {
+                    label = NodoFor.etiquetaDeSalto.pop();
+                    label1 = NodoFor.etiquetaDeSalto.pop();
+                    assembler += "JMP " + label1 + '\n';
+                    NodoFor.etiquetaDeSalto.push(label);
+                    NodoFor.etiquetaDeSalto.push(label1);
+                }
                 break;
             case ("continue con etiquetado"):
                 assembler += "JMP " + this.getHijoDer().getLexemaReemplazado() + '\n';

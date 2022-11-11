@@ -198,6 +198,21 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | retorno ';' {$$.arbol = $1.arbol;}
 	      | control ';'{$$.arbol = $1.arbol;}
 	      | salida ';' {$$.arbol = $1.arbol;}
+          | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
+                        AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
+                        $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaBreak),null,sentenciaBreak);}
+          | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
+                          AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                        $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
+          | CONTINUE ':' ID ';' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
+                                  if((ambitoCheck != null) && (Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getUso().equals("nombreEtiqueta"))){
+                                  Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
+                                  AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                  AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
+                                  $$.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
+                              }else
+                                  Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
+                       }
 	      | error_ejecucion
           ;
 
@@ -228,8 +243,7 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                                 AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
                               $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
                  | CONTINUE ':' ID ';' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
-
-                                        if(ambitoCheck != null){
+                                        if((ambitoCheck != null) && (Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getUso().equals("nombreEtiqueta"))){
                                         Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
                                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                         AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
