@@ -1416,30 +1416,30 @@ case 78:
 //#line 250 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                               AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
-                              yyval.arbol = new NodoHoja(sentenciaBreak);}
+                              yyval.arbol = new NodoContinueBreak(new NodoHoja(sentenciaBreak),null,sentenciaBreak);}
 break;
 case 79:
 //#line 253 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
-                                AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue");
-                                yyval.arbol = new NodoHoja(sentenciaContinue);}
+                                AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                              yyval.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
 break;
 case 80:
 //#line 256 "gramatica.y"
-{/*String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);*/
-                                        /*if(ambitoCheck != null){*/
+{String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(1).sval,ambito);
+                                        if(ambitoCheck != null){
                                             Main.tablaDeSimbolos.modificarSimbolo(val_peek(1).sval,val_peek(1).sval+"."+ambito);
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(1).sval+"."+ambito);
                                             Main.tablaDeSimbolos.getAtributosTablaS(val_peek(1).sval+"."+ambito).setUso("referenciaAEtiqueta");
                                             Main.tablaDeSimbolos.setAtributosDeSimbolo(val_peek(1).sval+"."+ambito, atributos);
-                                            AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue con etiquetado");
-                                            yyval.arbol = new NodoEtiquetado(new NodoHoja(atributos),null,sentenciaContinue);
+                                            AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue con etiquetado");
+                                            yyval.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);
                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +val_peek(1).sval);
-                                      /* }
+                                        }
                                         else{
-                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
-                                            $$.arbol = null;
-                                        }*/
+                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+val_peek(1).sval+"' en algun ambito alcanzable");
+                                            yyval.arbol = null;
+                                        }
                                         }
 break;
 case 82:

@@ -12,10 +12,10 @@ import ArbolSintactico.ArbolSintactico;
  */
 public class ParserVal
 {
+  public ArbolSintactico arbol;
 /**
  * integer value of this 'union'
  */
-public ArbolSintactico arbol;
 public int ival;
 
 /**

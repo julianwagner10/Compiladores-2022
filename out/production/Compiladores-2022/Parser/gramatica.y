@@ -249,24 +249,24 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | salida ';' {$$.arbol = $1.arbol;}
                  | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                               AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
-                              $$.arbol = new NodoHoja(sentenciaBreak);}
+                              $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaBreak),null,sentenciaBreak);}
                  | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
-                                AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue");
-                                $$.arbol = new NodoHoja(sentenciaContinue);}
-                 | CONTINUE ':' ID ';' {//String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
-                                        //if(ambitoCheck != null){
+                                AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                              $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
+                 | CONTINUE ':' ID ';' {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
+                                        if(ambitoCheck != null){
                                             Main.tablaDeSimbolos.modificarSimbolo($3.sval,$3.sval+"."+ambito);
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($3.sval+"."+ambito);
                                             Main.tablaDeSimbolos.getAtributosTablaS($3.sval+"."+ambito).setUso("referenciaAEtiqueta");
                                             Main.tablaDeSimbolos.setAtributosDeSimbolo($3.sval+"."+ambito, atributos);
-                                            AtributosTablaS sentenciaContinue =  new AtributosTablaS("Continue con etiquetado");
-                                            $$.arbol = new NodoEtiquetado(new NodoHoja(atributos),null,sentenciaContinue);
+                                            AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue con etiquetado");
+                                            $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);
                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia ejecutable CONTINUE con etiqueta: " +$3.sval);
-                                      /* }
+                                        }
                                         else{
                                             Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
                                             $$.arbol = null;
-                                        }*/
+                                        }
                                         }
                  | error_ejecucion_control
                  ;
