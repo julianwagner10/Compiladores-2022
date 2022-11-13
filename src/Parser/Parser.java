@@ -21,8 +21,10 @@ package Parser;
 import Principal.*;
 import ArbolSintactico.*;
 import java.util.ArrayList;
+import java.util.Stack;
+import java.util.*;
 
-//#line 23 "Parser.java"
+//#line 25 "Parser.java"
 
 
 
@@ -803,7 +805,7 @@ final static String yyrule[] = {
 "error_salida : OUT '(' CADENA",
 };
 
-//#line 725 "gramatica.y"
+//#line 788 "gramatica.y"
 
 private Lexico lexico;
 private ArbolSintactico arbolSintactico;
@@ -811,6 +813,7 @@ private String ambito;
 private ArrayList<String> lista_variables;
 private ArrayList<String> lista_parametros;
 private ArrayList<String> lista_parametros_reales;
+private Hashtable<String,ArrayList<Parametro>> parametrosFunciones;
 
 public Parser(Lexico lexico)
 {
@@ -819,6 +822,7 @@ public Parser(Lexico lexico)
   this.lista_variables = new ArrayList<String>();
   this.lista_parametros = new ArrayList<String>();
   this.lista_parametros_reales = new ArrayList<String>();
+  this.parametrosFunciones = new Hashtable<>();
 }
 
 public int yylex(){
@@ -896,7 +900,7 @@ public ArbolSintactico returnTree(){
 	return this.arbolSintactico;
 }
 
-//#line 828 "Parser.java"
+//#line 832 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -1051,77 +1055,81 @@ boolean doaction;
       {
 //########## USER-SUPPLIED ACTIONS ##########
 case 1:
-//#line 15 "gramatica.y"
+//#line 17 "gramatica.y"
 {arbolSintactico = val_peek(1).arbol;
                             Main.tablaDeSimbolos.getAtributosTablaS(val_peek(3).sval).setUso("nombrePrograma");
                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");
                             }
 break;
 case 2:
-//#line 19 "gramatica.y"
+//#line 21 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo programa incorrecto");}
 break;
 case 3:
-//#line 22 "gramatica.y"
+//#line 24 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador de programa");}
 break;
 case 4:
-//#line 23 "gramatica.y"
+//#line 25 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la llave de apertura de bloque de programa");}
 break;
 case 5:
-//#line 24 "gramatica.y"
+//#line 26 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la llave de cierre de bloque de programa");}
 break;
 case 6:
-//#line 27 "gramatica.y"
+//#line 29 "gramatica.y"
 {yyval.arbol = val_peek(0).arbol;}
 break;
 case 7:
-//#line 28 "gramatica.y"
+//#line 30 "gramatica.y"
 {     if(val_peek(0).arbol != null){
                                         if (val_peek(1).arbol !=null){
-                                        AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
-                                        yyval.arbol = new NodoBloqueEjecutable(val_peek(1).arbol,val_peek(0).arbol,atributos);
+                                            AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
+                                            atributos.setAmbito(ambito);
+                                            yyval.arbol = new NodoBloqueEjecutable(val_peek(1).arbol,val_peek(0).arbol,atributos);
                                     }else{
                                          AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
+                                         atributos.setAmbito(ambito);
                                          yyval.arbol = new NodoBloqueEjecutable(val_peek(0).arbol,val_peek(1).arbol,atributos);
                                     }
                                 }
                            }
 break;
 case 9:
-//#line 41 "gramatica.y"
+//#line 45 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " no es una sentencia válida");}
 break;
 case 10:
-//#line 44 "gramatica.y"
-{yyval.arbol = val_peek(0).arbol;}
-break;
-case 11:
-//#line 45 "gramatica.y"
-{yyval.arbol = val_peek(0).arbol;}
-break;
-case 12:
 //#line 48 "gramatica.y"
 {yyval.arbol = val_peek(0).arbol;}
 break;
-case 13:
+case 11:
 //#line 49 "gramatica.y"
+{yyval.arbol = val_peek(0).arbol;}
+break;
+case 12:
+//#line 52 "gramatica.y"
+{yyval.arbol = val_peek(0).arbol;}
+break;
+case 13:
+//#line 53 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutableFor");
+                                                               atributos.setAmbito(ambito);
                                                                yyval.arbol = new NodoBloqueEjecutable(val_peek(1).arbol,val_peek(0).arbol,atributos);}
 break;
 case 14:
-//#line 53 "gramatica.y"
+//#line 58 "gramatica.y"
 {yyval.arbol = val_peek(0).arbol;}
 break;
 case 15:
-//#line 54 "gramatica.y"
+//#line 59 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutableIf");
+                                                      atributos.setAmbito(ambito);
                                                       yyval.arbol = new NodoBloqueEjecutable(val_peek(1).arbol,val_peek(0).arbol,atributos);}
 break;
 case 16:
-//#line 59 "gramatica.y"
+//#line 65 "gramatica.y"
 {  String tipoVar = val_peek(2).sval;
 					                        lista_variables = (ArrayList<String>)val_peek(1).obj;
                                             for(String lexema : lista_variables){
@@ -1140,23 +1148,23 @@ case 16:
                                             }
 break;
 case 17:
-//#line 75 "gramatica.y"
+//#line 81 "gramatica.y"
 {yyval.arbol = val_peek(0).arbol;}
 break;
 case 19:
-//#line 79 "gramatica.y"
+//#line 85 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la declaracion de variables");}
 break;
 case 20:
-//#line 80 "gramatica.y"
+//#line 86 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el tipo de la variable en la declaracion");}
 break;
 case 21:
-//#line 81 "gramatica.y"
+//#line 87 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador de la variable en la declaracion");}
 break;
 case 22:
-//#line 84 "gramatica.y"
+//#line 90 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo el identificador -> " + val_peek(0).sval);
                         lista_variables.add(val_peek(0).sval);
                         Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval).setUso("Variable");
@@ -1164,7 +1172,7 @@ case 22:
                                 }
 break;
 case 23:
-//#line 89 "gramatica.y"
+//#line 95 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyo una lista de variables ");
       		                                    Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval).setUso("Variable");
                                                 lista_variables = (ArrayList<String>) val_peek(2).obj;
@@ -1173,48 +1181,51 @@ case 23:
                                                 }
 break;
 case 25:
-//#line 98 "gramatica.y"
+//#line 104 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ',' entre identificadores de variables");}
 break;
 case 26:
-//#line 99 "gramatica.y"
+//#line 105 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador antes de la coma");}
 break;
 case 27:
-//#line 100 "gramatica.y"
+//#line 106 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador despues de la coma");}
 break;
 case 28:
-//#line 103 "gramatica.y"
+//#line 109 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");
-								        {yyval.arbol = val_peek(1).arbol;}
+								        Main.listaDeAmbitos.add(ambito);
+								        yyval.arbol = val_peek(1).arbol;
 								        if(!ambito.equals("main")){
                                         	ambito = ambito.substring(0,ambito.lastIndexOf("."));
                                         }
                             }
 break;
 case 30:
-//#line 112 "gramatica.y"
+//#line 119 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta llave de apertura al bloque de sentencias de la funcion");}
 break;
 case 31:
-//#line 113 "gramatica.y"
+//#line 120 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta llave de cierre al bloque de sentencias de la funcion");}
 break;
 case 32:
-//#line 114 "gramatica.y"
+//#line 121 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el bloque de sentencias de la funcion");}
 break;
 case 33:
-//#line 117 "gramatica.y"
+//#line 124 "gramatica.y"
 {
-                    lista_parametros = (ArrayList<String>)val_peek(2).obj;
                     String nuevoLexema = val_peek(3).sval + "." + ambito;
                     if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
                         Main.tablaDeSimbolos.modificarSimbolo(val_peek(3).sval, nuevoLexema);
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                        atributos.setAmbito(ambito);
+                        System.out.println("Ambito de la funcion: "+nuevoLexema+ ", es: "+ ambito);
                         atributos.setUso("nombreFuncion");
                         atributos.setTipo(val_peek(0).sval);
+                        atributos.setListaDeParametros(lista_parametros);
                         Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
                         if(!lista_parametros.isEmpty()){
                             int posicion = 1;
@@ -1223,6 +1234,16 @@ case 33:
                                 posicion++;
                             }
                         }
+
+                        ArrayList<Parametro> parametros_actuales = new ArrayList<>();
+                        for(String p: lista_parametros){
+                            String idParametro = p;
+                            String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(p).getTipo();
+                            Parametro param = new Parametro(tipoId,idParametro);
+                            parametros_actuales.add(param);
+                        }
+                        parametrosFunciones.put(nuevoLexema,parametros_actuales);
+
                         Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una funcion declarada con nombre "+val_peek(3).sval+ " en el ámbito "+ambito+", con tipo de retorno " + Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
                     } else {
                         Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " la funcion "+ val_peek(3).sval + " ya fue declarada en este ambito");
@@ -1231,61 +1252,58 @@ case 33:
                     }
 break;
 case 35:
-//#line 142 "gramatica.y"
+//#line 161 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada fun en la declaracion");}
 break;
 case 36:
-//#line 143 "gramatica.y"
+//#line 162 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta identificador de funcion en la declaracion");}
 break;
 case 37:
-//#line 144 "gramatica.y"
+//#line 163 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta lista de parametros de funcion en la declaracion");}
 break;
 case 38:
-//#line 145 "gramatica.y"
+//#line 164 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ':' previo al tipo que devuelve la funcion en la declaracion");}
 break;
 case 39:
-//#line 146 "gramatica.y"
+//#line 165 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion en la declaracion");}
 break;
 case 40:
-//#line 149 "gramatica.y"
-{lista_parametros.clear();
-                              yyval = new ParserVal(lista_parametros);}
+//#line 168 "gramatica.y"
+{lista_parametros.clear();}
 break;
 case 41:
-//#line 151 "gramatica.y"
+//#line 169 "gramatica.y"
 {lista_parametros.clear();
-                                     			     lista_parametros.add(val_peek(1).sval);
-                                     			     yyval = new ParserVal(lista_parametros);}
+                                      lista_parametros.add(val_peek(1).sval);}
 break;
 case 42:
-//#line 154 "gramatica.y"
+//#line 171 "gramatica.y"
 {lista_parametros.clear();
                                                       if(!val_peek(3).sval.equals(val_peek(1).sval)){
                                                         lista_parametros.add(val_peek(3).sval);
                                                         lista_parametros.add(val_peek(1).sval);
-                                                        yyval = new ParserVal(lista_parametros);
                                                       } else
                                                             Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " no puede haber dos parametros con el mismo ID");
                                                       }
 break;
 case 44:
-//#line 165 "gramatica.y"
+//#line 181 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta parentesis de apertura de lista de parametros");}
 break;
 case 45:
-//#line 166 "gramatica.y"
+//#line 182 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta parentesis de cierre de lista de parametros");}
 break;
 case 46:
-//#line 167 "gramatica.y"
+//#line 183 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " el número máximo de parámetros permitidos es 2");}
 break;
 case 47:
-//#line 170 "gramatica.y"
+//#line 186 "gramatica.y"
 {String nuevoAmbitoId = val_peek(0).sval +"."+ambito;
                     Main.tablaDeSimbolos.modificarSimbolo(val_peek(0).sval,nuevoAmbitoId);
                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoAmbitoId);
@@ -1295,202 +1313,211 @@ case 47:
                     yyval = new ParserVal(nuevoAmbitoId);}
 break;
 case 49:
-//#line 180 "gramatica.y"
+//#line 196 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador del parametro");}
 break;
 case 50:
-//#line 181 "gramatica.y"
+//#line 197 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el tipo del parametro");}
 break;
 case 51:
-//#line 184 "gramatica.y"
+//#line 200 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó un tipo INT LARGO I32");
             yyval = new ParserVal ("i32");}
 break;
 case 52:
-//#line 186 "gramatica.y"
+//#line 202 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyó un tipo FLOAT F32");
             yyval = new ParserVal ("f32");}
 break;
 case 53:
-//#line 190 "gramatica.y"
+//#line 206 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 54:
-//#line 191 "gramatica.y"
+//#line 207 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
 	                                if(val_peek(1).arbol != null){
 	                                    AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
-	                                    yyval.arbol = new NodoInvocacion(val_peek(1).arbol,null,lexDiscard);
+	                                    lexDiscard.setAmbito(ambito);
+	                                    yyval.arbol = new NodoBloqueEjecutable(val_peek(1).arbol,null,lexDiscard);
 	                                }
 	                                }
 break;
 case 55:
-//#line 197 "gramatica.y"
+//#line 214 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 56:
-//#line 198 "gramatica.y"
+//#line 215 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 57:
-//#line 199 "gramatica.y"
+//#line 216 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 58:
-//#line 200 "gramatica.y"
+//#line 217 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 59:
-//#line 201 "gramatica.y"
+//#line 218 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                         AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
+                        sentenciaBreak.setAmbito(ambito);
                         yyval.arbol = new NodoContinueBreak(new NodoHoja(sentenciaBreak),null,sentenciaBreak);}
 break;
 case 60:
-//#line 204 "gramatica.y"
+//#line 222 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
                           AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                          sentenciaContinue.setAmbito(ambito);
                         yyval.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
 break;
 case 61:
-//#line 207 "gramatica.y"
+//#line 226 "gramatica.y"
 { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(1).sval,ambito);
                                   if((ambitoCheck != null) && (Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getUso().equals("nombreEtiqueta"))){
-                                  Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +val_peek(3).sval);
-                                  AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
-                                  AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
-                                  yyval.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
+                                      Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +val_peek(3).sval);
+                                      AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                      AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
+                                      lexEtiqueta.setAmbito(ambito);
+                                      yyval.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
                               }else
                                   Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+val_peek(1).sval+"' en algun ambito alcanzable");
                        }
 break;
 case 63:
-//#line 219 "gramatica.y"
+//#line 239 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la asignacion");}
 break;
 case 64:
-//#line 220 "gramatica.y"
+//#line 240 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la seleccion");}
 break;
 case 65:
-//#line 221 "gramatica.y"
+//#line 241 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia de control");}
 break;
 case 66:
-//#line 222 "gramatica.y"
+//#line 242 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la impresion");}
 break;
 case 67:
-//#line 223 "gramatica.y"
+//#line 243 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final del retorno");}
 break;
 case 68:
-//#line 224 "gramatica.y"
+//#line 244 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la invocacion despues de la palabra discard");}
 break;
 case 69:
-//#line 225 "gramatica.y"
+//#line 245 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la invocacion");}
 break;
 case 70:
-//#line 226 "gramatica.y"
+//#line 246 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
 break;
 case 71:
-//#line 229 "gramatica.y"
+//#line 249 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 72:
-//#line 230 "gramatica.y"
+//#line 250 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
                                            if(val_peek(1).arbol != null){
                                                AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
-                                               yyval.arbol = new NodoInvocacion(val_peek(1).arbol,null,lexDiscard);
+                                               lexDiscard.setAmbito(ambito);
+                                               yyval.arbol = new NodoBloqueEjecutable(val_peek(1).arbol,null,lexDiscard);
                                            }
                                            }
 break;
 case 73:
-//#line 236 "gramatica.y"
+//#line 257 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 74:
-//#line 237 "gramatica.y"
+//#line 258 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 75:
-//#line 238 "gramatica.y"
+//#line 259 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 76:
-//#line 239 "gramatica.y"
+//#line 260 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                               AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
+                              sentenciaBreak.setAmbito(ambito);
                               yyval.arbol = new NodoContinueBreak(new NodoHoja(sentenciaBreak),null,sentenciaBreak);}
 break;
 case 77:
-//#line 242 "gramatica.y"
+//#line 264 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
                                 AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                                sentenciaContinue.setAmbito(ambito);
                               yyval.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
 break;
 case 78:
-//#line 245 "gramatica.y"
+//#line 268 "gramatica.y"
 { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(1).sval,ambito);
                                         if((ambitoCheck != null) && (Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getUso().equals("nombreEtiqueta"))){
                                         Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +val_peek(3).sval);
                                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                         AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
+                                        lexEtiqueta.setAmbito(ambito);
                                         yyval.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
                                     }else
                                         Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+val_peek(1).sval+"' en algun ambito alcanzable");
                              }
 break;
 case 80:
-//#line 257 "gramatica.y"
+//#line 281 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia BREAK");}
 break;
 case 81:
-//#line 258 "gramatica.y"
+//#line 282 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
 break;
 case 82:
-//#line 259 "gramatica.y"
+//#line 283 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ':' previo a la etiqueta de la sentencia CONTINUE");}
 break;
 case 83:
-//#line 260 "gramatica.y"
+//#line 284 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la etiqueta en la sentencia CONTINUE");}
 break;
 case 84:
-//#line 261 "gramatica.y"
+//#line 285 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
 break;
 case 85:
-//#line 264 "gramatica.y"
-{
-                             String nuevoLexema = val_peek(1).sval + "." + ambito;
-                             if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
-                                 Main.tablaDeSimbolos.modificarSimbolo(val_peek(1).sval, nuevoLexema);
-                                 AtributosTablaS atributosT = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
-                                 atributosT.setUso("nombreEtiqueta");
-                                 Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema,atributosT);
-                                 yyval = new ParserVal(nuevoLexema);
-                             } else {
-                                 Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la etiqueta " + val_peek(1).sval + " ya fue declarada en este ambito");
-                                 Main.tablaDeSimbolos.eliminarSimbolo(val_peek(1).sval);
-                                 }
+//#line 288 "gramatica.y"
+{  String nuevoLexema = val_peek(1).sval + "." + ambito;
+                     if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
+                         Main.tablaDeSimbolos.modificarSimbolo(val_peek(1).sval, nuevoLexema);
+                         AtributosTablaS atributosT = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                         atributosT.setUso("nombreEtiqueta");
+                         Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema,atributosT);
+                         yyval = new ParserVal(nuevoLexema);
+                     } else {
+                         Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la etiqueta " + val_peek(1).sval + " ya fue declarada en este ambito");
+                         Main.tablaDeSimbolos.eliminarSimbolo(val_peek(1).sval);
+                         }
                      }
 break;
 case 86:
-//#line 283 "gramatica.y"
+//#line 301 "gramatica.y"
 {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(2).sval,ambito);
                                                 if(ambitoCheck != null){
                                                     if (val_peek(0).arbol!=null){
                                                         Main.tablaDeSimbolos.eliminarSimbolo(val_peek(2).sval);
                                                         AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                                        atributosId.setAmbito(ambito);
                                                         Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                         AtributosTablaS atributos = new AtributosTablaS("Asignacion");
+                                                        atributos.setAmbito(ambito);
                                                         NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),val_peek(0).arbol,atributos);
                                                     if (nodoA.getTipo()!=null){
                                                         yyval.arbol= nodoA;
@@ -1504,112 +1531,120 @@ case 86:
                                                 }
 break;
 case 87:
-//#line 302 "gramatica.y"
+//#line 322 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito);
+                                   atributosId.setAmbito(ambito);
                                    Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito).setUso("Variable");
                                    AtributosTablaS atributos = new AtributosTablaS("Asignacion");
+                                   atributos.setAmbito(ambito);
                                    yyval.arbol= new NodoAsignacion(new NodoHoja(atributosId),val_peek(0).arbol,atributos);
                                    }
 break;
 case 89:
-//#line 311 "gramatica.y"
+//#line 333 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
 break;
 case 90:
-//#line 312 "gramatica.y"
+//#line 334 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
 break;
 case 91:
-//#line 313 "gramatica.y"
+//#line 335 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la asignacion");}
 break;
 case 92:
-//#line 314 "gramatica.y"
+//#line 336 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
 break;
 case 93:
-//#line 315 "gramatica.y"
+//#line 337 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
 break;
 case 94:
-//#line 318 "gramatica.y"
+//#line 340 "gramatica.y"
 { AtributosTablaS retorno = new AtributosTablaS("RETURN");
+                                        retorno.setAmbito(ambito);
                                         yyval.arbol = new NodoRetorno(val_peek(0).arbol,null,retorno);
                                       }
 break;
 case 96:
-//#line 324 "gramatica.y"
+//#line 347 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra reservada RETURN");}
 break;
 case 97:
-//#line 327 "gramatica.y"
+//#line 350 "gramatica.y"
 {yyval.arbol = val_peek(0).arbol;}
 break;
 case 98:
-//#line 328 "gramatica.y"
+//#line 351 "gramatica.y"
 { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");
 	                 	                                 AtributosTablaS atributos = new AtributosTablaS("+");
+	                 	                                 atributos.setAmbito(ambito);
 	                 	                                 yyval.arbol = new NodoSuma(val_peek(2).arbol,val_peek(0).arbol,atributos);
 	                 	                                 }
 break;
 case 99:
-//#line 333 "gramatica.y"
+//#line 357 "gramatica.y"
 { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");
 	                 	                 	              AtributosTablaS atributos = new AtributosTablaS("-");
+	                 	                 	              atributos.setAmbito(ambito);
 	                 	                 	              yyval.arbol = new NodoResta(val_peek(2).arbol,val_peek(0).arbol,atributos);
 	                                                    }
 break;
 case 101:
-//#line 340 "gramatica.y"
+//#line 365 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '+' ");}
 break;
 case 102:
-//#line 341 "gramatica.y"
+//#line 366 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino luego de un '-' ");}
 break;
 case 103:
-//#line 344 "gramatica.y"
+//#line 369 "gramatica.y"
 { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");
 	                          AtributosTablaS atributos = new AtributosTablaS("*");
+	                          atributos.setAmbito(ambito);
 	                          yyval.arbol = new NodoMultiplicacion(val_peek(2).arbol,val_peek(0).arbol,atributos);
                              }
 break;
 case 104:
-//#line 348 "gramatica.y"
+//#line 374 "gramatica.y"
 { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");
 	                          AtributosTablaS atributos = new AtributosTablaS("/");
+	                          atributos.setAmbito(ambito);
 	                          yyval.arbol = new NodoDivision(val_peek(2).arbol,val_peek(0).arbol,atributos);
 	                          }
 break;
 case 105:
-//#line 352 "gramatica.y"
+//#line 379 "gramatica.y"
 {yyval.arbol = val_peek(0).arbol;}
 break;
 case 107:
-//#line 356 "gramatica.y"
+//#line 383 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el factor luego de un '*' ");}
 break;
 case 108:
-//#line 357 "gramatica.y"
+//#line 384 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el factor luego de un '/' ");}
 break;
 case 109:
-//#line 358 "gramatica.y"
+//#line 385 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '*' ");}
 break;
 case 110:
-//#line 359 "gramatica.y"
+//#line 386 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el termino antes de un '/' ");}
 break;
 case 111:
-//#line 362 "gramatica.y"
+//#line 389 "gramatica.y"
 {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(0).sval,ambito);
               if(ambitoCheck != null){
                   AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                   Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                   String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                   atributos.setTipo(tipoId);
+                  atributos.setAmbito(ambito);
                   yyval.arbol = new NodoHoja(atributos);
               }
               else{
@@ -1619,64 +1654,70 @@ case 111:
               }
 break;
 case 112:
-//#line 375 "gramatica.y"
+//#line 403 "gramatica.y"
 {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval);
+                        atributos.setAmbito(ambito);
                         yyval.arbol = new NodoHoja(atributos);
                        }
 break;
 case 113:
-//#line 378 "gramatica.y"
+//#line 407 "gramatica.y"
 {if (chequearRangoEnteros() == true){
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval);
                         atributos.setTipo("i32");
+                        atributos.setAmbito(ambito);
                         yyval.arbol = new NodoHoja(atributos);
                         }
                    }
 break;
 case 114:
-//#line 384 "gramatica.y"
+//#line 414 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
                       AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval+"."+ambito);
+                      atributosId.setAmbito(ambito);
                       yyval.arbol = new NodoHoja(atributosId);
                       }
 break;
 case 115:
-//#line 388 "gramatica.y"
+//#line 419 "gramatica.y"
 {if (chequearNegativos() == true){
                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+val_peek(0).sval);
+                       atributos.setAmbito(ambito);
                        yyval.arbol = new NodoHoja(atributos);
                        }
                       }
 break;
 case 116:
-//#line 393 "gramatica.y"
+//#line 425 "gramatica.y"
 {if (chequearNegativos() ==true){
                                AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+val_peek(0).sval);
+                               atributos.setAmbito(ambito);
                                yyval.arbol = new NodoHoja(atributos);
                                }
                            }
 break;
 case 117:
-//#line 400 "gramatica.y"
+//#line 433 "gramatica.y"
 { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(3).sval,ambito);
                                             if(ambitoCheck != null){
                                                 if (val_peek(1).arbol !=null){
-                                                    if(lista_parametros.size() == lista_parametros_reales.size()){
+                                                    ArrayList<Parametro> parametros_funcion_actual = new ArrayList<>();
+                                                    parametros_funcion_actual.addAll(parametrosFunciones.get(ambitoCheck));
+                                                    if(parametros_funcion_actual.size() == lista_parametros_reales.size()){
                                                         int pos = 0;
                                                         int nroDeNoCoincidencias = 0;
                                                         for(String paramR : lista_parametros_reales){
                                                             String tipoParamR = Main.tablaDeSimbolos.getAtributosTablaS(paramR).getTipo();
-                                                            String parametro = lista_parametros.get(pos);
-                                                            String tipoParam = Main.tablaDeSimbolos.getAtributosTablaS(parametro).getTipo();
+                                                            String tipoParam = parametros_funcion_actual.get(pos).getTipo();
                                                             if(!tipoParamR.equals(tipoParam))
                                                                 nroDeNoCoincidencias++;
-                                                            }
                                                             pos++;
+                                                        }
                                                         if(nroDeNoCoincidencias == 0){
                                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + val_peek(3).sval);
-                                                            Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idInvocacion");
                                                             AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
-                                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(3).sval+"."+ambito);
+                                                            lexInvocacion.setAmbito(ambito);
+                                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                                             yyval.arbol = new NodoInvocacion(new NodoHoja(lexID),val_peek(1).arbol,lexInvocacion);
                                                         }
                                                         else{
@@ -1695,12 +1736,11 @@ case 117:
                                             }
 break;
 case 118:
-//#line 435 "gramatica.y"
+//#line 469 "gramatica.y"
 {  String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(2).sval,ambito);
                             if(ambitoCheck != null){
                                 if(lista_parametros.size() == lista_parametros_reales.size()){
                                     Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + val_peek(2).sval);
-                                    Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idInvocacion");
                                     AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
                                     AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito);
                                     yyval.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);
@@ -1713,17 +1753,20 @@ case 118:
                          }
 break;
 case 120:
-//#line 453 "gramatica.y"
+//#line 486 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
 break;
 case 121:
-//#line 454 "gramatica.y"
+//#line 487 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de cierre de la invocacion ");}
 break;
 case 122:
-//#line 457 "gramatica.y"
+//#line 490 "gramatica.y"
 { if(val_peek(0).arbol !=null){
                                             AtributosTablaS lexParam = new AtributosTablaS("Un Parametro");
+                                            lista_parametros_reales.clear();
+                                            lista_parametros_reales.add(val_peek(0).sval);
+                                            lexParam.setParametroEnLista(val_peek(0).sval);
                                             yyval.arbol = new NodoParam(val_peek(0).arbol,null,lexParam);
                                         }
                                         else
@@ -1731,9 +1774,11 @@ case 122:
                                         }
 break;
 case 123:
-//#line 464 "gramatica.y"
+//#line 500 "gramatica.y"
 { if(val_peek(2).arbol !=null && val_peek(0).arbol!=null){
                                                                     AtributosTablaS lexParam = new AtributosTablaS("Dos Parametros");
+                                                                    lexParam.setParametroEnLista(val_peek(2).sval);
+                                                                    lexParam.setParametroEnLista(val_peek(0).sval);
                                                                     lista_parametros_reales.clear();
                                                                     lista_parametros_reales.add(val_peek(2).sval);
                                                                     lista_parametros_reales.add(val_peek(0).sval);
@@ -1743,25 +1788,24 @@ case 123:
                                                                }
 break;
 case 125:
-//#line 476 "gramatica.y"
+//#line 515 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
 break;
 case 126:
-//#line 477 "gramatica.y"
+//#line 516 "gramatica.y"
 {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el numero maximo de parametros soportados es de dos ");}
 break;
 case 127:
-//#line 478 "gramatica.y"
+//#line 517 "gramatica.y"
 {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el numero maximo de parametros soportados es de dos ");}
 break;
 case 128:
-//#line 481 "gramatica.y"
+//#line 520 "gramatica.y"
 { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(0).sval,ambito);
                       if(ambitoCheck != null){
                           AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval+"."+ambito);
+                          atributos.setAmbito(ambito);
                           Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
-                          lista_parametros_reales.clear();
-                          lista_parametros_reales.add(val_peek(0).sval);
                           yyval.arbol = new NodoHoja(atributos);
                           }else{
                             Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+val_peek(0).sval);
@@ -1770,196 +1814,208 @@ case 128:
                           }
 break;
 case 129:
-//#line 493 "gramatica.y"
+//#line 531 "gramatica.y"
 {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + val_peek(0).sval);
-                                    lista_parametros_reales.clear();
-                                    lista_parametros_reales.add(val_peek(0).sval);
                                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval);
+                                    atributos.setAmbito(ambito);
                                     yyval.arbol = new NodoHoja(atributos);
                                    }
 break;
 case 130:
-//#line 499 "gramatica.y"
+//#line 536 "gramatica.y"
 {if (chequearRangoEnteros() == true) {
-                                   lista_parametros_reales.clear();
-                                   lista_parametros_reales.add(val_peek(0).sval);
                                    Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + val_peek(0).sval);
                                    AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval);
+                                   atributos.setAmbito(ambito);
                                    yyval.arbol = new NodoHoja(atributos);
                                }
                                }
 break;
 case 131:
-//#line 507 "gramatica.y"
+//#line 543 "gramatica.y"
 {if (chequearNegativos()==true){
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+val_peek(0).sval);
+                                            atributos.setAmbito(ambito);
                                             yyval.arbol = new NodoHoja(atributos);
                                             }
                                   }
 break;
 case 132:
-//#line 512 "gramatica.y"
+//#line 549 "gramatica.y"
 {if (chequearNegativos()==true){
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+val_peek(0).sval);
+                                            atributos.setAmbito(ambito);
                                             yyval.arbol = new NodoHoja(atributos);
                                             }
                                        }
 break;
 case 133:
-//#line 518 "gramatica.y"
+//#line 556 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");
                                             AtributosTablaS atributos = new AtributosTablaS("IF");
+                                            atributos.setAmbito(ambito);
                                             yyval.arbol = new NodoIf(val_peek(2).arbol,val_peek(0).arbol,atributos);}
 break;
 case 135:
-//#line 524 "gramatica.y"
+//#line 563 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
 break;
 case 136:
-//#line 525 "gramatica.y"
+//#line 564 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '(' de la sentencia IF ");}
 break;
 case 137:
-//#line 526 "gramatica.y"
+//#line 565 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la condicion de la sentencia IF ");}
 break;
 case 138:
-//#line 527 "gramatica.y"
+//#line 566 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' de la sentencia IF ");}
 break;
 case 139:
-//#line 528 "gramatica.y"
+//#line 567 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el bloque ejecutable de la sentencia IF ");}
 break;
 case 140:
-//#line 531 "gramatica.y"
+//#line 570 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("CuerpoIf");
+                                    atributos.setAmbito(ambito);
                                     yyval.arbol = new NodoCuerpoIf(val_peek(1).arbol,null,atributos);
                                     }
 break;
 case 141:
-//#line 534 "gramatica.y"
+//#line 574 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("CuerpoIf");
+                                                atributos.setAmbito(ambito);
                                                 yyval.arbol = new NodoCuerpoIf(val_peek(2).arbol,val_peek(1).arbol,atributos);
                                                 }
 break;
 case 143:
-//#line 540 "gramatica.y"
+//#line 581 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
 break;
 case 144:
-//#line 541 "gramatica.y"
+//#line 582 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
 break;
 case 145:
-//#line 542 "gramatica.y"
+//#line 583 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta palabra reservada ENDIF ");}
 break;
 case 146:
-//#line 546 "gramatica.y"
+//#line 587 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Then");
+                        atributos.setAmbito(ambito);
                         yyval.arbol = new NodoCuerpoThen(val_peek(0).arbol,null,atributos);}
 break;
 case 147:
-//#line 548 "gramatica.y"
+//#line 590 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Then");
+                                          atributos.setAmbito(ambito);
                                           yyval.arbol = new NodoCuerpoThen(val_peek(1).arbol,null,atributos);}
 break;
 case 149:
-//#line 553 "gramatica.y"
+//#line 596 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Else");
+                             atributos.setAmbito(ambito);
                              yyval.arbol = new NodoCuerpoElse(val_peek(0).arbol,null,atributos);}
 break;
 case 150:
-//#line 555 "gramatica.y"
+//#line 599 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Else");
+                                                atributos.setAmbito(ambito);
                                                 yyval.arbol = new NodoCuerpoElse(val_peek(1).arbol,null,atributos);}
 break;
 case 152:
-//#line 560 "gramatica.y"
+//#line 605 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
 break;
 case 153:
-//#line 561 "gramatica.y"
+//#line 606 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
 break;
 case 154:
-//#line 564 "gramatica.y"
+//#line 609 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el la palabra reservada ELSE antes de las sentencias ejecutables ");}
 break;
 case 155:
-//#line 565 "gramatica.y"
+//#line 610 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
 break;
 case 156:
-//#line 566 "gramatica.y"
+//#line 611 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
 break;
 case 157:
-//#line 569 "gramatica.y"
+//#line 614 "gramatica.y"
 { yyval.arbol = val_peek(0).arbol;}
 break;
 case 158:
-//#line 570 "gramatica.y"
+//#line 615 "gramatica.y"
 {yyval.arbol = val_peek(1).arbol;}
 break;
 case 160:
-//#line 574 "gramatica.y"
+//#line 619 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
 break;
 case 161:
-//#line 575 "gramatica.y"
+//#line 620 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
 break;
 case 162:
-//#line 579 "gramatica.y"
+//#line 624 "gramatica.y"
 {AtributosTablaS atributos = new AtributosTablaS("Condicion");
+                                                                  atributos.setAmbito(ambito);
                                                                   AtributosTablaS atributos2 = new AtributosTablaS(val_peek(1).sval);
+                                                                  atributos2.setAmbito(ambito);
                                                                   yyval.arbol = new NodoCondicionIf(new NodoExpresionLogica(val_peek(2).arbol,val_peek(0).arbol,atributos2),null,atributos);}
 break;
 case 164:
-//#line 585 "gramatica.y"
+//#line 632 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica en la condicion ");}
 break;
 case 165:
-//#line 586 "gramatica.y"
+//#line 633 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica en la condicion ");}
 break;
 case 166:
-//#line 587 "gramatica.y"
+//#line 634 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " condicion mal declarada ");}
 break;
 case 167:
-//#line 590 "gramatica.y"
+//#line 637 "gramatica.y"
 {yyval = new ParserVal("<");}
 break;
 case 168:
-//#line 591 "gramatica.y"
+//#line 638 "gramatica.y"
 {yyval = new ParserVal(">");}
 break;
 case 169:
-//#line 592 "gramatica.y"
+//#line 639 "gramatica.y"
 {yyval = new ParserVal("=");}
 break;
 case 170:
-//#line 593 "gramatica.y"
+//#line 640 "gramatica.y"
 {yyval = new ParserVal(">=");}
 break;
 case 171:
-//#line 594 "gramatica.y"
+//#line 641 "gramatica.y"
 {yyval = new ParserVal("<=");}
 break;
 case 172:
-//#line 595 "gramatica.y"
+//#line 642 "gramatica.y"
 {yyval = new ParserVal("=!");}
 break;
 case 173:
-//#line 598 "gramatica.y"
+//#line 645 "gramatica.y"
 {if((val_peek(6).arbol != null)&&(val_peek(4).arbol != null)&&(val_peek(2).arbol != null)){
                                                                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");
                                                                                             AtributosTablaS lexSentenciaFor = new AtributosTablaS("Sentencia FOR");
+                                                                                            lexSentenciaFor.setAmbito(ambito);
                                                                                             AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
+                                                                                            lexCuerpoFor.setAmbito(ambito);
                                                                                             AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
+                                                                                            lexEncabezadoFor.setAmbito(ambito);
                                                                                             ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor(val_peek(0).arbol,null,lexCuerpoFor);
                                                                                             String IdAIncrementar = val_peek(6).arbol.getHijoIzq().getLexema();
                                                                                             val_peek(4).arbol.getHijoIzq().setId(IdAIncrementar);
@@ -1972,12 +2028,15 @@ case 173:
                                                                                         }
 break;
 case 174:
-//#line 613 "gramatica.y"
+//#line 663 "gramatica.y"
 {if((val_peek(6).arbol != null)&&(val_peek(4).arbol != null)&&(val_peek(2).arbol != null)){
                                                                                   Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");
                                                                                   AtributosTablaS lexSentenciaFor = new AtributosTablaS("Sentencia FOR");
+                                                                                  lexSentenciaFor.setAmbito(ambito);
                                                                                   AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
+                                                                                  lexCuerpoFor.setAmbito(ambito);
                                                                                   AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
+                                                                                  lexEncabezadoFor.setAmbito(ambito);
                                                                                   ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor(val_peek(0).arbol,null,lexCuerpoFor);
                                                                                   String IdAIncrementar = val_peek(6).arbol.getHijoIzq().getLexema();
                                                                                   val_peek(6).arbol.setId(val_peek(9).sval);
@@ -1991,60 +2050,65 @@ case 174:
                                                                               }
 break;
 case 175:
-//#line 629 "gramatica.y"
+//#line 682 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control erronea");}
 break;
 case 176:
-//#line 632 "gramatica.y"
+//#line 685 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el contenido dentro de los parentensis del for");}
 break;
 case 177:
-//#line 635 "gramatica.y"
+//#line 688 "gramatica.y"
 {
                           AtributosTablaS atributos1 = new AtributosTablaS("Incremento");
+                          atributos1.setAmbito(ambito);
                           yyval.arbol  = new NodoIncrementoFor(new NodoHoja(Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval)), null, atributos1);}
 break;
 case 178:
-//#line 638 "gramatica.y"
+//#line 692 "gramatica.y"
 {
                           AtributosTablaS atributos1 = new AtributosTablaS("Decremento");
+                          atributos1.setAmbito(ambito);
                           yyval.arbol  = new NodoDecrementoFor(new NodoHoja(Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval)), null, atributos1);}
 break;
 case 179:
-//#line 641 "gramatica.y"
+//#line 696 "gramatica.y"
 { yyval.arbol = null;}
 break;
 case 180:
-//#line 644 "gramatica.y"
+//#line 699 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el signo '+' o '-' antes de la constante");}
 break;
 case 181:
-//#line 645 "gramatica.y"
+//#line 700 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '-'");}
 break;
 case 182:
-//#line 646 "gramatica.y"
+//#line 701 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera luego del '+'");}
 break;
 case 183:
-//#line 647 "gramatica.y"
+//#line 702 "gramatica.y"
 {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el incremento debe ser un numero entero");}
 break;
 case 184:
-//#line 648 "gramatica.y"
+//#line 703 "gramatica.y"
 {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el decremento debe ser un numero entero");}
 break;
 case 185:
-//#line 651 "gramatica.y"
+//#line 706 "gramatica.y"
 { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(2).sval,ambito);
                                         if(ambitoCheck != null){
                                             String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                                             if(tipoId.equals("i32")){
                                                 if (chequearRangoEnteros()==true){
                                                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(2).sval+"."+ambito);
+                                                    atributos.setAmbito(ambito);
                                                     Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                     AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
+                                                    atributos2.setAmbito(ambito);
                                                     AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(0).sval);
+                                                    atributos3.setAmbito(ambito);
                                                     NodoAsignacionFor nodoA = new NodoAsignacionFor(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
                                                     if (nodoA.getTipo()!=null){
                                                         yyval.arbol= nodoA;
@@ -2070,25 +2134,28 @@ case 185:
                                         }
 break;
 case 187:
-//#line 686 "gramatica.y"
+//#line 744 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion se la sentencia FOR ");}
 break;
 case 188:
-//#line 687 "gramatica.y"
+//#line 745 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '=:' en la asignacion de la sentencia FOR ");}
 break;
 case 189:
-//#line 688 "gramatica.y"
+//#line 746 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la constante entera de la asignacion de la sentencia FOR ");}
 break;
 case 190:
-//#line 691 "gramatica.y"
+//#line 749 "gramatica.y"
 {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito(val_peek(2).sval,ambito);
                                                    if(ambitoCheck != null){
                                                        Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                        AtributosTablaS atributos = new AtributosTablaS("CondicionFOR");
+                                                       atributos.setAmbito(ambito);
                                                        AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                                       atributos2.setAmbito(ambito);
                                                        AtributosTablaS atributos3 = new AtributosTablaS(val_peek(1).sval);
+                                                       atributos3.setAmbito(ambito);
                                                        yyval.arbol = new NodoCondicionFor(new NodoComparacionFor(new NodoHoja(atributos2),val_peek(0).arbol,atributos3),null,atributos);
                                                    }
                                                    else{
@@ -2098,38 +2165,40 @@ case 190:
                                                    }
 break;
 case 192:
-//#line 707 "gramatica.y"
+//#line 768 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la condicion de la sentencia FOR ");}
 break;
 case 193:
-//#line 708 "gramatica.y"
+//#line 769 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el comparador en la condicion de la sentencia FOR ");}
 break;
 case 194:
-//#line 709 "gramatica.y"
+//#line 770 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la condicion de la sentencia FOR ");}
 break;
 case 195:
-//#line 712 "gramatica.y"
+//#line 773 "gramatica.y"
 {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");
                           AtributosTablaS lexSalida = new AtributosTablaS("Sentencia de Impresion por Pantalla");
+                          lexSalida.setAmbito(ambito);
                           AtributosTablaS lexCadena = Main.tablaDeSimbolos.getAtributosTablaS(val_peek(1).sval);
+                          lexCadena.setAmbito(ambito);
                           yyval.arbol = new NodoSalida(new NodoHoja(lexCadena),null,lexSalida);
                           }
 break;
 case 197:
-//#line 720 "gramatica.y"
+//#line 783 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '(' que encierra la cadena ");}
 break;
 case 198:
-//#line 721 "gramatica.y"
+//#line 784 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la cadena que se quiere imprimir ");}
 break;
 case 199:
-//#line 722 "gramatica.y"
+//#line 785 "gramatica.y"
 {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el ')' que encierra la cadena ");}
 break;
-//#line 2056 "Parser.java"
+//#line 2125 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

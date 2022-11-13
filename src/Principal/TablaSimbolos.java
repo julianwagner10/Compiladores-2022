@@ -104,7 +104,7 @@ public class TablaSimbolos {
 
     public String chequearAmbito(String id, String ambito) {
         String aux = id + "." + ambito;
-        while (!aux.equals(id)) { //Hasta que no desgloce todo el ambito
+        while (!aux.equals(id)) { //Hasta que no desgloce todoo el ambito
             if (tablaSimbolos.containsKey(aux)) {
                 return aux;
             }
@@ -115,8 +115,6 @@ public class TablaSimbolos {
 
     public String generarCodigoAssembler(){
         String assembler ="";
-        String value = "";
-        int counter = 0;
         for(String key : this.tablaSimbolos.keySet()) {
                 AtributosTablaS atributos = this.tablaSimbolos.get(key);
                 String lexema = atributos.getLexema();
@@ -144,6 +142,19 @@ public class TablaSimbolos {
             }
         }
         return assembler;
+    }
+
+    public String getFuncionMedianteAmbito(String ambito,ArrayList<String> funcionesGeneradas){
+        Enumeration iterator = tablaSimbolos.keys();
+        while (iterator.hasMoreElements()) {
+            String posibleFuncionARetornar = (String) iterator.nextElement();
+            AtributosTablaS ats = tablaSimbolos.get(posibleFuncionARetornar);
+            if (ats.getAmbito().equals(ambito) && ats.getUso().equals("nombreFuncion") && !funcionesGeneradas.contains(posibleFuncionARetornar)) {
+                funcionesGeneradas.add(posibleFuncionARetornar);
+                return posibleFuncionARetornar;
+            }
+        }
+        return null;
     }
 
 }

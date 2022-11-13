@@ -1,8 +1,10 @@
 InvocacionCorrecta{
-fun f1(i32 y,i32 z):i32{
+i32 w,t;
+t =: t + w;
+
+fun f1(i32 y,f32 z):i32{
     i32 x;
     if(x<y)then{
-        x =:y;
         y =: y+2;
     }
     else
@@ -10,6 +12,8 @@ fun f1(i32 y,i32 z):i32{
     end_if;
 
     return x;
-    }
-discard f1(23,22);
+}
+
+discard f1(23,2.2);
+
 }

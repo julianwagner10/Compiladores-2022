@@ -11,7 +11,7 @@ public class NodoCuerpoElse extends ArbolSintactico {
     @Override
     public String generarCodigoAssembler() {
         String assembler = "";
-        assembler += NodoIf.etiquetaDeSalto.pop() + ":" + '\n'; //Desapilo la etiqueta que hace referencia al dedstino de la bifurcacion incondicional y la agrego al codigo de salida.
+        assembler += NodoIf.etiquetaDeSalto.pop() + ":" ; //Desapilo la etiqueta que hace referencia al dedstino de la bifurcacion incondicional y la agrego al codigo de salida.
         return assembler;
     }
 }

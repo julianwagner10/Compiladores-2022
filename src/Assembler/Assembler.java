@@ -4,6 +4,8 @@ import ArbolSintactico.ArbolSintactico;
 import Principal.Main;
 
 import java.io.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class Assembler {
     private ArbolSintactico arbol;
@@ -33,10 +35,10 @@ public class Assembler {
         this.assemblerData += ".data" + '\n';
         this.assemblerData += "_limiteSuperiorInt DD " + limiteSuperiorint + '\n';
         this.assemblerData += "_limiteInferiorInt DD " + limiteInferiorint + '\n';
-        this.assemblerData += "_limiteInferiorDoublePositivo DQ " + limiteInferiorFloatPositivo + '\n';
-        this.assemblerData += "_limiteSuperiorDoublePositivo DQ " + limiteSuperiorFloatPositivo + '\n';
-        this.assemblerData += "_limiteInferiorDoubleNegativo DQ " + limiteInferiorFloatNegativo + '\n';
-        this.assemblerData += "_limiteSuperiorDoubleNegativo DQ " + limiteSuperiorFloatNegativo + '\n';
+        this.assemblerData += "_limiteInferiorFloatPositivo DQ " + limiteInferiorFloatPositivo + '\n';
+        this.assemblerData += "_limiteSuperiorFloatPositivo DQ " + limiteSuperiorFloatPositivo + '\n';
+        this.assemblerData += "_limiteInferiorFloatNegativo DQ " + limiteInferiorFloatNegativo + '\n';
+        this.assemblerData += "_limiteSuperiorFloatNegativo DQ " + limiteSuperiorFloatNegativo + '\n';
 
 
         this.assemblerData += "_errorOverflowInt" + " DB " + "\"Error suma enteros\", 0" + '\n';
@@ -55,12 +57,14 @@ public class Assembler {
         this.assemblerCode += "invoke MessageBox, NULL, addr _errorRecursionPropia, addr _errorRecursionPropia, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
         this.assemblerCode += '\n';
+
+        this.generarFunciones(this.arbol); //Genero todos los subprocesos, es decir, las funciones.
+
         this.assemblerCode += "start:" + '\n';
 
-
-
         if(this.arbol != null)
-            this.getMostLeftTree(this.arbol);
+            this.getArbolDeMasIzq(this.arbol,"main");
+
         this.assemblerCode += "invoke ExitProcess, 0" + '\n' + "end start";
 
         this.assemblerData += Main.tablaDeSimbolos.generarCodigoAssembler();
@@ -88,25 +92,50 @@ public class Assembler {
 
     }
 
-    public void getMostLeftTree(ArbolSintactico raiz) {
+    public void getArbolDeMasIzq(ArbolSintactico raiz, String ambitoActual) {
         if (raiz != null && !raiz.esHoja()) {
-            if ((raiz.getHijoDer() != null)) {
-                if (raiz.getHijoIzq().esHoja() && raiz.getHijoDer().esHoja()) {
-                    this.assemblerCode += raiz.generarCodigoAssembler();
+            if (raiz.getHijoIzq() != null) {
+                if ((raiz.getHijoDer() != null)) {
+                    if (raiz.getHijoIzq().esHoja() && raiz.getHijoDer().esHoja() && raiz.getAtributo().getAmbito().equals(ambitoActual)) {
+                        this.assemblerCode += raiz.generarCodigoAssembler();
+                    } else {
+                        this.getArbolDeMasIzq(raiz.getHijoIzq(),ambitoActual);
+                        this.getArbolDeMasIzq(raiz.getHijoDer(),ambitoActual);
+                        if(raiz.getAtributo().getAmbito().equals(ambitoActual))
+                            this.assemblerCode += raiz.generarCodigoAssembler();
+                    }
                 } else {
-                    this.getMostLeftTree(raiz.getHijoIzq());
-                    this.getMostLeftTree(raiz.getHijoDer());
-                    this.assemblerCode += raiz.generarCodigoAssembler();
-                }
-            } else {
-                if (raiz.getHijoIzq().esHoja())
-                    this.assemblerCode += raiz.generarCodigoAssembler();
-                else{
-                    this.getMostLeftTree(raiz.getHijoIzq());
-                    this.assemblerCode += raiz.generarCodigoAssembler();
+                    if (raiz.getHijoIzq().esHoja() && raiz.getAtributo().getAmbito().equals(ambitoActual)) {
+                        this.assemblerCode += raiz.generarCodigoAssembler();
+                    }
+                    else {
+                        this.getArbolDeMasIzq(raiz.getHijoIzq(),ambitoActual);
+                        if(raiz.getAtributo().getAmbito().equals(ambitoActual))
+                            this.assemblerCode += raiz.generarCodigoAssembler();
+                    }
                 }
             }
         }
     }
 
+    public void generarFunciones(ArbolSintactico raiz){
+        this.assemblerCode += "";
+        ArrayList<String> funcionesGeneradas = new ArrayList<>(); //Necesito llevar un registro de las funciones a las cuales ya se le genero aseembler
+        if(raiz != null) {
+            for (String am : Main.listaDeAmbitos) {
+                String aux = am;
+                if (!am.equals("main")) {
+                    am = am.substring(0,am.lastIndexOf("."));
+                }
+                String idFuncion = Main.tablaDeSimbolos.getFuncionMedianteAmbito(am,funcionesGeneradas);
+                am = aux;
+                this.assemblerCode += idFuncion + ":" + '\n';
+                this.getArbolDeMasIzq(raiz, am);
+                if (!am.equals("main")) {
+                    this.assemblerCode += "ret" + '\n';
+                    this.assemblerCode += '\n';
+                }
+            }
+        }
+    }
 }

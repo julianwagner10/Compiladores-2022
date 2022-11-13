@@ -30,8 +30,8 @@ public class NodoExpresionLogica extends ArbolSintactico {
 
                 String auxVar = "_var" + this.contador;     //Necesito la variable aux para guardar la palabra de estado en la memoria
                                                             //Estas tres instrucciones se hacen luego de hacer una comparacion en el coprocesador.
-                assembler += "FSTSW _"+auxVar + '\n';       //Almaceno la palabra de estado en la memoria.
-                assembler += "MOV AX, _" + auxVar + '\n';   //Copio el contenido en el registro AX
+                assembler += "FSTSW "+auxVar + '\n';       //Almaceno la palabra de estado en la memoria.
+                assembler += "MOV AX, " + auxVar + '\n';   //Copio el contenido en el registro AX
                 assembler += "SAHF" + '\n';                 //Almacena en los 8 bits menos significativos, del registro de indicadores, el valor del registro AH.
 
                 Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");

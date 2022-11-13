@@ -3,6 +3,8 @@ package Parser;
 import Principal.*;
 import ArbolSintactico.*;
 import java.util.ArrayList;
+import java.util.Stack;
+import java.util.*;
 
 %}
 
@@ -27,10 +29,12 @@ error_programa : '{'bloque'}' {Main.erroresSintacticos.add("Error sináctico: Li
 bloque : sentencia {$$.arbol = $1.arbol;}
        | bloque sentencia {     if($2.arbol != null){
                                         if ($1.arbol !=null){
-                                        AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
-                                        $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);
+                                            AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
+                                            atributos.setAmbito(ambito);
+                                            $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);
                                     }else{
                                          AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutable");
+                                         atributos.setAmbito(ambito);
                                          $$.arbol = new NodoBloqueEjecutable($2.arbol,$1.arbol,atributos);
                                     }
                                 }
@@ -47,11 +51,13 @@ sentencia : declaracion {$$.arbol = $1.arbol;}
 
 bloque_ejecutable_for: ejecucion_control {$$.arbol = $1.arbol;}
                      | bloque_ejecutable_for ejecucion_control{AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutableFor");
+                                                               atributos.setAmbito(ambito);
                                                                $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                      ;
 
 bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
                     | bloque_ejecutable_if ejecucion {AtributosTablaS atributos = new AtributosTablaS("BloqueEjecutableIf");
+                                                      atributos.setAmbito(ambito);
                                                       $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                     ;
 
@@ -101,7 +107,8 @@ error_lista_de_variables : lista_de_variables ID {Main.erroresSintacticos.add("E
                          ;
 
 funcion : declaracion_fun '{'bloque'}' {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");
-								        {$$.arbol = $3.arbol;}
+								        Main.listaDeAmbitos.add(ambito);
+								        $$.arbol = $3.arbol;
 								        if(!ambito.equals("main")){
                                         	ambito = ambito.substring(0,ambito.lastIndexOf("."));
                                         }
@@ -115,13 +122,15 @@ error_funcion : declaracion_fun  bloque '}' {Main.erroresSintacticos.add("Error 
               ;
 
 declaracion_fun : FUN ID lista_de_parametros ':' tipo{
-                    lista_parametros = (ArrayList<String>)$3.obj;
                     String nuevoLexema = $2.sval + "." + ambito;
                     if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
                         Main.tablaDeSimbolos.modificarSimbolo($2.sval, nuevoLexema);
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                        atributos.setAmbito(ambito);
+                        System.out.println("Ambito de la funcion: "+nuevoLexema+ ", es: "+ ambito);
                         atributos.setUso("nombreFuncion");
                         atributos.setTipo($5.sval);
+                        atributos.setListaDeParametros(lista_parametros);
                         Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema, atributos);
                         if(!lista_parametros.isEmpty()){
                             int posicion = 1;
@@ -130,6 +139,16 @@ declaracion_fun : FUN ID lista_de_parametros ':' tipo{
                                 posicion++;
                             }
                         }
+
+                        ArrayList<Parametro> parametros_actuales = new ArrayList<>();
+                        for(String p: lista_parametros){
+                            String idParametro = p;
+                            String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(p).getTipo();
+                            Parametro param = new Parametro(tipoId,idParametro);
+                            parametros_actuales.add(param);
+                        }
+                        parametrosFunciones.put(nuevoLexema,parametros_actuales);
+
                         Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una funcion declarada con nombre "+$2.sval+ " en el ámbito "+ambito+", con tipo de retorno " + Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
                     } else {
                         Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " la funcion "+ $2.sval + " ya fue declarada en este ambito");
@@ -146,16 +165,13 @@ error_declaracion_fun : ID lista_de_parametros ':' tipo {Main.erroresSintacticos
                       | FUN ID lista_de_parametros ':' error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el tipo que devuelve la funcion en la declaracion");}
                       ;
 
-lista_de_parametros : '(' ')' {lista_parametros.clear();
-                              $$ = new ParserVal(lista_parametros);}
+lista_de_parametros : '(' ')' {lista_parametros.clear();}
                     | '('parametro')'{lista_parametros.clear();
-                                     			     lista_parametros.add($2.sval);
-                                     			     $$ = new ParserVal(lista_parametros);}
+                                      lista_parametros.add($2.sval);}
                     | '(' parametro ',' parametro ')'{lista_parametros.clear();
                                                       if(!$2.sval.equals($4.sval)){
                                                         lista_parametros.add($2.sval);
                                                         lista_parametros.add($4.sval);
-                                                        $$ = new ParserVal(lista_parametros);
                                                       } else
                                                             Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea + " no puede haber dos parametros con el mismo ID");
                                                       }
@@ -191,7 +207,8 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
 	                                if($2.arbol != null){
 	                                    AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
-	                                    $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+	                                    lexDiscard.setAmbito(ambito);
+	                                    $$.arbol = new NodoBloqueEjecutable($2.arbol,null,lexDiscard);
 	                                }
 	                                }
 	      | seleccion ';'{$$.arbol = $1.arbol;}
@@ -200,16 +217,19 @@ ejecucion : asignacion ';'{$$.arbol = $1.arbol;}
 	      | salida ';' {$$.arbol = $1.arbol;}
           | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                         AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
+                        sentenciaBreak.setAmbito(ambito);
                         $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaBreak),null,sentenciaBreak);}
           | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
                           AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                          sentenciaContinue.setAmbito(ambito);
                         $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
           | CONTINUE ':' ID ';' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
                                   if((ambitoCheck != null) && (Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getUso().equals("nombreEtiqueta"))){
-                                  Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
-                                  AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
-                                  AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
-                                  $$.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
+                                      Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
+                                      AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                      AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
+                                      lexEtiqueta.setAmbito(ambito);
+                                      $$.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
                               }else
                                   Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
                        }
@@ -230,7 +250,8 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
                                            if($2.arbol != null){
                                                AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
-                                               $$.arbol = new NodoInvocacion($2.arbol,null,lexDiscard);
+                                               lexDiscard.setAmbito(ambito);
+                                               $$.arbol = new NodoBloqueEjecutable($2.arbol,null,lexDiscard);
                                            }
                                            }
                  | seleccion ';' {$$.arbol = $1.arbol;}
@@ -238,15 +259,18 @@ ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
                  | salida ';' {$$.arbol = $1.arbol;}
                  | BREAK ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK");
                               AtributosTablaS sentenciaBreak =  new AtributosTablaS("break");
+                              sentenciaBreak.setAmbito(ambito);
                               $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaBreak),null,sentenciaBreak);}
                  | CONTINUE ';'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable CONTINUE");
                                 AtributosTablaS sentenciaContinue =  new AtributosTablaS("continue");
+                                sentenciaContinue.setAmbito(ambito);
                               $$.arbol = new NodoContinueBreak(new NodoHoja(sentenciaContinue),null,sentenciaContinue);}
                  | CONTINUE ':' ID ';' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($3.sval,ambito);
                                         if((ambitoCheck != null) && (Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getUso().equals("nombreEtiqueta"))){
                                         Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control con etiqueta: " +$1.sval);
                                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                         AtributosTablaS lexEtiqueta = new AtributosTablaS("continue con etiquetado");
+                                        lexEtiqueta.setAmbito(ambito);
                                         $$.arbol = new NodoContinueBreak(new NodoHoja(lexEtiqueta),new NodoHoja(atributos),lexEtiqueta);
                                     }else
                                         Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " no exite una sentencia de control etiquetada con '"+$3.sval+"' en algun ambito alcanzable");
@@ -261,32 +285,28 @@ error_ejecucion_control: BREAK error{Main.erroresSintacticos.add("Error sinácti
                        | CONTINUE ':' ID error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta ';' al final de la sentencia CONTINUE");}
                        ;
 
-etiqueta : ID ':' {
-                             String nuevoLexema = $1.sval + "." + ambito;
-                             if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
-                                 Main.tablaDeSimbolos.modificarSimbolo($1.sval, nuevoLexema);
-                                 AtributosTablaS atributosT = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
-                                 atributosT.setUso("nombreEtiqueta");
-                                 Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema,atributosT);
-                                 $$ = new ParserVal(nuevoLexema);
-                             } else {
-                                 Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la etiqueta " + $1.sval + " ya fue declarada en este ambito");
-                                 Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
-                                 }
+etiqueta : ID ':' {  String nuevoLexema = $1.sval + "." + ambito;
+                     if(!Main.tablaDeSimbolos.existeLexema(nuevoLexema)){
+                         Main.tablaDeSimbolos.modificarSimbolo($1.sval, nuevoLexema);
+                         AtributosTablaS atributosT = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
+                         atributosT.setUso("nombreEtiqueta");
+                         Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema,atributosT);
+                         $$ = new ParserVal(nuevoLexema);
+                     } else {
+                         Main.erroresSemanticos.add("Error semántico: Linea " + Lexico.linea+ " la etiqueta " + $1.sval + " ya fue declarada en este ambito");
+                         Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
+                         }
                      }
-
-
-
-
-
 
 asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                                 if(ambitoCheck != null){
                                                     if ($3.arbol!=null){
                                                         Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
                                                         AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                                        atributosId.setAmbito(ambito);
                                                         Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                         AtributosTablaS atributos = new AtributosTablaS("Asignacion");
+                                                        atributos.setAmbito(ambito);
                                                         NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                                     if (nodoA.getTipo()!=null){
                                                         $$.arbol= nodoA;
@@ -301,8 +321,10 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
 
            | ID ASIGNACION control {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                    AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                   atributosId.setAmbito(ambito);
                                    Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito).setUso("Variable");
                                    AtributosTablaS atributos = new AtributosTablaS("Asignacion");
+                                   atributos.setAmbito(ambito);
                                    $$.arbol= new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                    }
            | error_asignacion
@@ -316,6 +338,7 @@ error_asignacion : ID error expresion_aritmetica {Main.erroresSintacticos.add("E
                  ;
 
 retorno : RETURN expresion_aritmetica { AtributosTablaS retorno = new AtributosTablaS("RETURN");
+                                        retorno.setAmbito(ambito);
                                         $$.arbol = new NodoRetorno($2.arbol,null,retorno);
                                       }
         | error_retorno
@@ -327,11 +350,13 @@ error_retorno : RETURN {Main.erroresSintacticos.add("Error sináctico: Linea " +
 expresion_aritmetica : termino{$$.arbol = $1.arbol;}
 	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");
 	                 	                                 AtributosTablaS atributos = new AtributosTablaS("+");
+	                 	                                 atributos.setAmbito(ambito);
 	                 	                                 $$.arbol = new NodoSuma($1.arbol,$3.arbol,atributos);
 	                 	                                 }
 
 	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");
 	                 	                 	              AtributosTablaS atributos = new AtributosTablaS("-");
+	                 	                 	              atributos.setAmbito(ambito);
 	                 	                 	              $$.arbol = new NodoResta($1.arbol,$3.arbol,atributos);
 	                                                    }
 	                 | error_expresion_aritmetica
@@ -343,10 +368,12 @@ error_expresion_aritmetica : expresion_aritmetica '+' error{Main.erroresSintacti
 
 termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una multiplicacion");
 	                          AtributosTablaS atributos = new AtributosTablaS("*");
+	                          atributos.setAmbito(ambito);
 	                          $$.arbol = new NodoMultiplicacion($1.arbol,$3.arbol,atributos);
                              }
 	    | termino '/' factor  { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");
 	                          AtributosTablaS atributos = new AtributosTablaS("/");
+	                          atributos.setAmbito(ambito);
 	                          $$.arbol = new NodoDivision($1.arbol,$3.arbol,atributos);
 	                          }
 	    | factor{$$.arbol = $1.arbol;}
@@ -365,6 +392,7 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                   Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                   String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                   atributos.setTipo(tipoId);
+                  atributos.setAmbito(ambito);
                   $$.arbol = new NodoHoja(atributos);
               }
               else{
@@ -373,25 +401,30 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                     }
               }
         | CTE_FLOTANTE {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                        atributos.setAmbito(ambito);
                         $$.arbol = new NodoHoja(atributos);
                        }
         | CTE_INT {if (chequearRangoEnteros() == true){
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                         atributos.setTipo("i32");
+                        atributos.setAmbito(ambito);
                         $$.arbol = new NodoHoja(atributos);
                         }
                    }
         | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
                       AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                      atributosId.setAmbito(ambito);
                       $$.arbol = new NodoHoja(atributosId);
                       }
         | '-' CTE_INT {if (chequearNegativos() == true){
                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
+                       atributos.setAmbito(ambito);
                        $$.arbol = new NodoHoja(atributos);
                        }
                       }
         | '-' CTE_FLOTANTE {if (chequearNegativos() ==true){
                                AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
+                               atributos.setAmbito(ambito);
                                $$.arbol = new NodoHoja(atributos);
                                }
                            }
@@ -400,22 +433,23 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
 invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                             if(ambitoCheck != null){
                                                 if ($3.arbol !=null){
-                                                    if(lista_parametros.size() == lista_parametros_reales.size()){
+                                                    ArrayList<Parametro> parametros_funcion_actual = new ArrayList<>();
+                                                    parametros_funcion_actual.addAll(parametrosFunciones.get(ambitoCheck));
+                                                    if(parametros_funcion_actual.size() == lista_parametros_reales.size()){
                                                         int pos = 0;
                                                         int nroDeNoCoincidencias = 0;
                                                         for(String paramR : lista_parametros_reales){
                                                             String tipoParamR = Main.tablaDeSimbolos.getAtributosTablaS(paramR).getTipo();
-                                                            String parametro = lista_parametros.get(pos);
-                                                            String tipoParam = Main.tablaDeSimbolos.getAtributosTablaS(parametro).getTipo();
+                                                            String tipoParam = parametros_funcion_actual.get(pos).getTipo();
                                                             if(!tipoParamR.equals(tipoParam))
                                                                 nroDeNoCoincidencias++;
-                                                            }
                                                             pos++;
+                                                        }
                                                         if(nroDeNoCoincidencias == 0){
                                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
-                                                            Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idInvocacion");
                                                             AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
-                                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                                            lexInvocacion.setAmbito(ambito);
+                                                            AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                                             $$.arbol = new NodoInvocacion(new NodoHoja(lexID),$3.arbol,lexInvocacion);
                                                         }
                                                         else{
@@ -436,7 +470,6 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                             if(ambitoCheck != null){
                                 if(lista_parametros.size() == lista_parametros_reales.size()){
                                     Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
-                                    Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("idInvocacion");
                                     AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
                                     AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                     $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);
@@ -456,6 +489,9 @@ error_invocacion : ID '(' parametros_reales error {Main.erroresSintacticos.add("
 
 parametros_reales : factor_invocacion { if($1.arbol !=null){
                                             AtributosTablaS lexParam = new AtributosTablaS("Un Parametro");
+                                            lista_parametros_reales.clear();
+                                            lista_parametros_reales.add($1.sval);
+                                            lexParam.setParametroEnLista($1.sval);
                                             $$.arbol = new NodoParam($1.arbol,null,lexParam);
                                         }
                                         else
@@ -463,6 +499,8 @@ parametros_reales : factor_invocacion { if($1.arbol !=null){
                                         }
                   | factor_invocacion  ','  factor_invocacion { if($1.arbol !=null && $3.arbol!=null){
                                                                     AtributosTablaS lexParam = new AtributosTablaS("Dos Parametros");
+                                                                    lexParam.setParametroEnLista($1.sval);
+                                                                    lexParam.setParametroEnLista($3.sval);
                                                                     lista_parametros_reales.clear();
                                                                     lista_parametros_reales.add($1.sval);
                                                                     lista_parametros_reales.add($3.sval);
@@ -473,6 +511,7 @@ parametros_reales : factor_invocacion { if($1.arbol !=null){
                   | error_parametros_reales
                   ;
 
+
 error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una ',' entre los dos parametros reales ");}
                         | factor_invocacion  ','  factor_invocacion ','  factor_invocacion {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el numero maximo de parametros soportados es de dos ");}
                         | factor_invocacion  ','  factor_invocacion ','  factor_invocacion ','  factor_invocacion {Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el numero maximo de parametros soportados es de dos ");}
@@ -481,9 +520,8 @@ error_parametros_reales : factor_invocacion factor_invocacion {Main.erroresSinta
 factor_invocacion 	: ID { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                       if(ambitoCheck != null){
                           AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                          atributos.setAmbito(ambito);
                           Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
-                          lista_parametros_reales.clear();
-                          lista_parametros_reales.add($1.sval);
                           $$.arbol = new NodoHoja(atributos);
                           }else{
                             Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
@@ -491,32 +529,33 @@ factor_invocacion 	: ID { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbi
                           }
                           }
                     | CTE_FLOTANTE {Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante FLOTANTE -> " + $1.sval);
-                                    lista_parametros_reales.clear();
-                                    lista_parametros_reales.add($1.sval);
                                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                    atributos.setAmbito(ambito);
                                     $$.arbol = new NodoHoja(atributos);
                                    }
                     | CTE_INT {if (chequearRangoEnteros() == true) {
-                                   lista_parametros_reales.clear();
-                                   lista_parametros_reales.add($1.sval);
                                    Main.informesSintacticos.add("[Lexico | Linea " + Lexico.linea + "] se leyó, dentro de una invocacion, la constante INT LARGA -> " + $1.sval);
                                    AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
+                                   atributos.setAmbito(ambito);
                                    $$.arbol = new NodoHoja(atributos);
                                }
                                }
                     | '-' CTE_INT {if (chequearNegativos()==true){
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
+                                            atributos.setAmbito(ambito);
                                             $$.arbol = new NodoHoja(atributos);
                                             }
                                   }
                     | '-' CTE_FLOTANTE {if (chequearNegativos()==true){
                                             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
+                                            atributos.setAmbito(ambito);
                                             $$.arbol = new NodoHoja(atributos);
                                             }
                                        }
                     ;
 seleccion : IF '(' condicion ')' cuerpo_if {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se leyó una sentencia de seleccion IF");
                                             AtributosTablaS atributos = new AtributosTablaS("IF");
+                                            atributos.setAmbito(ambito);
                                             $$.arbol = new NodoIf($3.arbol,$5.arbol,atributos);}
           | error_seleccion
           ;
@@ -529,9 +568,11 @@ error_seleccion: '(' condicion ')' cuerpo_if  {Main.erroresSintacticos.add("Erro
                ;
 
 cuerpo_if : THEN cuerpo_then ENDIF {AtributosTablaS atributos = new AtributosTablaS("CuerpoIf");
+                                    atributos.setAmbito(ambito);
                                     $$.arbol = new NodoCuerpoIf($2.arbol,null,atributos);
                                     }
           | THEN cuerpo_then cuerpo_else ENDIF {AtributosTablaS atributos = new AtributosTablaS("CuerpoIf");
+                                                atributos.setAmbito(ambito);
                                                 $$.arbol = new NodoCuerpoIf($2.arbol,$3.arbol,atributos);
                                                 }
           | error_cuerpo_if
@@ -544,15 +585,19 @@ error_cuerpo_if: error cuerpo_then cuerpo_else ENDIF {Main.erroresSintacticos.ad
 
 
 cuerpo_then: ejecucion {AtributosTablaS atributos = new AtributosTablaS("Then");
+                        atributos.setAmbito(ambito);
                         $$.arbol = new NodoCuerpoThen($1.arbol,null,atributos);}
            | '{' bloque_ejecutable_if '}'{AtributosTablaS atributos = new AtributosTablaS("Then");
+                                          atributos.setAmbito(ambito);
                                           $$.arbol = new NodoCuerpoThen($2.arbol,null,atributos);}
            | error_cuerpo_then
            ;
 
 cuerpo_else: ELSE ejecucion {AtributosTablaS atributos = new AtributosTablaS("Else");
+                             atributos.setAmbito(ambito);
                              $$.arbol = new NodoCuerpoElse($2.arbol,null,atributos);}
            | ELSE '{' bloque_ejecutable_if '}' {AtributosTablaS atributos = new AtributosTablaS("Else");
+                                                atributos.setAmbito(ambito);
                                                 $$.arbol = new NodoCuerpoElse($3.arbol,null,atributos);}
            | error_cuerpo_else
            ;
@@ -577,7 +622,9 @@ error_bloque_for : bloque_ejecutable_for '}' {Main.erroresSintacticos.add("Error
 
 
 condicion : expresion_aritmetica comparador expresion_aritmetica {AtributosTablaS atributos = new AtributosTablaS("Condicion");
+                                                                  atributos.setAmbito(ambito);
                                                                   AtributosTablaS atributos2 = new AtributosTablaS($2.sval);
+                                                                  atributos2.setAmbito(ambito);
                                                                   $$.arbol = new NodoCondicionIf(new NodoExpresionLogica($1.arbol,$3.arbol,atributos2),null,atributos);}
           | error_condicion
           ;
@@ -598,8 +645,11 @@ comparador : '<' {$$ = new ParserVal("<");}
 control : FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {if(($3.arbol != null)&&($5.arbol != null)&&($7.arbol != null)){
                                                                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");
                                                                                             AtributosTablaS lexSentenciaFor = new AtributosTablaS("Sentencia FOR");
+                                                                                            lexSentenciaFor.setAmbito(ambito);
                                                                                             AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
+                                                                                            lexCuerpoFor.setAmbito(ambito);
                                                                                             AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
+                                                                                            lexEncabezadoFor.setAmbito(ambito);
                                                                                             ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor($9.arbol,null,lexCuerpoFor);
                                                                                             String IdAIncrementar = $3.arbol.getHijoIzq().getLexema();
                                                                                             $5.arbol.getHijoIzq().setId(IdAIncrementar);
@@ -613,8 +663,11 @@ control : FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {if
            |etiqueta FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {if(($4.arbol != null)&&($6.arbol != null)&&($8.arbol != null)){
                                                                                   Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo una sentencia de control FOR");
                                                                                   AtributosTablaS lexSentenciaFor = new AtributosTablaS("Sentencia FOR");
+                                                                                  lexSentenciaFor.setAmbito(ambito);
                                                                                   AtributosTablaS lexCuerpoFor = new AtributosTablaS("Cuerpo FOR");
+                                                                                  lexCuerpoFor.setAmbito(ambito);
                                                                                   AtributosTablaS lexEncabezadoFor = new AtributosTablaS("Encabezado FOR");
+                                                                                  lexEncabezadoFor.setAmbito(ambito);
                                                                                   ArbolSintactico nodoCuerpoFor = new NodoCuerpoFor($10.arbol,null,lexCuerpoFor);
                                                                                   String IdAIncrementar = $4.arbol.getHijoIzq().getLexema();
                                                                                   $4.arbol.setId($1.sval);
@@ -634,9 +687,11 @@ error_control : FOR '(' ')' bloque_for {Main.erroresSintacticos.add("Error siná
 
 incr_decr : '+' CTE_INT {
                           AtributosTablaS atributos1 = new AtributosTablaS("Incremento");
+                          atributos1.setAmbito(ambito);
                           $$.arbol  = new NodoIncrementoFor(new NodoHoja(Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
            | '-' CTE_INT {
                           AtributosTablaS atributos1 = new AtributosTablaS("Decremento");
+                          atributos1.setAmbito(ambito);
                           $$.arbol  = new NodoDecrementoFor(new NodoHoja(Main.tablaDeSimbolos.getAtributosTablaS($2.sval)), null, atributos1);}
            | error_incr_decr{ $$.arbol = null;}
            ;
@@ -654,9 +709,12 @@ asignacion_for: ID ASIGNACION CTE_INT { String ambitoCheck = Main.tablaDeSimbolo
                                             if(tipoId.equals("i32")){
                                                 if (chequearRangoEnteros()==true){
                                                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                                    atributos.setAmbito(ambito);
                                                     Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                     AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
+                                                    atributos2.setAmbito(ambito);
                                                     AtributosTablaS atributos3 = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
+                                                    atributos3.setAmbito(ambito);
                                                     NodoAsignacionFor nodoA = new NodoAsignacionFor(new NodoHoja(atributos),new NodoHoja(atributos3),atributos2);
                                                     if (nodoA.getTipo()!=null){
                                                         $$.arbol= nodoA;
@@ -692,8 +750,11 @@ condicion_for: ID comparador expresion_aritmetica {String ambitoCheck = Main.tab
                                                    if(ambitoCheck != null){
                                                        Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                        AtributosTablaS atributos = new AtributosTablaS("CondicionFOR");
+                                                       atributos.setAmbito(ambito);
                                                        AtributosTablaS atributos2 = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
+                                                       atributos2.setAmbito(ambito);
                                                        AtributosTablaS atributos3 = new AtributosTablaS($2.sval);
+                                                       atributos3.setAmbito(ambito);
                                                        $$.arbol = new NodoCondicionFor(new NodoComparacionFor(new NodoHoja(atributos2),$3.arbol,atributos3),null,atributos);
                                                    }
                                                    else{
@@ -711,7 +772,9 @@ error_condicion_for : comparador expresion_aritmetica {Main.erroresSintacticos.a
 
 salida : OUT '('CADENA')'{Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una sentencia de salida OUT");
                           AtributosTablaS lexSalida = new AtributosTablaS("Sentencia de Impresion por Pantalla");
+                          lexSalida.setAmbito(ambito);
                           AtributosTablaS lexCadena = Main.tablaDeSimbolos.getAtributosTablaS($3.sval);
+                          lexCadena.setAmbito(ambito);
                           $$.arbol = new NodoSalida(new NodoHoja(lexCadena),null,lexSalida);
                           }
        | error_salida
@@ -729,6 +792,7 @@ private String ambito;
 private ArrayList<String> lista_variables;
 private ArrayList<String> lista_parametros;
 private ArrayList<String> lista_parametros_reales;
+private Hashtable<String,ArrayList<Parametro>> parametrosFunciones;
 
 public Parser(Lexico lexico)
 {
@@ -737,6 +801,7 @@ public Parser(Lexico lexico)
   this.lista_variables = new ArrayList<String>();
   this.lista_parametros = new ArrayList<String>();
   this.lista_parametros_reales = new ArrayList<String>();
+  this.parametrosFunciones = new Hashtable<>();
 }
 
 public int yylex(){

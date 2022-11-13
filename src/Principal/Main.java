@@ -20,6 +20,8 @@ public class Main{
 
     public static List<String> erroresSemanticos = new ArrayList<>();
 
+    public static List<String> listaDeAmbitos = new ArrayList<>();
+
 
     private static StringBuilder obtenerTextoALeer(BufferedReader ubicacion) throws IOException { //Metodo para obtener el texto a leer que contiene excepciones a errores no evitables por parte del programador.
 
@@ -113,6 +115,7 @@ public class Main{
         System.out.println("Tabla de simbolos ");
         System.out.println("");
         tablaDeSimbolos.mostrarTablasimbolos();
+
     }
 
 }
