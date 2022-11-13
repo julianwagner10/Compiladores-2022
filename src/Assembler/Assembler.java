@@ -123,15 +123,10 @@ public class Assembler {
         ArrayList<String> funcionesGeneradas = new ArrayList<>(); //Necesito llevar un registro de las funciones a las cuales ya se le genero aseembler
         if(raiz != null) {
             for (String am : Main.listaDeAmbitos) {
-                String aux = am;
                 if (!am.equals("main")) {
-                    am = am.substring(0,am.lastIndexOf("."));
-                }
-                String idFuncion = Main.tablaDeSimbolos.getFuncionMedianteAmbito(am,funcionesGeneradas);
-                am = aux;
-                this.assemblerCode += idFuncion + ":" + '\n';
-                this.getArbolDeMasIzq(raiz, am);
-                if (!am.equals("main")) {
+                    String idFuncion = Main.tablaDeSimbolos.getFuncionMedianteAmbito( am.substring(0,am.lastIndexOf(".")),funcionesGeneradas);
+                    this.assemblerCode += idFuncion + ":" + '\n';
+                    this.getArbolDeMasIzq(raiz, am);
                     this.assemblerCode += "ret" + '\n';
                     this.assemblerCode += '\n';
                 }

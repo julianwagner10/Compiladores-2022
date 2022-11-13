@@ -127,7 +127,6 @@ declaracion_fun : FUN ID lista_de_parametros ':' tipo{
                         Main.tablaDeSimbolos.modificarSimbolo($2.sval, nuevoLexema);
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
                         atributos.setAmbito(ambito);
-                        System.out.println("Ambito de la funcion: "+nuevoLexema+ ", es: "+ ambito);
                         atributos.setUso("nombreFuncion");
                         atributos.setTipo($5.sval);
                         atributos.setListaDeParametros(lista_parametros);
