@@ -10,7 +10,7 @@ fun f1(i32 y,i32 v):i32{
         else
             y=: x;
         end_if;
-        return y;
+        return y/x;
     }
     fun f3(i32 w):f32{
         i32 t;

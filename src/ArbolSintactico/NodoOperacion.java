@@ -20,14 +20,13 @@ public class NodoOperacion extends ArbolSintactico{
         if (tipoIzq.equals(tipoDer))
             super.setTipo(tipoIzq);
         else{
-            if (tipoIzq.equals("FLOAT")){
-                super.setTipo("FLOAT");
-                hijoDer.setTipo("FLOAT");
+            if (tipoIzq.equals("f32")){
+                super.setTipo("f32");
+                hijoDer.setTipo("f32");
             }else{
-                super.setTipo("FLOAT");
-                hijoIzq.setTipo("FLOAT");
+                super.setTipo("f32");
+                hijoIzq.setTipo("f32");
             }
-
         }
     }
 }

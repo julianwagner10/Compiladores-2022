@@ -1,5 +1,6 @@
 package Principal;
 
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class TablaSimbolos {
@@ -155,6 +156,22 @@ public class TablaSimbolos {
             }
         }
         return null;
+    }
+
+    public boolean getTipoFuncionDeRetorno(String ambito,String tipo){ //Este metodo compara el tipo de la expresion aritmetica a retornar, con el tipo de la funcion que contiene ese retorno.
+        Enumeration iterator = tablaSimbolos.keys();
+        if(!ambito.equals("main")) {
+            String ambitoAux = ambito.substring(ambito.lastIndexOf(".")+1,ambito.length());
+            String nombreFuncion = ambitoAux +"."+ ambito.substring(0,ambito.lastIndexOf(".")); //Recreo la funcion a traves del ambito.
+            while (iterator.hasMoreElements()) {
+                String simbolo = (String) iterator.nextElement();
+                AtributosTablaS ats = tablaSimbolos.get(simbolo);
+                if (ats.getLexema().equals(nombreFuncion) && ats.getUso().equals("nombreFuncion") && ats.getTipo().equals(tipo) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

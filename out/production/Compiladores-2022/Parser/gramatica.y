@@ -336,9 +336,15 @@ error_asignacion : ID error expresion_aritmetica {Main.erroresSintacticos.add("E
                  | ASIGNACION control {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
                  ;
 
-retorno : RETURN expresion_aritmetica { AtributosTablaS retorno = new AtributosTablaS("RETURN");
-                                        retorno.setAmbito(ambito);
-                                        $$.arbol = new NodoRetorno($2.arbol,null,retorno);
+retorno : RETURN expresion_aritmetica { if(Main.tablaDeSimbolos.getTipoFuncionDeRetorno(ambito,$2.sval)){
+                                            AtributosTablaS retorno = new AtributosTablaS("RETURN");
+                                            retorno.setAmbito(ambito);
+                                            $$.arbol = new NodoRetorno($2.arbol,null,retorno);
+                                        }
+                                        else{
+                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " el tipo que se quiere retornar no coincide con el de la funcion ");
+                                            $$.arbol = null;
+                                        }
                                       }
         | error_retorno
         ;
@@ -346,17 +352,21 @@ retorno : RETURN expresion_aritmetica { AtributosTablaS retorno = new AtributosT
 error_retorno : RETURN {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta una expresion aritmetica luego de la palabra reservada RETURN");}
               ;
 
-expresion_aritmetica : termino{$$.arbol = $1.arbol;}
+expresion_aritmetica : termino{$$.arbol = $1.arbol;
+                               $$.sval = $1.sval;
+                               }
 	                 | expresion_aritmetica '+' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una suma");
 	                 	                                 AtributosTablaS atributos = new AtributosTablaS("+");
 	                 	                                 atributos.setAmbito(ambito);
 	                 	                                 $$.arbol = new NodoSuma($1.arbol,$3.arbol,atributos);
+	                 	                                 $$.sval = $3.sval;
 	                 	                                 }
 
 	                 | expresion_aritmetica '-' termino { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una resta");
 	                 	                 	              AtributosTablaS atributos = new AtributosTablaS("-");
 	                 	                 	              atributos.setAmbito(ambito);
 	                 	                 	              $$.arbol = new NodoResta($1.arbol,$3.arbol,atributos);
+	                 	                 	              $$.sval = $3.sval;
 	                                                    }
 	                 | error_expresion_aritmetica
                      ;
@@ -369,11 +379,13 @@ termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " +
 	                          AtributosTablaS atributos = new AtributosTablaS("*");
 	                          atributos.setAmbito(ambito);
 	                          $$.arbol = new NodoMultiplicacion($1.arbol,$3.arbol,atributos);
+	                          $$.sval = $3.sval;
                              }
 	    | termino '/' factor  { Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se realizó una division");
 	                          AtributosTablaS atributos = new AtributosTablaS("/");
 	                          atributos.setAmbito(ambito);
 	                          $$.arbol = new NodoDivision($1.arbol,$3.arbol,atributos);
+	                          $$.sval = $3.sval;
 	                          }
 	    | factor{$$.arbol = $1.arbol;}
 	    | error_termino
@@ -393,6 +405,7 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                   atributos.setTipo(tipoId);
                   atributos.setAmbito(ambito);
                   $$.arbol = new NodoHoja(atributos);
+                  $$.sval = tipoId;
               }
               else{
                     Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
@@ -402,12 +415,14 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
         | CTE_FLOTANTE {AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                         atributos.setAmbito(ambito);
                         $$.arbol = new NodoHoja(atributos);
+                         $$.sval = "f32";
                        }
         | CTE_INT {if (chequearRangoEnteros() == true){
                         AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval);
                         atributos.setTipo("i32");
                         atributos.setAmbito(ambito);
                         $$.arbol = new NodoHoja(atributos);
+                        $$.sval = "i32";
                         }
                    }
         | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
@@ -419,12 +434,14 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
                        atributos.setAmbito(ambito);
                        $$.arbol = new NodoHoja(atributos);
+                       $$.sval = "i32";
                        }
                       }
         | '-' CTE_FLOTANTE {if (chequearNegativos() ==true){
                                AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
                                atributos.setAmbito(ambito);
                                $$.arbol = new NodoHoja(atributos);
+                               $$.sval = "f32";
                                }
                            }
         ;
