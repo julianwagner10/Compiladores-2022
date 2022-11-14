@@ -447,7 +447,8 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
         ;
 
 invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
-                                            if(ambitoCheck != null){
+                                            boolean recursionCheck = Main.tablaDeSimbolos.chequearRecursionFuncion($1.sval,ambito);
+                                            if((ambitoCheck != null) && (recursionCheck)){
                                                 if ($3.arbol !=null){
                                                     ArrayList<Parametro> parametros_funcion_actual = new ArrayList<>();
                                                     parametros_funcion_actual.addAll(parametrosFunciones.get(ambitoCheck));
@@ -480,7 +481,7 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                                 }
                                             }
                                             else
-                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
+                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] error de invocacion de funcion, ya sea porque no existe o porque se esta autoinvocando ");
                                             }
            | ID '('  ')' {  String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                             if(ambitoCheck != null){

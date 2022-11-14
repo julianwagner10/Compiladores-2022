@@ -114,6 +114,23 @@ public class TablaSimbolos {
         return null;
     }
 
+    public boolean chequearRecursionFuncion(String id, String ambito){
+        String aux = ambito;
+        String aux2;
+
+        while(!aux.equals("main")) {
+            aux2= aux.substring(aux.lastIndexOf("."));
+            aux2 = aux2.replace(".","");
+            aux = aux.substring(0, aux.lastIndexOf("."));
+
+            System.out.println("aux "+aux);
+            System.out.println("Aux 2 "+aux2);
+            if (aux2.equals(id))
+                return false;
+        }
+            return true;
+    }
+
     public String generarCodigoAssembler(){
         String assembler ="";
         for(String key : this.tablaSimbolos.keySet()) {
