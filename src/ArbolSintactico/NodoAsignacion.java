@@ -15,10 +15,10 @@ public class NodoAsignacion extends ArbolSintactico{
         String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
         String lexemaDer = this.getHijoDer().getLexemaReemplazado();
         if (this.getTipo().equals("i32")) {
-            assembler += "MOV EBX, _" + lexemaDer + '\n';
+            assembler += "MOV EBX, " + lexemaDer + '\n';
             assembler += "MOV _" + lexemaIzq + ", " + "EBX" + '\n';
         }else{
-            assembler += "FLD _" + lexemaDer+ '\n';
+            assembler += "FLD " + lexemaDer+ '\n';
             assembler += "FSTP _" + lexemaIzq + '\n';
 
         }

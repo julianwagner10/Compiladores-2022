@@ -38,7 +38,7 @@ public class NodoSuma extends NodoOperacion {
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");
 
-            assembler += "FLD _" + lexemaIzq+ '\n';
+            assembler += "FLD " + lexemaIzq+ '\n';
             assembler += "FADD _" + lexemaDer+ '\n';
 
             assembler += "FCOMP " + "_limiteSuperiorFloatPositivo" + '\n'; //Comparo el lexema de la der con el valor guardado en ST, y se extrae el valor en ST.
@@ -46,7 +46,7 @@ public class NodoSuma extends NodoOperacion {
             String auxVarComp = "_var" + this.contador;     //Necesito la variable aux para guardar la palabra de estado en la memoria
                                                             //Estas tres instrucciones se hacen luego de hacer una comparacion en el coprocesador.
             assembler += "FSTSW "+auxVarComp + '\n';       //Almaceno la palabra de estado en la memoria.
-            assembler += "MOV AX, _" + auxVarComp + '\n';   //Copio el contenido en el registro AX
+            assembler += "MOV AX, " + auxVarComp + '\n';   //Copio el contenido en el registro AX
             assembler += "SAHF" + '\n';                 //Almacena en los 8 bits menos significativos, del registro de indicadores, el valor del registro AH.
 
             assembler += "JA " + "Error_Suma_Flotantes" + '\n'; // Si excede salto.

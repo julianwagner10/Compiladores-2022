@@ -25,15 +25,15 @@ public class NodoInvocacion extends ArbolSintactico{
             listaDeParametrosReales.addAll(this.getHijoDer().getAtributo().getListaDeParametros());
             for(int i=0; i< listaDeParametrosReales.size();i++){
                 if(Main.tablaDeSimbolos.getAtributosTablaS(listaDeParametrosReales.get(i)).getTipo().equals("i32")){
-                    assembler += "MOV _"+ this.listaDeParametros.get(i) + ", _" + listaDeParametrosReales.get(i) + '\n';
+                    assembler += "MOV _"+ this.listaDeParametros.get(i).replace('.','_') + ", _" + listaDeParametrosReales.get(i).replace('.','_')+ '\n';
                 }
                 else{
-                    assembler += "FLD _" +listaDeParametrosReales.get(i) + '\n';
-                    assembler += "FSTP _" + this.listaDeParametros.get(i) + '\n';
+                    assembler += "FLD _" +listaDeParametrosReales.get(i).replace('.','_')+ '\n';
+                    assembler += "FSTP _" + this.listaDeParametros.get(i).replace('.','_')+ '\n';
                 }
             }
         }
-        assembler += "CALL " + idFuncionAInvocar + '\n';
+        assembler += "CALL " + idFuncionAInvocar.replace('.','_')+ '\n';
         return assembler;
     }
 }
