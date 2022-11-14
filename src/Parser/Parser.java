@@ -1749,7 +1749,7 @@ case 117:
                                                 }
                                             }
                                             else
-                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] error de invocacion de funcion, ya sea porque no existe o porque se esta autoinvocando ");
+                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] error de invocacion de la funcion"+ val_peek(3).sval +  ", ya sea porque no existe o porque se esta autoinvocando ");
                                             }
 break;
 case 118:
