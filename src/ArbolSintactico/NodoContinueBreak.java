@@ -13,7 +13,7 @@ public class NodoContinueBreak extends ArbolSintactico{
         String label;
         String label1;
         System.out.println("Entre a nodo continue break");
-        switch (this.getHijoIzq().getLexema()) {
+        switch (this.getLexema()) {
             case ("break"):
                 if(!NodoFor.etiquetaDeSalto.empty()) {
                     System.out.println("entre por el lado del break");
@@ -35,6 +35,18 @@ public class NodoContinueBreak extends ArbolSintactico{
                 assembler += "JMP " + this.getHijoDer().getLexemaReemplazado() + '\n';
                 this.setId(this.getHijoDer().getLexema());
                 break;
+            case ("break retorno"):
+                System.out.println("entre por el lado del break retorno");
+                if(this.getTipo().equals("i32")) {
+                    String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
+                    assembler += "MOV EAX, _"+lexemaIzq + '\n';
+                }
+                else{
+                    String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
+                    assembler += "FLD " +lexemaIzq;
+                }
+                break;
+
         }
         return assembler;
 

@@ -26,5 +26,4 @@ public class NodoComparacionFor extends ArbolSintactico {
             }
             return assembler;
         }
-
 }

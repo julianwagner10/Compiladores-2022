@@ -1,5 +1,8 @@
-programa{
-i32 x;
-y=:z;
-
+ControlComoExpresionBienDef{
+i32 a1,id,x,z;
+a1 =: for (id=:2 ; id>4 ; +2){
+    if(x>z)then
+        break 5;
+    end_if;
+    };
 }

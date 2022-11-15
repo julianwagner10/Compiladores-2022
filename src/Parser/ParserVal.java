@@ -15,7 +15,6 @@ public class ParserVal
 /**
  * integer value of this 'union'
  */
-public ArbolSintactico arbol;
 public int ival;
 
 /**
@@ -32,6 +31,8 @@ public String sval;
  * object value of this 'union'
  */
 public Object obj;
+
+public ArbolSintactico arbol;
 
 //#############################################
 //## C O N S T R U C T O R S

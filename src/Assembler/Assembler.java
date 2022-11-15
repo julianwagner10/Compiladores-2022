@@ -126,7 +126,7 @@ public class Assembler {
             for (String am : Main.listaDeAmbitos) {
                 if (!am.equals("main")) {
                     String idFuncion = Main.tablaDeSimbolos.getFuncionMedianteAmbito( am.substring(0,am.lastIndexOf(".")),funcionesGeneradas);
-                    this.assemblerCode += idFuncion + ":" + '\n';
+                    this.assemblerCode += idFuncion.replace('.','_') + ":" + '\n';
                     this.getArbolDeMasIzq(raiz, am);
                     this.assemblerCode += "ret" + '\n';
                     this.assemblerCode += '\n';

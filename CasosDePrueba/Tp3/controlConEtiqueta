@@ -1,8 +1,6 @@
 IfMalDefinido2{
 i32 x;
 if (x>2) then
-
     break;
-
 end_if;
 }

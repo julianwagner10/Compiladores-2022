@@ -4,6 +4,8 @@ import Principal.AtributosTablaS;
 
 public class NodoAsignacion extends ArbolSintactico{
 
+    String valorRetorno = null;
+
     public NodoAsignacion(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos){
         super(hijoIzq,hijoDer,atributos);
         chequearCompatiblidadTipo(hijoIzq,hijoDer);
@@ -13,14 +15,20 @@ public class NodoAsignacion extends ArbolSintactico{
     public String generarCodigoAssembler() {
         String assembler = "";
         String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
-        String lexemaDer = this.getHijoDer().getLexemaReemplazado();
+        String lexemaDer = null;
+        if(this.getLexema().equals("Asignacion"))
+                lexemaDer = this.getHijoDer().getLexemaReemplazado();
+        else
+            if(this.getLexema().equals("AsignacionConControl")){
+                this.getValorDeRetornoDeControl(this.getHijoDer());
+                lexemaDer = this.valorRetorno;
+            }
         if (this.getTipo().equals("i32")) {
             assembler += "MOV EBX, " + lexemaDer + '\n';
             assembler += "MOV _" + lexemaIzq + ", " + "EBX" + '\n';
         }else{
             assembler += "FLD " + lexemaDer+ '\n';
             assembler += "FSTP _" + lexemaIzq + '\n';
-
         }
         this.eliminarHijos(this);
         return assembler;
@@ -42,4 +50,16 @@ public class NodoAsignacion extends ArbolSintactico{
         }
     }
 
+    public void getValorDeRetornoDeControl(ArbolSintactico raiz) {
+        if (raiz.getLexema().equals("break retorno") || raiz.getLexema().equals("valor por defecto")) {
+            this.valorRetorno = raiz.getHijoIzq().getLexemaReemplazado();
+        } else if (raiz.getHijoIzq() != null && raiz.getHijoDer() == null) {
+                    this.getValorDeRetornoDeControl(raiz.getHijoIzq());
+                }else if (raiz.getHijoDer() != null && raiz.getHijoIzq() == null) {
+                            this.getValorDeRetornoDeControl(raiz.getHijoDer());
+                        } else if (!raiz.esHoja()) {
+                                    this.getValorDeRetornoDeControl(raiz.getHijoIzq());
+                                    this.getValorDeRetornoDeControl(raiz.getHijoDer());
+                                }
+    }
 }
