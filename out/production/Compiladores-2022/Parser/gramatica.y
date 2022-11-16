@@ -245,7 +245,8 @@ error_ejecucion : asignacion error{Main.erroresSintacticos.add("Error sináctico
                 | invocacion ';'{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra discard antes de la invocacion");}
                 ;
 
-ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;}
+ejecucion_control: asignacion ';' {$$.arbol = $1.arbol;
+                                   $$.sval = $1.sval;}
                  | DISCARD invocacion ';' {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de tipo DISCARD ");
                                            if($2.arbol != null){
                                                AtributosTablaS lexDiscard = new AtributosTablaS("Discard");
@@ -368,6 +369,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                                         NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
                                                     if (nodoA.getTipo()!=null){
                                                         $$.arbol= nodoA;
+                                                        $$.sval = $3.sval;
                                                     }
                                                     else{
                                                         Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");
