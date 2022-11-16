@@ -1,6 +1,4 @@
 InvocacionCorrecta{
-f32 w,t;
-t =: t + w;
 
 fun f1(i32 y,f32 z):i32{
     i32 x;

@@ -3,6 +3,7 @@ package ArbolSintactico;
 import Principal.AtributosTablaS;
 
 public class NodoCuerpoFor extends ArbolSintactico{
+
     public NodoCuerpoFor(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributo) {
         super(hijoIzq, hijoDer, atributo);
     }
@@ -15,7 +16,9 @@ public class NodoCuerpoFor extends ArbolSintactico{
         String label1 = NodoFor.etiquetaDeSalto.pop();
         assembler += "JMP " + label1 + '\n';
         NodoFor.etiquetaDeSalto.push(label);
+
         return assembler;
 
     }
+
 }

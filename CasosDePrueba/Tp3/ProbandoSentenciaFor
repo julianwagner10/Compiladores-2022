@@ -2,6 +2,6 @@ programa{
 i32 x,y,id;
 for (id=:2 ; id>4 ; +2){
     x=:214;
-    break;
+    continue;
 };
 }

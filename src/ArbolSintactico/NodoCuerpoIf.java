@@ -15,8 +15,15 @@ public class NodoCuerpoIf extends ArbolSintactico {
     public String generarCodigoAssembler() {
         String assembler = "";
         if(this.getHijoDer() == null){
-            assembler += NodoIf.etiquetaDeSalto.pop() + ":" +'\n' ; //Desapilo la etiqueta que hace referencia a saltar directo al
-                                                                    // else ya que no existe este bloque, si no se cumple la condicion del if
+            String labelaux = NodoIf.etiquetaDeSalto.pop(); //Necesito la etiqueta que fue seteada previamente a esta.
+            if(!NodoIf.etiquetaDeSalto.isEmpty()) {
+                assembler += NodoIf.etiquetaDeSalto.pop() + ":" + '\n'; //Utilizo la etiqueta que necesito en ese momento
+                NodoIf.etiquetaDeSalto.push(labelaux); //Vuelvo a pushear la etiqueta que habia sacado anteriormente.
+            }
+            else{
+                assembler += labelaux + ":" + '\n'; //Utilizo la etiqueta que necesito en ese momento
+            }
+
         }
         return assembler;
     }

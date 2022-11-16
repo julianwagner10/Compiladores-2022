@@ -10,6 +10,7 @@ public abstract class ArbolSintactico {
     private String operador = null;
     private int cant = 0;
     private String printTree = "";
+    private String varRetorno = null; //Variable creada para poder obtener el valor a asignar cuando se usa una sentencia de control como expresion.
 
     public static int contador = 0;
     String id = null;
@@ -18,6 +19,7 @@ public abstract class ArbolSintactico {
         this.hijoIzq = hijoIzq;
         this.hijoDer = hijoDer;
         this.atributo = atributo;
+
     }
 
     public ArbolSintactico(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, String operador) {
@@ -154,5 +156,11 @@ public abstract class ArbolSintactico {
         this.id = id.replace(".","_");
     }
 
+    public String getVarRetorno() {
+        return this.varRetorno;
+    }
 
+    public void setVarRetorno(String varRetorno) {
+        this.varRetorno = varRetorno;
+    }
 }

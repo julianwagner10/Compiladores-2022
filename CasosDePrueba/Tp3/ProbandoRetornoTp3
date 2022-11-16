@@ -1,6 +1,6 @@
 FuncionBienDeclarada{
 fun f1(i32 y,i32 v):i32{
-    f32 x;
+    i32 x;
     fun f2(f32 z):i32{
         i32 x;
         if(x<y)then{
@@ -13,13 +13,13 @@ fun f1(i32 y,i32 v):i32{
         return y/x;
     }
     fun f3(i32 w):f32{
-        i32 t;
+        f32 t;
         if(w<y)then{
             y=: y + 2;
             w =:y;
         }
         end_if;
-        return w;
+        return t;
     }
     return x;
 }

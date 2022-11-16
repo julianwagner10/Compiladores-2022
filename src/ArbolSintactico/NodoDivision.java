@@ -16,7 +16,7 @@ public class NodoDivision extends NodoOperacion{
         if (this.getTipo().equals("i32")) {
 
             assembler += "MOV EAX, " + this.getHijoIzq().getLexema() + '\n';
-            assembler += "DIV " + this.getHijoDer().getLexema() + '\n';
+            assembler += "IDIV " + this.getHijoDer().getLexema() + '\n';
 
             String auxVar = "_var" + this.contador;
             assembler += "MOV " + auxVar + ", EAX" + '\n';// Muevo a la variable.

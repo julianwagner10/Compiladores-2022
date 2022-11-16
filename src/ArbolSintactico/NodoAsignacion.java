@@ -5,6 +5,7 @@ import Principal.AtributosTablaS;
 public class NodoAsignacion extends ArbolSintactico{
 
     String valorRetorno = null;
+    String variableRetorno = null;
 
     public NodoAsignacion(ArbolSintactico hijoIzq, ArbolSintactico hijoDer, AtributosTablaS atributos){
         super(hijoIzq,hijoDer,atributos);
@@ -21,7 +22,7 @@ public class NodoAsignacion extends ArbolSintactico{
         else
             if(this.getLexema().equals("AsignacionConControl")){
                 this.getValorDeRetornoDeControl(this.getHijoDer());
-                lexemaDer = this.valorRetorno;
+                lexemaDer = this.variableRetorno;
             }
         if (this.getTipo().equals("i32")) {
             assembler += "MOV EBX, " + lexemaDer + '\n';
@@ -53,6 +54,7 @@ public class NodoAsignacion extends ArbolSintactico{
     public void getValorDeRetornoDeControl(ArbolSintactico raiz) {
         if (raiz.getLexema().equals("break retorno") || raiz.getLexema().equals("valor por defecto")) {
             this.valorRetorno = raiz.getHijoIzq().getLexemaReemplazado();
+            this.variableRetorno = raiz.getVarRetorno();
         } else if (raiz.getHijoIzq() != null && raiz.getHijoDer() == null) {
                     this.getValorDeRetornoDeControl(raiz.getHijoIzq());
                 }else if (raiz.getHijoDer() != null && raiz.getHijoIzq() == null) {

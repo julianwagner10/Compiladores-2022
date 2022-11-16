@@ -311,7 +311,7 @@ break_con_retorno : BREAK factor_invocacion ';'{String ambitoCheck = Main.tablaD
                                          String tipoFactor = null;
                                          AtributosTablaS retornoAsignable = null;
                                          if(ambitoCheck != null || usoFactor.equals("constante")){
-                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto la sentencia ejecutable BREAK acompañada de un valor de retorno");
+                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto un valor de retorno por defecto");
                                              if(ambitoCheck != null){
                                                   tipoFactor = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                                                   retornoAsignable = new AtributosTablaS(ambitoCheck);
@@ -377,9 +377,9 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                                 Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
                                                 }
 
-           | ID ASIGNACION control {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
+           | ID ASIGNACION control cuerpo_else {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                     if(ambitoCheck != null){
-                                        if ($3.arbol!=null){
+                                        if ($3.arbol!=null && $4.arbol!=null){
                                            Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detecto una sentencia de control utilizada como expresion en una asignacion ");
                                            Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
                                            AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
@@ -388,7 +388,10 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                            AtributosTablaS atributos = new AtributosTablaS("AsignacionConControl");
                                            atributos.setAmbito(ambito);
                                            atributos.setTipo($3.sval);
-                                           NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),$3.arbol,atributos);
+                                           AtributosTablaS atributos2 = new AtributosTablaS("Control con retorno");
+                                           atributos2.setAmbito(ambito);
+                                           atributos2.setTipo($3.sval);
+                                           NodoAsignacion nodoA = new NodoAsignacion(new NodoHoja(atributosId),new NodoBloqueEjecutable($3.arbol,$4.arbol,atributos2),atributos);
                                            if (nodoA.getTipo()!=null){
                                                $$.arbol= nodoA;
                                            }
@@ -403,10 +406,10 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
            ;
 
 error_asignacion : ID error expresion_aritmetica {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
-                 | ID error control {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
+                 | ID error control cuerpo_else{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta '=:' en la asignacion");}
                  | ID ASIGNACION error{Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la expresion aritmetica en la asignacion");}
                  | ASIGNACION expresion_aritmetica {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
-                 | ASIGNACION control {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
+                 | ASIGNACION control cuerpo_else {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
                  ;
 
 retorno : RETURN expresion_aritmetica { if(Main.tablaDeSimbolos.getTipoFuncionDeRetorno(ambito,$2.sval)){
@@ -693,7 +696,6 @@ cuerpo_then: ejecucion {AtributosTablaS atributos = new AtributosTablaS("Then");
            | break_con_retorno {AtributosTablaS atributos = new AtributosTablaS("Then");
                                 atributos.setAmbito(ambito);
                                 atributos.setTipo($1.sval);
-                                System.out.println("Tipo breakConRetorno dentro de then" + $1.sval);
                                 $$.arbol = new NodoCuerpoThen($1.arbol,null,atributos);
                                 $$.sval = $1.sval;}
            | error_cuerpo_then
@@ -708,7 +710,7 @@ cuerpo_else: ELSE ejecucion {AtributosTablaS atributos = new AtributosTablaS("El
            | ELSE break_con_retorno {AtributosTablaS atributos = new AtributosTablaS("Else");
                                      atributos.setAmbito(ambito);
                                      atributos.setTipo($2.sval);
-                                     $$.arbol = new NodoCuerpoThen($2.arbol,null,atributos);
+                                     $$.arbol = new NodoCuerpoElse($2.arbol,null,atributos);
                                      $$.sval = $2.sval;}
            | error_cuerpo_else
            ;
@@ -720,13 +722,12 @@ error_cuerpo_then : bloque_ejecutable_if '}' {Main.erroresSintacticos.add("Error
 error_cuerpo_else :   '{' bloque_ejecutable_if '}'  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el la palabra reservada ELSE antes de las sentencias ejecutables ");}
                 | ELSE bloque_ejecutable_if '}' {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '{' de apertura del bloque ejecutable de la sentencia ");}
                 | ELSE '{' bloque_ejecutable_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '}' de cierre del bloque ejecutable de la sentencia ");}
+                | ELSE error {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el valor de retorno por defecto ");}
                 ;
 
 bloque_for : ejecucion_control{ $$.arbol = $1.arbol;
-                                System.out.println("Tipo ejecucion_control: " +$1.sval);
                                 $$.sval = $1.sval;}
            | '{' bloque_ejecutable_for '}' {$$.sval = $2.sval;
-                                            System.out.println("Tipo bloque_ejecutable_for: " +$2.sval);
                                             $$.arbol = $2.arbol;}
            | error_bloque_for
            ;
@@ -772,7 +773,6 @@ control : FOR '(' asignacion_for';'condicion_for';' incr_decr ')' bloque_for {if
                                                                                             $7.arbol.setId(IdAIncrementar);
                                                                                             ArbolSintactico encabezadoFor = new NodoEncabezadoFor(new NodoEncabezadoFor($3.arbol,$5.arbol,lexEncabezadoFor),$7.arbol,lexEncabezadoFor);
                                                                                             $$.arbol = new NodoFor(encabezadoFor,nodoCuerpoFor,lexSentenciaFor);
-                                                                                            System.out.println("Tipo bloque_for: " +$9.sval);
                                                                                             $$.sval = $9.sval;
                                                                                           }
                                                                                           else

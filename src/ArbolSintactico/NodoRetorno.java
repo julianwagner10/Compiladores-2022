@@ -17,13 +17,13 @@ public class NodoRetorno extends ArbolSintactico{
         String tipoOperador = this.getHijoIzq().getTipo();
         if(usoOp.equals("Variable") || usoOp.equals("constante")){ //Necesito generar codigo assembler cuando la expresion aritmetica a retornar es una variable o una constante.
             if(tipoOperador.equals("i32")){
-                assembler += "MOV EBX, _" + operador +'\n';
+                assembler += "MOV EBX, " + operador +'\n';
                 String auxVar = "_var" + this.contador;
                 assembler += "MOV " + auxVar + ", EBX" + '\n';// Muevo a la variable.
                 Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "Variable");
             }
             else{
-                assembler += "FLD _" + operador+ '\n';
+                assembler += "FLD " + operador+ '\n';
                 String auxVar = "_var" + this.contador;
                 assembler += "FSTP " + auxVar+ '\n';
                 Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");
