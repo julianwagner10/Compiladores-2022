@@ -1,8 +1,8 @@
 ControlComoExpresionBienDef{
-i32 id,x;
-f32 a1,z;
+i32 id,x,z;
+f32 a1;
 a1 =: for (id=:2 ; id>4 ; +2){
-        z=: ;
+        z=: 2;
         if(x>z)then
             break z;
         end_if;

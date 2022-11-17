@@ -1,4 +1,5 @@
 FuncionBienDeclarada{
+i32 x;
 fun f1(i32 y,i32 v):i32{
     i32 x;
     fun f2(f32 z):i32{
@@ -10,9 +11,9 @@ fun f1(i32 y,i32 v):i32{
         else
             y=: x;
         end_if;
-        return y/x;
+        return y;
     }
-    x =: x+3;
+    x =: f2(2.5);
     fun f3(i32 w):f32{
         f32 t;
         if(w<y)then{
@@ -22,9 +23,10 @@ fun f1(i32 y,i32 v):i32{
         end_if;
         return t;
     }
+    y =: f3(45);
     return x;
 }
 
-discard f1(25,45);
+x=:f1(21,4);
 
 }

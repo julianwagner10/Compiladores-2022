@@ -48,7 +48,7 @@ public class NodoContinueBreak extends ArbolSintactico{
                 }
                 else{
                     String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
-                    assembler += "FLD " +lexemaIzq;
+                    assembler += "FLD " +lexemaIzq + '\n';
                     assembler += "FSTP " + auxVar+ '\n';
                     this.setVarRetorno(auxVar);
                     Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");

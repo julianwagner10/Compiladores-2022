@@ -16,7 +16,6 @@ fun f1(i32 y,f32 z):i32{
         return y;
     }
     return y ;
-    }
 }
 discard f1(23,2.2);
 }

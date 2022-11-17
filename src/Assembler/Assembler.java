@@ -126,13 +126,14 @@ public class Assembler {
             for (String am : Main.listaDeAmbitos) {
                 if (!am.equals("main")) {
                     String idFuncion = Main.tablaDeSimbolos.getFuncionMedianteAmbito( am.substring(0,am.lastIndexOf(".")),funcionesGeneradas);
-                    this.assemblerCode += idFuncion.replace('.','_') + ":" + '\n';
-                    this.getArbolDeMasIzq(raiz, am);
+                    this.assemblerCode += idFuncion.replace('.','_') + ":" + '\n'; //Reemplazo por sintaxis aceptada por assembler
+                    String subId = idFuncion.substring(0, idFuncion.indexOf(".", 0)); //Obtengo el nombre de la funcion sin nameMangling
+                    am = Main.tablaDeSimbolos.getAtributosTablaS(idFuncion).getAmbito() +"."+subId; //Recreo el ambito interno de cada funcion para poder generar assembler independiente de cada una.
+                    this.getArbolDeMasIzq(raiz, am); //Creo assembler para cada funcion en base a su ambito interno.
                     this.assemblerCode += "ret" + '\n';
                     this.assemblerCode += '\n';
                 }
             }
         }
     }
-
 }

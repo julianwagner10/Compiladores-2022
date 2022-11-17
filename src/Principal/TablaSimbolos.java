@@ -137,8 +137,6 @@ public class TablaSimbolos {
             aux2 = aux2.replace(".","");
             aux = aux.substring(0, aux.lastIndexOf("."));
 
-            System.out.println("aux "+aux);
-            System.out.println("Aux 2 "+aux2);
             if (aux2.equals(id))
                 return false;
         }
@@ -181,9 +179,11 @@ public class TablaSimbolos {
         while (iterator.hasMoreElements()) {
             String posibleFuncionARetornar = (String) iterator.nextElement();
             AtributosTablaS ats = tablaSimbolos.get(posibleFuncionARetornar);
-            if (ats.getAmbito().equals(ambito) && ats.getUso().equals("nombreFuncion") && !funcionesGeneradas.contains(posibleFuncionARetornar)) {
-                funcionesGeneradas.add(posibleFuncionARetornar);
-                return posibleFuncionARetornar;
+            if(ats.getUso().equals("nombreFuncion")) {
+                if (ats.getAmbito().equals(ambito) &&!funcionesGeneradas.contains(posibleFuncionARetornar)){
+                    funcionesGeneradas.add(posibleFuncionARetornar);
+                    return posibleFuncionARetornar;
+                }
             }
         }
         return null;
@@ -192,7 +192,7 @@ public class TablaSimbolos {
     public boolean getTipoFuncionDeRetorno(String ambito,String tipo){ //Este metodo compara el tipo de la expresion aritmetica a retornar, con el tipo de la funcion que contiene ese retorno.
         Enumeration iterator = tablaSimbolos.keys();
         if(!ambito.equals("main")) {
-            String ambitoAux = ambito.substring(ambito.lastIndexOf(".")+1,ambito.length());
+            String ambitoAux = ambito.substring(ambito.lastIndexOf(".")+1); //obtengo el nombre de la funcion en base a un ambito dado, gracias al namemangling.
             String nombreFuncion = ambitoAux +"."+ ambito.substring(0,ambito.lastIndexOf(".")); //Recreo la funcion a traves del ambito.
             while (iterator.hasMoreElements()) {
                 String simbolo = (String) iterator.nextElement();
@@ -206,11 +206,9 @@ public class TablaSimbolos {
     }
 
     public String getValorDeRetornoDeFuncion(String idFuncion){
-
-        String subNombreFuncion = idFuncion.substring(0,idFuncion.lastIndexOf("."));
-        String ambitoRetorono = Main.tablaDeSimbolos.getAtributosTablaS(idFuncion).getAmbito()+"."+subNombreFuncion;
-
-        Enumeration iterator = this.tablaSimbolos.keys();
+        String subNombreFuncion = idFuncion.substring(0, idFuncion.indexOf(".", 0)); //Obtengo el nombre de la funcion sin nameMangling
+        String ambitoRetorono = Main.tablaDeSimbolos.getAtributosTablaS(idFuncion).getAmbito() + "." + subNombreFuncion; //recreo el ambito del valor a retornar entre el ambito de la funcion y el nombre de la misma
+        Enumeration iterator = this.tablaSimbolos.keys();                                                               // por ej: si el ambito de la funcion es main.f1 y el nombre de la funcion es f2, el ambito del retorno va a ser main.f1.f2
         while (iterator.hasMoreElements()) {
             String valorSalida = (String) iterator.nextElement();
             AtributosTablaS ats = this.tablaSimbolos.get(valorSalida);

@@ -19,7 +19,7 @@ public class NodoAsignacion extends ArbolSintactico{
         String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
         String lexemaDer = null;
         if(this.getLexema().equals("Asignacion"))
-            if(this.getHijoDer().getLexema().equals("Invocacion")){ //Aqui obtengo el valor de retorno de una funcion, cuando se invoca a una funcion en una asignacion.
+            if(this.getHijoDer().getLexema().equals("Invocacion")){ //Aqui obtengo el valor de retorno de una funcion, cuando se la invoca en una asignacion.
                 String idFuncion = this.getHijoDer().getHijoIzq().getLexema();
                 lexemaDer = Main.tablaDeSimbolos.getValorDeRetornoDeFuncion(idFuncion.replace('_','.'));
             }

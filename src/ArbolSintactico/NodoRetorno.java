@@ -28,6 +28,7 @@ public class NodoRetorno extends ArbolSintactico{
                 assembler += "FSTP " + auxVar+ '\n';
                 Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableRetorno",this.getAtributo().getAmbito());
             }
+            this.contador++;
         }
         return assembler;
     }

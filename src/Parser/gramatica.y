@@ -386,6 +386,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                            Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
                                            AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                            atributosId.setAmbito(ambito);
+                                           atributosId.setTipo(Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo());
                                            Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                            AtributosTablaS atributos = new AtributosTablaS("AsignacionConControl");
                                            atributos.setAmbito(ambito);
@@ -560,7 +561,7 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                                 }
                                             }
                                             else
-                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] error de invocacion de la funcion " + $1.sval +  ", ya sea porque no existe o porque se esta autoinvocando ");
+                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] error de invocacion de la funcion " + $1.sval +  ", ya sea porque no existe, no es alcanzable desde aqui o porque se esta autoinvocando ");
                                             }
            | ID '('  ')' {  String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                             if(ambitoCheck != null){
