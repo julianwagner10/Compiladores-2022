@@ -2,12 +2,12 @@ ControlComoExpresionBienDef{
 i32 id,x;
 f32 a1,z;
 a1 =: for (id=:2 ; id>4 ; +2){
-        z=: x;
+        z=: ;
         if(x>z)then
             break z;
         end_if;
         }
         else
-            46.5;
+            46;
         ;
 }

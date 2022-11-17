@@ -465,7 +465,8 @@ termino : termino '*' factor { Main.informesSintacticos.add("[Parser | Linea " +
 	                          $$.arbol = new NodoDivision($1.arbol,$3.arbol,atributos);
 	                          $$.sval = $3.sval;
 	                          }
-	    | factor{$$.arbol = $1.arbol;}
+	    | factor{$$.arbol = $1.arbol;
+	             $$.sval = $1.sval;}
 	    | error_termino
         ;
 
@@ -504,9 +505,8 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                         }
                    }
         | invocacion {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco una funcion en una expresion aritmetica");
-                      AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
-                      atributosId.setAmbito(ambito);
-                      $$.arbol = new NodoHoja(atributosId);
+                      $$.arbol = $1.arbol;
+                      $$.sval = $1.sval;
                       }
         | '-' CTE_INT {if (chequearNegativos() == true){
                        AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS("-"+$2.sval);
@@ -546,6 +546,7 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                                             lexInvocacion.setAmbito(ambito);
                                                             AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                                             $$.arbol = new NodoInvocacion(new NodoHoja(lexID),$3.arbol,lexInvocacion);
+                                                            $$.sval = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                                                         }
                                                         else{
                                                             Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] el tipo de los parametros invocados no coinciden con los de la funcion a invocar");
@@ -568,6 +569,7 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                     AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
                                     AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                     $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);
+                                    $$.sval = ambitoCheck;
                                 }
                                 else
                                     Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] flatan el/los parametros en la invocacion ");

@@ -20,13 +20,13 @@ public class NodoRetorno extends ArbolSintactico{
                 assembler += "MOV EBX, " + operador +'\n';
                 String auxVar = "_var" + this.contador;
                 assembler += "MOV " + auxVar + ", EBX" + '\n';// Muevo a la variable.
-                Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "Variable");
+                Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableRetorno",this.getAtributo().getAmbito());
             }
             else{
                 assembler += "FLD " + operador+ '\n';
                 String auxVar = "_var" + this.contador;
                 assembler += "FSTP " + auxVar+ '\n';
-                Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");
+                Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableRetorno",this.getAtributo().getAmbito());
             }
         }
         return assembler;

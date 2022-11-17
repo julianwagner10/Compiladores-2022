@@ -73,6 +73,7 @@ public class TablaSimbolos {
             }
         }
     }
+
     public void setSimbolo(String lexema, int id, String tipo,String uso) {
 
         if (tablaSimbolos.containsKey(lexema))
@@ -84,6 +85,19 @@ public class TablaSimbolos {
             }
         }
     }
+
+    public void setSimbolo(String lexema, int id, String tipo,String uso,String ambito) {
+
+        if (tablaSimbolos.containsKey(lexema))
+            System.out.println("[Lexico | linea " + Lexico.linea + "] Se detecto un lexema ya existente en la tabla de simbolos, con valor -> " + lexema);
+        else {
+            if (!this.esPalabraReservada(lexema)) {
+                AtributosTablaS at = new AtributosTablaS(id, tipo, uso, ambito, lexema);
+                tablaSimbolos.put(lexema, at);
+            }
+        }
+    }
+
     public void mostrarTablasimbolos() {
         Enumeration iterator = tablaSimbolos.keys();
         while (iterator.hasMoreElements()) {
@@ -189,6 +203,22 @@ public class TablaSimbolos {
             }
         }
         return false;
+    }
+
+    public String getValorDeRetornoDeFuncion(String idFuncion){
+
+        String subNombreFuncion = idFuncion.substring(0,idFuncion.lastIndexOf("."));
+        String ambitoRetorono = Main.tablaDeSimbolos.getAtributosTablaS(idFuncion).getAmbito()+"."+subNombreFuncion;
+
+        Enumeration iterator = this.tablaSimbolos.keys();
+        while (iterator.hasMoreElements()) {
+            String valorSalida = (String) iterator.nextElement();
+            AtributosTablaS ats = this.tablaSimbolos.get(valorSalida);
+                if(ats.getAmbito().equals(ambitoRetorono)&&(ats.getUso().equals("VariableRetorno"))){
+                    return ats.getLexema();
+            }
+        }
+        return null;
     }
 
 }

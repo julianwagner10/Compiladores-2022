@@ -1,14 +1,17 @@
 InvocacionCorrecta{
 
+i32 t;
+
 fun f1(i32 y,f32 z):i32{
     i32 x;
     if(x<y)then{
-        y =: y+2;
+        z =: z+y;
     }
     else
-        y=: x;
+        z=: y;
     end_if;
-    return y ;
+    return x ;
 }
+
 discard f1(23,2.2);
 }
