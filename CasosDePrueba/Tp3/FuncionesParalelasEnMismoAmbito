@@ -1,0 +1,27 @@
+Funciones{
+i32 y;
+f32 k;
+fun f2(f32 z):i32{
+    i32 x;
+    if(x<y)then{
+        x =:y;
+        y=: y + 2;
+    }
+    else
+        y=: x;
+    end_if;
+    return y/x;
+}
+fun f3(i32 w):f32{
+    f32 t;
+    if(w<y)then{
+        y=: y + 2;
+        w =:y;
+    }
+    end_if;
+    return t;
+}
+
+discard f2(25.5);
+k =: f3(24);
+}

@@ -12,6 +12,7 @@ fun f1(i32 y,i32 v):i32{
         end_if;
         return y/x;
     }
+    x =: x+3;
     fun f3(i32 w):f32{
         f32 t;
         if(w<y)then{
