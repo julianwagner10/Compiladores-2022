@@ -1,0 +1,15 @@
+ConversionImplicita{
+i32 x;
+f32 y;
+y =: x;
+
+fun f3(i32 w):i32{
+    f32 t;
+    if(t<w)then{
+        w =: w+5;
+    }
+    end_if;
+    return w;
+}
+y =: f3(22);
+}

@@ -14,7 +14,8 @@ public class NodoFor extends ArbolSintactico{
     @Override
     public String generarCodigoAssembler() {
         String assembler = "";
-        assembler += this.etiquetaDeSalto.pop() + ":" + '\n';
+        if(!this.etiquetaDeSalto.isEmpty())
+            assembler += this.etiquetaDeSalto.pop() + ":" + '\n';
         return assembler;
 
     }

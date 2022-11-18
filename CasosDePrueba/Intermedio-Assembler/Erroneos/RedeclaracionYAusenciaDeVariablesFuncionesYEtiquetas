@@ -1,0 +1,22 @@
+RedeclaracionYAusencia{
+i32 x;
+f32 x;
+
+fun f1(f32 z):i32{
+    x=:t;
+    outer : for (id=:0 ; id<=84 ; +3){
+                for(x=:0; x<=id; +1){
+                    t =: x+10;
+                    continue : outerrr;
+                };
+               };
+    return t;
+}
+
+fun f1():f32{
+    f32 y;
+    y=:2.5;
+    return y;
+}
+
+}

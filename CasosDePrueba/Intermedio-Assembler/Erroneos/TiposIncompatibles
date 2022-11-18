@@ -1,0 +1,27 @@
+TiposIncompatibles{
+i32 x,a1,id;
+f32 y,z;
+x=:y+3;
+x=:y/25;
+x=:45.6;
+
+fun f1():f32{
+    f32 z;
+    if(x<10)then{
+        z =: z/y;
+    }
+    end_if;
+    return z ;
+}
+
+a1 =: for (id=:2 ; id>4 ; +2){
+        if(y>z)then
+            break z;
+        end_if;
+        }
+        else
+            46.5;
+        ;
+
+x=: f1();
+}

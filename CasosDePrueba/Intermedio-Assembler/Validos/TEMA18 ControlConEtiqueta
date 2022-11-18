@@ -1,0 +1,9 @@
+ControlConEtiqueta{
+i32 id,x,z;
+outer : for (id=:0 ; id<=84 ; +3){
+            outer2 : for(x=:0; x<=id; +1){
+                        continue : outer2;
+            };
+            continue : outer;
+           };
+}

@@ -26,15 +26,13 @@ public class NodoContinueBreak extends ArbolSintactico{
             case ("continue"):
                 if(!NodoFor.etiquetaDeSalto.empty()) {
                     label = NodoFor.etiquetaDeSalto.pop();
-                    label1 = NodoFor.etiquetaDeSalto.pop();
-                    assembler += "JMP " + label1 + '\n';
+                    if(!NodoFor.etiquetaDeSalto.empty()) {
+                        label1 = NodoFor.etiquetaDeSalto.pop();
+                        assembler += "JMP " + label1 + '\n';
+                        NodoFor.etiquetaDeSalto.push(label1); //Vuelvo a setear las etiquetas como estaban antes del salto
+                    }
                     NodoFor.etiquetaDeSalto.push(label);
-                    NodoFor.etiquetaDeSalto.push(label1);
                 }
-                break;
-            case ("continue con etiquetado"):
-                assembler += "JMP " + this.getHijoDer().getLexemaReemplazado() + '\n';
-                this.setId(this.getHijoDer().getLexema());
                 break;
             case ("break retorno"):
             case("valor por defecto"):

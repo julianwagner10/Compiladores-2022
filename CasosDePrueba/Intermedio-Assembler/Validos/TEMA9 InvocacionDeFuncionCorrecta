@@ -1,6 +1,7 @@
 InvocacionCorrecta{
 
 i32 t;
+f32 w;
 
 fun f1(i32 y,f32 z):i32{
     i32 x;
@@ -14,4 +15,5 @@ fun f1(i32 y,f32 z):i32{
 }
 
 discard f1(23,2.2);
+w =: f1(25,3.4);
 }

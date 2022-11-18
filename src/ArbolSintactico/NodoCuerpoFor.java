@@ -12,11 +12,14 @@ public class NodoCuerpoFor extends ArbolSintactico{
     public String generarCodigoAssembler() {
 
         String assembler = "";
-        String label = NodoFor.etiquetaDeSalto.pop();
-        String label1 = NodoFor.etiquetaDeSalto.pop();
-        assembler += "JMP " + label1 + '\n';
-        NodoFor.etiquetaDeSalto.push(label);
-
+        if(!NodoFor.etiquetaDeSalto.isEmpty()) {
+            String label = NodoFor.etiquetaDeSalto.pop();
+            if(!NodoFor.etiquetaDeSalto.isEmpty()) {
+                String label1 = NodoFor.etiquetaDeSalto.pop();
+                assembler += "JMP " + label1 + '\n';
+            }
+            NodoFor.etiquetaDeSalto.push(label);
+        }
         return assembler;
 
     }

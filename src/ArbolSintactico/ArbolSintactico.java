@@ -2,6 +2,9 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 import Assembler.Assembler;
+
+import java.sql.SQLOutput;
+
 public abstract class ArbolSintactico {
     private ArbolSintactico hijoIzq = null;
     private ArbolSintactico hijoDer = null;
@@ -122,7 +125,7 @@ public abstract class ArbolSintactico {
                 return "JGE";
             case "<=":
                 return "JG";
-            case "==":
+            case "=":
                 return "JNE";
             case "!=":
                 return "JE";
@@ -140,7 +143,7 @@ public abstract class ArbolSintactico {
                 return "JAE";
             case "<=":
                 return "JA";
-            case "==":
+            case "=":
                 return "JNE";
             case "!=":
                 return "JE";

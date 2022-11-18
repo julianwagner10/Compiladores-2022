@@ -2,6 +2,7 @@ package ArbolSintactico;
 
 import Principal.AtributosTablaS;
 import Principal.Main;
+import Principal.Lexico;
 
 public class NodoAsignacion extends ArbolSintactico{
 
@@ -44,16 +45,17 @@ public class NodoAsignacion extends ArbolSintactico{
     public void chequearCompatiblidadTipo(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
         String tipoIzq = hijoIzq.getTipo();
         String tipoDer = hijoDer.getTipo();
-        if (tipoIzq.equals(tipoDer) || hijoDer.getLexema().equals("Invocacion"))
+        if (tipoIzq.equals(tipoDer) ) {
             super.setTipo(tipoIzq);
+        }
         else{
             if (tipoIzq.equals("f32")){
                 super.setTipo("f32");
+                Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se realizo una conversion de "+hijoDer.getTipo()+", a "+tipoIzq);
                 hijoDer.setTipo("f32");
             }else{
                 super.setTipo(null);
             }
-
         }
     }
 

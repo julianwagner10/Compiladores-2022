@@ -1,0 +1,17 @@
+ViolacionDeAlcance{
+i32 x,y,z;
+
+fun f1():i32{
+     i32 w;
+     y=:x;
+     fun f2():i32{
+        i32 x;
+        x =:y;
+        return x;
+     }
+     return y;
+}
+
+z=: f2();
+y=:y+w;
+}

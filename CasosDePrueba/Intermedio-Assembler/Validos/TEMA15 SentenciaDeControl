@@ -1,0 +1,16 @@
+SentenciaDeControl{
+i32 x,y,id,w;
+for (id=:2 ; id<=10 ; +2){
+    for (w=:0 ; w<=id ; +1){
+        if(y=w)then
+            y =: y-w;
+        end_if;
+    };
+    x=:y+2;
+    if(x<y)then
+        continue;
+    else
+        break;
+    end_if;
+};
+}

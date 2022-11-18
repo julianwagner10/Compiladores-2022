@@ -1,0 +1,19 @@
+DiferentesAsignaciones{
+
+f32 k;
+k =: k + 2.5;
+
+fun f1(i32 y,f32 z):f32{
+    i32 x;
+    if(x<y)then{
+        z=:z-5;
+        z =: z/y;
+    }
+    else
+        z=: y;
+    end_if;
+    return z ;
+}
+
+k =:f1(23,2.2);
+}

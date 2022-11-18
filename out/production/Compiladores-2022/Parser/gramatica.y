@@ -109,6 +109,7 @@ error_lista_de_variables : lista_de_variables ID {Main.erroresSintacticos.add("E
 funcion : declaracion_fun '{'bloque'}' {Main.informesSintacticos.add("[Parser | linea " + Lexico.linea + "] se declaro una funcion de forma correcta");
 								        Main.listaDeAmbitos.add(ambito);
 								        $$.arbol = $3.arbol;
+								        lista_parametros.clear();
 								        if(!ambito.equals("main")){
                                         	ambito = ambito.substring(0,ambito.lastIndexOf("."));
                                         }
@@ -376,7 +377,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                                     }
                                                 }
                                                 }else
-                                                Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
+                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] falta la declaracion de "+$1.sval);
                                                 }
 
            | ID ASIGNACION control cuerpo_else {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
@@ -402,7 +403,7 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] asignacion con tipo incompatibles ");
                                            }
                                     }else
-                                        Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
+                                        Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "]  falta la declaracion de "+$1.sval);
                                    }
                                    }
            | error_asignacion
@@ -415,7 +416,7 @@ error_asignacion : ID error expresion_aritmetica {Main.erroresSintacticos.add("E
                  | ASIGNACION control cuerpo_else {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el identificador en la asignacion");}
                  ;
 
-retorno : RETURN expresion_aritmetica { if(Main.tablaDeSimbolos.getTipoFuncionDeRetorno(ambito,$2.sval)){
+retorno : RETURN expresion_aritmetica {if(Main.tablaDeSimbolos.getTipoFuncionDeRetorno(ambito,$2.sval)){
                                             AtributosTablaS retorno = new AtributosTablaS("RETURN");
                                             retorno.setAmbito(ambito);
                                             $$.arbol = new NodoRetorno($2.arbol,null,retorno);
@@ -488,7 +489,7 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                   $$.sval = tipoId;
               }
               else{
-                    Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
+                    Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] falta la declaracion de "+$1.sval);
                     $$.arbol = null;
                     }
               }
@@ -545,6 +546,7 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                                                             AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion");
                                                             lexInvocacion.setAmbito(ambito);
+                                                            lexInvocacion.setTipo(Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo());
                                                             AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                                             $$.arbol = new NodoInvocacion(new NodoHoja(lexID),$3.arbol,lexInvocacion);
                                                             $$.sval = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
@@ -560,23 +562,32 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                                     }
                                                 }
                                             }
-                                            else
+                                            else{
                                                 Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] error de invocacion de la funcion " + $1.sval +  ", ya sea porque no existe, no es alcanzable desde aqui o porque se esta autoinvocando ");
+                                                $$.arbol = null;
+                                                }
                                             }
            | ID '('  ')' {  String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
-                            if(ambitoCheck != null){
+                            boolean recursionCheck = Main.tablaDeSimbolos.chequearRecursionFuncion($1.sval,ambito);
+                            if((ambitoCheck != null)&& (recursionCheck)){
                                 if(lista_parametros.size() == lista_parametros_reales.size()){
                                     Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se invoco la funcion -> " + $1.sval);
                                     AtributosTablaS lexInvocacion = new AtributosTablaS("Invocacion sin parametros");
+                                    lexInvocacion.setAmbito(ambito);
+                                    lexInvocacion.setTipo(Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo());
                                     AtributosTablaS lexID = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
                                     $$.arbol = new NodoInvocacion(new NodoHoja(lexID),null,lexInvocacion);
-                                    $$.sval = ambitoCheck;
+                                    $$.sval = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                                 }
-                                else
-                                    Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] flatan el/los parametros en la invocacion ");
+                                else{
+                                    Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] faltan el/los parametros en la invocacion ");
+                                    $$.arbol = null;
+                                }
                             }
-                            else
-                              Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
+                            else{
+                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito o se quiere autoinvocar la misma ");
+                                $$.arbol = null;
+                            }
                          }
            | error_invocacion
            ;
@@ -625,7 +636,7 @@ factor_invocacion 	: ID { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbi
                           $$.arbol = new NodoHoja(atributos);
                           $$.sval = $1.sval;
                           }else{
-                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
+                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] falta la declaracion de "+$1.sval);
                             $$.arbol = null;
                           }
                           }
@@ -831,7 +842,7 @@ asignacion_for: ID ASIGNACION CTE_INT { String ambitoCheck = Main.tablaDeSimbolo
                                             String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                                             if(tipoId.equals("i32")){
                                                 if (chequearRangoEnteros()==true){
-                                                    AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS($1.sval+"."+ambito);
+                                                    AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
                                                     atributos.setAmbito(ambito);
                                                     Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                     AtributosTablaS atributos2 = new AtributosTablaS("Asignacion FOR");
@@ -857,7 +868,7 @@ asignacion_for: ID ASIGNACION CTE_INT { String ambitoCheck = Main.tablaDeSimbolo
                                             }
                                         }
                                         else{
-                                            Main.erroresSemanticos.add("Error semantico: Linea " + Lexico.linea + " falta la declaracion de "+$1.sval);
+                                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] falta la declaracion de "+$1.sval);
                                             $$.arbol= null;
                                         }
                                         }

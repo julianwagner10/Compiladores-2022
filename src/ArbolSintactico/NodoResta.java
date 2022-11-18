@@ -14,7 +14,7 @@ public class NodoResta extends NodoOperacion{
     public String generarCodigoAssembler() {
         String assembler = "";
         if (this.getTipo().equals("i32")) {
-            assembler += "MOV EBX, _" + this.getHijoIzq().getLexema() + '\n';
+            assembler += "MOV EBX, _" + this.getHijoIzq().getLexemaReemplazado() + '\n';
             assembler += "SUB EBX, _" + this.getHijoDer().getLexema() + '\n';
             assembler += "CMP EBX, _limiteInferioINT" + '\n'; // Comparo que no exceda el rango.
             assembler += "JA " + "Error_Suma_Enteros" + '\n'; // Si excede salto.

@@ -11,21 +11,24 @@ public class NodoOperacion extends ArbolSintactico{
 
     @Override
     public String generarCodigoAssembler() {
-        return null;
+        String assembler = "";
+        return assembler;
     }
 
     public void chequearCompatiblidadTipo(ArbolSintactico hijoIzq, ArbolSintactico hijoDer) {
-        String tipoIzq = hijoIzq.getTipo();
-        String tipoDer = hijoDer.getTipo();
-        if (tipoIzq.equals(tipoDer))
-            super.setTipo(tipoIzq);
-        else{
-            if (tipoIzq.equals("f32")){
-                super.setTipo("f32");
-                hijoDer.setTipo("f32");
-            }else{
-                super.setTipo("f32");
-                hijoIzq.setTipo("f32");
+        if(hijoIzq != null && hijoDer != null ) {
+            String tipoIzq = hijoIzq.getTipo();
+            String tipoDer = hijoDer.getTipo();
+            if (tipoIzq.equals(tipoDer))
+                super.setTipo(tipoIzq);
+            else {
+                if (tipoIzq.equals("f32")) {
+                    super.setTipo("f32");
+                    hijoDer.setTipo("f32");
+                } else {
+                    super.setTipo("f32");
+                    hijoIzq.setTipo("f32");
+                }
             }
         }
     }

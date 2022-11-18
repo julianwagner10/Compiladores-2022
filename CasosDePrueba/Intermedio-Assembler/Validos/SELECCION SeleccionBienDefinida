@@ -6,8 +6,10 @@ y=:2;
 if (x>25) then{
     y=: x;
     }
-    else{
+else{
     y=:20;
-    }
+}
 end_if;
+
+out('se detecto una sentencia de control');
 }

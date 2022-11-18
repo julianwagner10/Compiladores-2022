@@ -1,9 +1,9 @@
-InvocacionCorrecta{
-f32 w,t;
+InvocacionIncorrecta{
+f32 w,t,z;
 t =: t + w;
 
-fun f1(i32 y,f32 z):i32{
-    i32 x;
+fun f1():i32{
+    i32 x,y;
     if(x<y)then{
         y =: y+2;
     }
@@ -12,10 +12,10 @@ fun f1(i32 y,f32 z):i32{
     end_if;
 
     fun f2(i32 y,f32 z):i32{
-        discard f1(23,2.2);
+        discard f1();
         return y;
     }
     return y ;
 }
-discard f1(23,2.2);
+discard f1();
 }
