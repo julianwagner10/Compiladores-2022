@@ -677,6 +677,7 @@ seleccion : IF '(' condicion ')' cuerpo_if {Main.informesSintacticos.add("[Parse
           | error_seleccion
           ;
 
+
 error_seleccion: '(' condicion ')' cuerpo_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la palabra reservada IF ");}
                | IF condicion ')' cuerpo_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta el '(' de la sentencia IF ");}
                | IF '(' ')' cuerpo_if  {Main.erroresSintacticos.add("Error sináctico: Linea " + Lexico.linea + " falta la condicion de la sentencia IF ");}
