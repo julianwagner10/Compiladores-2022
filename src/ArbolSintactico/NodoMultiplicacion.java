@@ -16,11 +16,11 @@ public class NodoMultiplicacion extends NodoOperacion {
         if (this.getTipo().equals("i32")) {
 
             assembler += "MOV EAX, " + this.getHijoIzq().getLexema() + '\n';
-            assembler += "MUL " + this.getHijoDer().getLexema() + '\n';
+            assembler += "IMUL " + this.getHijoDer().getLexema() + '\n';
             String auxVar = "_var" + this.contador;
             assembler += "MOV " + auxVar + ", EAX" + '\n';// Muevo a la variable.
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "Variable");
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable"); //Transformo a flotante porque el resultado es de 64 bits.
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);

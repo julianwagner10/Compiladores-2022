@@ -17,11 +17,8 @@ public class Assembler {
 
 
     private static final long limiteSuperiorint = 2147483647;
-    private static final long limiteInferiorint = -2147483648;
-    private static final float limiteInferiorFloatPositivo = 1.17549435f-38;
     private static final float limiteSuperiorFloatPositivo = 3.40282347f+38;
-    private static final float limiteInferiorFloatNegativo = -1.17549435f-38;
-    private static final float limiteSuperiorFloatNegativo = -3.40282347f+38;
+
 
     public Assembler(ArbolSintactico arbol){
         this.arbol = arbol;
@@ -35,16 +32,12 @@ public class Assembler {
 
         this.assemblerData += ".data" + '\n';
         this.assemblerData += "_limiteSuperiorInt DD " + limiteSuperiorint + '\n';
-        this.assemblerData += "_limiteInferiorInt DD " + limiteInferiorint + '\n';
-        this.assemblerData += "_limiteInferiorFloatPositivo DQ " + limiteInferiorFloatPositivo + '\n';
         this.assemblerData += "_limiteSuperiorFloatPositivo DQ " + limiteSuperiorFloatPositivo + '\n';
-        this.assemblerData += "_limiteInferiorFloatNegativo DQ " + limiteInferiorFloatNegativo + '\n';
-        this.assemblerData += "_limiteSuperiorFloatNegativo DQ " + limiteSuperiorFloatNegativo + '\n';
+
 
 
         this.assemblerData += "_errorOverflowInt" + " DB " + "\"Error suma enteros\", 0" + '\n';
         this.assemblerData += "_errorOverflowFloat" + " DB " + "\"Error suma flotante\" , 0" + '\n';
-        this.assemblerData += "_errorRecursionPropia" + " DB " + "\"Error en invocacion a funcion, se detecto una recursion de la misma\" , 0" + '\n';
 
         this.assemblerCode += ".code" + '\n';
 
@@ -54,10 +47,7 @@ public class Assembler {
         this.assemblerCode += "Error_Suma_Flotantes:"+ '\n';
         this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowFloat, addr _errorOverflowFloat, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
-        this.assemblerCode += "Error_Invocacion_Funcion:"+ '\n';
-        this.assemblerCode += "invoke MessageBox, NULL, addr _errorRecursionPropia, addr _errorRecursionPropia, MB_OK"+ '\n';
-        this.assemblerCode += "invoke ExitProcess, 0" + '\n';
-        this.assemblerCode += '\n';
+
 
         this.generarFunciones(this.arbol); //Genero todos los subprocesos, es decir, las funciones.
 

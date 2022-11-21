@@ -16,8 +16,6 @@ public class NodoResta extends NodoOperacion{
         if (this.getTipo().equals("i32")) {
             assembler += "MOV EBX, _" + this.getHijoIzq().getLexemaReemplazado() + '\n';
             assembler += "SUB EBX, _" + this.getHijoDer().getLexema() + '\n';
-            assembler += "CMP EBX, _limiteInferioINT" + '\n'; // Comparo que no exceda el rango.
-            assembler += "JA " + "Error_Suma_Enteros" + '\n'; // Si excede salto.
             String auxVar = "_var" + this.contador;
             assembler += "MOV " + auxVar + ", EBX" + '\n';// Muevo a la variable.
 
