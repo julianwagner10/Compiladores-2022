@@ -36,7 +36,6 @@ public class NodoAsignacionFor extends ArbolSintactico{
         else{
             if (tipoIzq.equals("f32")){
                 super.setTipo("f32");
-                hijoDer.setTipo("f32");
             }else{
                 super.setTipo(null);
             }

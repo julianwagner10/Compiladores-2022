@@ -58,7 +58,6 @@ public class NodoAsignacion extends ArbolSintactico{
             if (tipoIzq.equals("f32")){
                 super.setTipo("f32");
                 Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se realizo una conversion de "+hijoDer.getTipo()+", a "+tipoIzq);
-                hijoDer.setTipo("f32");
             }else{
                 super.setTipo(null);
             }

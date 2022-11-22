@@ -36,9 +36,26 @@ public class NodoResta extends NodoOperacion{
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");
 
+            if (this.getHijoIzq().getTipo().equals(this.getHijoDer().getTipo())){
+                assembler += "FLD _" + lexemaIzq+ '\n';
+                assembler += "FSUB _" + lexemaDer+ '\n';
+            }
+            else{
+                if(this.getHijoIzq().getTipo().equals("i32")){
+                    assembler += "FILD _" + lexemaIzq + '\n';
+                    assembler += "FSUB _" + lexemaDer+ '\n';
+                }
+                else{
+                    String conversion = "_var" + this.contador;
+                    Main.tablaDeSimbolos.setSimbolo(conversion, Lexico.ID, "f32", "VariableAuxiliar");
+                    assembler += "FILD _" + lexemaDer + '\n';
+                    assembler += "FSTP _" + conversion+ '\n';
+                    assembler += "FLD _" + lexemaIzq + '\n';
+                    assembler += "FSUB _" + conversion + '\n';
+                    this.contador++;
+                }
+            }
 
-            assembler += "FLD _" + lexemaIzq+ '\n';
-            assembler += "FSUB _" + lexemaDer+ '\n';
 
             String auxVar = "_var" + this.contador;
             assembler += "FSTP _" + auxVar+ '\n';

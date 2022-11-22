@@ -36,8 +36,22 @@ public class NodoMultiplicacion extends NodoOperacion {
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");
 
-            assembler += "FLD _" + lexemaIzq+ '\n';
-            assembler += "FMUL _" + lexemaDer+ '\n';
+            if (this.getHijoIzq().getTipo().equals(this.getHijoDer().getTipo())){
+                assembler += "FLD _" + lexemaIzq+ '\n';
+                assembler += "FMUL _" + lexemaDer+ '\n';
+            }
+            else{
+                if(this.getHijoIzq().getTipo().equals("i32")){
+                    assembler += "FILD _" + lexemaIzq + '\n';
+                    assembler += "FMUL _" + lexemaDer+ '\n';
+                }
+                else{
+                    assembler += "FILD _" + lexemaDer + '\n';
+                    assembler += "FMUL _" + lexemaIzq+ '\n';
+                }
+            }
+
+
 
             String auxVar = "_var" + this.contador;
             assembler += "FSTP _" + auxVar+ '\n';

@@ -14,16 +14,16 @@ fun f1(i32 y,i32 v):i32{
         return y;
     }
     x =: f2(2.5);
-    fun f3(i32 w):i32{
-        i32 t;
+    fun f3(i32 w,f32 p):i32{
         if(w<y)then{
             y=: y + 2;
             w =:y;
+            p=: p - w;
         }
         end_if;
-        return t;
+        return w;
     }
-    y =: f3(45);
+    y =: f3(45,3.4);
     return x;
 }
 

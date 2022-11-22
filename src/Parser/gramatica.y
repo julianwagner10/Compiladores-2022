@@ -562,10 +562,16 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                                     }
                                                 }
                                             }
-                                            else{
-                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] error de invocacion de la funcion " + $1.sval +  ", ya sea porque no existe, no es alcanzable desde aqui o porque se esta autoinvocando ");
-                                                $$.arbol = null;
-                                                }
+                                                      else{
+                                                          if(ambitoCheck == null){
+                                                              Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
+                                                              $$.arbol = null;
+                                                              }
+                                                          if (!recursionCheck){
+                                                              Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] la funcion se esta queriendo autoinvocar ");
+                                                              $$.arbol = null;
+                                                          }
+                                                      }
                                             }
            | ID '('  ')' {  String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                             boolean recursionCheck = Main.tablaDeSimbolos.chequearRecursionFuncion($1.sval,ambito);
@@ -585,8 +591,14 @@ invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSim
                                 }
                             }
                             else{
-                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito o se quiere autoinvocar la misma ");
-                                $$.arbol = null;
+                                if(ambitoCheck == null){
+                                    Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe una funcion con ese nombre en este ambito ");
+                                    $$.arbol = null;
+                                    }
+                                if (!recursionCheck){
+                                    Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] la funcion se esta queriendo autoinvocar ");
+                                    $$.arbol = null;
+                                }
                             }
                          }
            | error_invocacion
