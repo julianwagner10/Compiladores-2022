@@ -72,43 +72,49 @@ public class Main{
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Informes Sintacticos :");
         System.out.println("");
-        for(String s :informesSintacticos){
+        for (String s : informesSintacticos) {
             System.out.println(s);
         }
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Informes Semanticos :");
         System.out.println("");
-        for(String s :informesSemanticos){
+        for (String s : informesSemanticos) {
             System.out.println(s);
         }
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Errores Lexicos :");
         System.out.println("");
-        for(String l :erroresLexicos){
+        for (String l : erroresLexicos) {
             System.out.println(l);
         }
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Errores Sintacticos :");
         System.out.println("");
-        for(String e :erroresSintacticos){
+        for (String e : erroresSintacticos) {
             System.out.println(e);
         }
 
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Errores Semánticos :");
         System.out.println("");
-        for(String e :erroresSemanticos){
+        for (String e : erroresSemanticos) {
             System.out.println(e);
         }
 
+        if (erroresSemanticos.isEmpty() && erroresSintacticos.isEmpty() && erroresLexicos.isEmpty()) {
 
-        System.out.println("------------------------------------------------------------------------------------");
-        System.out.println("Arbol sintáctico ");
-        System.out.println(p.printSyntacticTree());
+            System.out.println("------------------------------------------------------------------------------------");
+            System.out.println("Arbol sintáctico ");
+            System.out.println(p.printSyntacticTree());
 
-        ArbolSintactico arbol = p.returnTree();
-        Assembler assembler = new Assembler(arbol);
-        assembler.generarCodigoAssembler();
+            ArbolSintactico arbol = p.returnTree();
+            Assembler assembler = new Assembler(arbol);
+            assembler.generarCodigoAssembler();
+        }
+        else {
+            System.out.println("------------------------------------------------------------------------------------");
+            System.out.println("No se puede mostrar arbol ni codigo assembler dado que se presentan errores en el texto de entrada");
+        }
 
 
         System.out.println("------------------------------------------------------------------------------------");
