@@ -160,7 +160,10 @@ public class TablaSimbolos {
                         }
                         break;
                     case (Lexico.CADENA):
-                        assembler = assembler + "_" + lexema.replace('.','_') + " DB " + lexema + ", 0 \n";
+                        String aux = lexema;
+                        lexema = lexema.replace("'","_");
+                        lexema = lexema.replace(" ","");
+                        assembler = assembler + lexema + " DB " + aux + ", 0 \n";
                         break;
 
                     case (Lexico.CTE_INT):

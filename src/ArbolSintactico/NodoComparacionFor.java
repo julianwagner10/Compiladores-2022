@@ -15,7 +15,7 @@ public class NodoComparacionFor extends ArbolSintactico {
     @Override
     public String generarCodigoAssembler() {
         String assembler = "";
-        if((this.getHijoIzq().getUso().equals("Variable")) && (this.getHijoIzq().getLexema().equals(this.id)) ) {
+        if((this.getHijoIzq().getUso().equals("Variable")) && (this.getHijoIzq().getLexemaReemplazado().equals(this.id)) ) {
                 assembler += "MOV EBX, _" + this.getHijoIzq().getLexema() + '\n'; //Muevo el lexema de la izq al registro EBX
                 assembler += "CMP EBX, _"+ this.getHijoDer().getLexema() + '\n'; //Comparo el lexema de la derecha con lo del registro EBX
 
