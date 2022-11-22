@@ -151,10 +151,11 @@ public class TablaSimbolos {
                 switch (atributos.getIdentificador()) {
                     case (Lexico.ID):
                         if(atributos.getTipo().equals("i32")){
-                            assembler += "_" + lexema.replace('.','_') + " DD ?"  + '\n'; //32 bits
+                                assembler += "_" + lexema.replace('.','_') + " DD ?"  + '\n'; //32 bits
+
                         }
                         if(atributos.getTipo().equals("f32")) {
-                            assembler += "_" + lexema.replace('.','_') + " DQ ?"  + '\n'; //64 bits
+                                assembler += "_" + lexema.replace('.','_') + " DQ ?"  + '\n'; //64 bits
                         }
                         break;
                     case (Lexico.CADENA):

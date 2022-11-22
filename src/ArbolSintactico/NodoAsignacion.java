@@ -32,10 +32,10 @@ public class NodoAsignacion extends ArbolSintactico{
                 lexemaDer = this.variableRetorno;
             }
         if (this.getTipo().equals("i32")) {
-            assembler += "MOV EBX, " + lexemaDer + '\n';
+            assembler += "MOV EBX, _" + lexemaDer + '\n';
             assembler += "MOV _" + lexemaIzq + ", " + "EBX" + '\n';
         }else{
-            assembler += "FLD " + lexemaDer+ '\n';
+            assembler += "FLD _" + lexemaDer+ '\n';
             assembler += "FSTP _" + lexemaIzq + '\n';
         }
         this.eliminarHijos(this);

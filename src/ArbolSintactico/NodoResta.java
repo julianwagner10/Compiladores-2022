@@ -17,9 +17,9 @@ public class NodoResta extends NodoOperacion{
             assembler += "MOV EBX, _" + this.getHijoIzq().getLexemaReemplazado() + '\n';
             assembler += "SUB EBX, _" + this.getHijoDer().getLexema() + '\n';
             String auxVar = "_var" + this.contador;
-            assembler += "MOV " + auxVar + ", EBX" + '\n';// Muevo a la variable.
+            assembler += "MOV _" + auxVar + ", EBX" + '\n';// Muevo a la variable.
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "Variable");
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar");
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);
@@ -36,11 +36,11 @@ public class NodoResta extends NodoOperacion{
 
 
             assembler += "FLD _" + lexemaIzq+ '\n';
-            assembler += "FSUB " + lexemaDer+ '\n';
+            assembler += "FSUB _" + lexemaDer+ '\n';
 
             String auxVar = "_var" + this.contador;
-            assembler += "FSTP " + auxVar+ '\n';
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");
+            assembler += "FSTP _" + auxVar+ '\n';
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);

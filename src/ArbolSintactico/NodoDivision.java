@@ -15,13 +15,13 @@ public class NodoDivision extends NodoOperacion{
         String assembler = "";
         if (this.getTipo().equals("i32")) {
 
-            assembler += "MOV EAX, " + this.getHijoIzq().getLexema() + '\n';
-            assembler += "IDIV " + this.getHijoDer().getLexema() + '\n';
+            assembler += "MOV EAX, _" + this.getHijoIzq().getLexema() + '\n';
+            assembler += "IDIV _" + this.getHijoDer().getLexema() + '\n';
 
             String auxVar = "_var" + this.contador;
-            assembler += "MOV " + auxVar + ", EAX" + '\n';// Muevo a la variable.
+            assembler += "MOV _" + auxVar + ", EAX" + '\n';// Muevo a la variable.
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "Variable");
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar");
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);
@@ -35,12 +35,12 @@ public class NodoDivision extends NodoOperacion{
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");
 
-            assembler += "FLD " + lexemaIzq+ '\n';
-            assembler += "FDIV " + lexemaDer+ '\n';
+            assembler += "FLD _" + lexemaIzq+ '\n';
+            assembler += "FDIV _" + lexemaDer+ '\n';
 
             String auxVar = "_var" + this.contador;
-            assembler += "FSTP " + auxVar+ '\n';
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");
+            assembler += "FSTP _" + auxVar+ '\n';
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);

@@ -40,16 +40,16 @@ public class NodoContinueBreak extends ArbolSintactico{
                 if(this.getTipo().equals("i32")) {
                     String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
                     assembler += "MOV EBX, _"+lexemaIzq+ '\n';
-                    assembler += "MOV "+auxVar+", EBX"+ '\n';
+                    assembler += "MOV _"+auxVar+", EBX"+ '\n';
                     this.setVarRetorno(auxVar);
-                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "Variable");
+                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar");
                 }
                 else{
                     String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
-                    assembler += "FLD " +lexemaIzq + '\n';
-                    assembler += "FSTP " + auxVar+ '\n';
+                    assembler += "FLD _" +lexemaIzq + '\n';
+                    assembler += "FSTP _" + auxVar+ '\n';
                     this.setVarRetorno(auxVar);
-                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");
+                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
                 }
                 break;
         }
