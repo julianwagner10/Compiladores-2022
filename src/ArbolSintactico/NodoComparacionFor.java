@@ -19,7 +19,7 @@ public class NodoComparacionFor extends ArbolSintactico {
                 assembler += "MOV EBX, _" + this.getHijoIzq().getLexema() + '\n'; //Muevo el lexema de la izq al registro EBX
                 assembler += "CMP EBX, _"+ this.getHijoDer().getLexema() + '\n'; //Comparo el lexema de la derecha con lo del registro EBX
 
-                String label = "FOR_CMP " + ++contadorEtiquetas;
+                String label = "FOR_CMP" + ++contadorEtiquetas;
                 assembler += this.getCondicionDeSalto(this.getLexema()) + " " + label + '\n';
                 NodoFor.etiquetaDeSalto.push(label);
 

@@ -20,7 +20,7 @@ public class NodoAsignacionFor extends ArbolSintactico{
         if (this.id!=null)
             label = this.id ;
         else
-            label = "FOR_INICIO " + ++contador;
+            label = "FOR_INICIO" + ++contador;
         NodoFor.etiquetaDeSalto.push(label);
         assembler += label + ":" + '\n';
 

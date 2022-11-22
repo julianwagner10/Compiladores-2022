@@ -20,7 +20,7 @@ public class NodoExpresionLogica extends ArbolSintactico {
                 assembler += "MOV EBX, _" + this.getHijoIzq().getLexema().replace('.','_') + '\n'; //Muevo el lexema de la izq al registro EBX
                 assembler += "CMP EBX, _"+ this.getHijoDer().getLexema().replace('.','_') + '\n'; //Comparo el lexema de la derecha con lo del registro EBX
 
-                String label = "IF_CMP " + ++contadorEtiquetas;
+                String label = "IF_CMP" + ++contadorEtiquetas;
                 assembler += this.getCondicionDeSalto(this.getLexema()) + " " + label + '\n';
                 NodoIf.etiquetaDeSalto.push(label);
             }
@@ -36,7 +36,7 @@ public class NodoExpresionLogica extends ArbolSintactico {
 
                 Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "Variable");
 
-                String label = "IF_CMP " + ++contadorEtiquetas;
+                String label = "IF_CMP" + ++contadorEtiquetas;
                 assembler += this.getCondicionDeSaltoSinSigno(this.getLexema())+ " " +label + '\n';
                 NodoIf.etiquetaDeSalto.push(label);
 

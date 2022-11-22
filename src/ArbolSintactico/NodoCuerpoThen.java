@@ -20,7 +20,7 @@ public class NodoCuerpoThen extends ArbolSintactico{
         String assembler = "";
         buscarExistenciaDeBreak(this);
         if(!this.existeBreak) {
-            String label = "IF_THEN " + ++contador;  //Si estoy en el then, quiere decir que me tengo que saltear al else.
+            String label = "IF_THEN" + ++contador;  //Si estoy en el then, quiere decir que me tengo que saltear al else.
             assembler += "JMP " + label + '\n';  //Genero la etiqueta correspondiente a la bifurcacion incondicional, es decir, no voy a entrar al else.
             if (!NodoIf.etiquetaDeSalto.isEmpty()) {
                 assembler += NodoIf.etiquetaDeSalto.pop() + ":" + '\n'; //Desapilo la etiqueta correspondiente a la bifurcacion con su respectivo salto.
@@ -28,7 +28,7 @@ public class NodoCuerpoThen extends ArbolSintactico{
             }
         }
         else{
-            String label1 = "BREAK_CTRL " + ++contador;
+            String label1 = "BREAK_CTRL" + ++contador;
             assembler += "JMP " + label1 + '\n';
             NodoIf.etiquetaDeSalto.push(label1);
         }
