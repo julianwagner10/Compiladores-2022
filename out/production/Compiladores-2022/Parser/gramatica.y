@@ -184,14 +184,12 @@ error_lista_de_parametros : parametro')' {Main.erroresSintacticos.add("Error sin
                           ;
 
 parametro : tipo ID{String nuevoAmbitoId = $2.sval +"."+ambito;
-                    System.out.println("Var: " + $2.sval + "Tipo "+$1.sval);
-
                     Main.tablaDeSimbolos.modificarSimbolo($2.sval,nuevoAmbitoId);
                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoAmbitoId);
                     atributos.setTipo($1.sval);
                     atributos.setUso("nombreParametro");
                     Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoAmbitoId, atributos);
-                    $$ = new ParserVal(nuevoAmbitoId);} //copia valor
+                    $$ = new ParserVal(nuevoAmbitoId);}
           | error_parametro
           ;
 
