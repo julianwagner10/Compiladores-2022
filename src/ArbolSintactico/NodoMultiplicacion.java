@@ -15,8 +15,8 @@ public class NodoMultiplicacion extends NodoOperacion {
         String assembler = "";
         if (this.getTipo().equals("i32")) {
 
-            assembler += "MOV EAX, _" + this.getHijoIzq().getLexema() + '\n';
-            assembler += "IMUL _" + this.getHijoDer().getLexema() + '\n';
+            assembler += "MOV EAX, _" + this.getHijoIzq().getLexemaReemplazado() + '\n';
+            assembler += "IMUL _" + this.getHijoDer().getLexemaReemplazado() + '\n';
             String auxVar = "_var" + this.contador;
             assembler += "MOV _" + auxVar + ", EAX" + '\n';// Muevo a la variable.
 

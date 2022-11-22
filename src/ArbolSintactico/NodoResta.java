@@ -15,7 +15,7 @@ public class NodoResta extends NodoOperacion{
         String assembler = "";
         if (this.getTipo().equals("i32")) {
             assembler += "MOV EBX, _" + this.getHijoIzq().getLexemaReemplazado() + '\n';
-            assembler += "SUB EBX, _" + this.getHijoDer().getLexema() + '\n';
+            assembler += "SUB EBX, _" + this.getHijoDer().getLexemaReemplazado() + '\n';
             String auxVar = "_var" + this.contador;
             assembler += "MOV _" + auxVar + ", EBX" + '\n';// Muevo a la variable.
 
