@@ -148,7 +148,6 @@ public class TablaSimbolos {
         for(String key : this.tablaSimbolos.keySet()) {
                 AtributosTablaS atributos = this.tablaSimbolos.get(key);
                 String lexema = atributos.getLexema();
-            System.out.println("Lexema "+lexema + " id "+atributos.getIdentificador()+" tipo "+atributos.getTipo());
                 switch (atributos.getIdentificador()) {
                     case (Lexico.ID):
                         if(atributos.getTipo().equals("i32")){
