@@ -30,6 +30,8 @@ public class NodoResta extends NodoOperacion{
             String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
             String lexemaDer = this.getHijoDer().getLexemaReemplazado();
             lexemaIzq = lexemaIzq.replace("+","__");
+            lexemaIzq = lexemaIzq.replace('.','_');
+            lexemaIzq = lexemaIzq.replace('-','_');
             lexemaDer = lexemaDer.replace('.','_');
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");

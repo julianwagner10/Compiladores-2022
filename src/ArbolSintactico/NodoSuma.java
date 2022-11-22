@@ -34,29 +34,21 @@ public class NodoSuma extends NodoOperacion {
             String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
             String lexemaDer = this.getHijoDer().getLexemaReemplazado();
             lexemaIzq = lexemaIzq.replace("+","__");
+            lexemaIzq = lexemaIzq.replace('.','_');
+            lexemaIzq = lexemaIzq.replace('-','_');
             lexemaDer = lexemaDer.replace('.','_');
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");
-
             assembler += "FLD _" + lexemaIzq+ '\n';
             assembler += "FADD _" + lexemaDer+ '\n';
 
             assembler += "FCOMP " + "_limiteSuperiorFloatPositivo" + '\n'; //Comparo el lexema de la der con el valor guardado en ST, y se extrae el valor en ST.
 
-            String auxVarComp = "_var" + this.contador;     //Necesito la variable aux para guardar la palabra de estado en la memoria
-
-            //Estas tres instrucciones se hacen luego de hacer una comparacion en el coprocesador.
-            assembler += "FSTSW _"+auxVarComp + '\n';       //Almaceno la palabra de estado en la memoria.
-            assembler += "MOV AX, _" + auxVarComp + '\n';   //Copio el contenido en el registro AX
-            assembler += "SAHF" + '\n';                 //Almacena en los 8 bits menos significativos, del registro de indicadores, el valor del registro AH.
-
             assembler += "JA " + "Error_Suma_Flotantes" + '\n'; // Si excede salto.
-
 
             String auxVar = "_var" + this.contador;
             assembler += "FSTP _" + auxVar+ '\n';
             Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
-            Main.tablaDeSimbolos.setSimbolo(auxVarComp, Lexico.ID, "f32", "VariableAuxiliar");
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);

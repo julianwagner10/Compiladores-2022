@@ -115,8 +115,7 @@ public abstract class ArbolSintactico {
     }
 
     public String  getLexemaReemplazado(){
-        this.atributo.setLexema(this.atributo.getLexema().replace('.','_'));
-        return this.atributo.getLexema();
+        return this.atributo.getLexema().replace('.','_');
     }
 
     public String getCondicionDeSalto(String comparador) {

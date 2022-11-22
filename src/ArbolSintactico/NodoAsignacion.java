@@ -19,6 +19,9 @@ public class NodoAsignacion extends ArbolSintactico{
         String assembler = "";
         String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
         String lexemaDer = null;
+
+
+
         if(this.getLexema().equals("Asignacion"))
             if(this.getHijoDer().getLexema().equals("Invocacion")){ //Aqui obtengo el valor de retorno de una funcion, cuando se la invoca en una asignacion.
                 String idFuncion = this.getHijoDer().getHijoIzq().getLexema();
@@ -35,6 +38,9 @@ public class NodoAsignacion extends ArbolSintactico{
             assembler += "MOV EBX, _" + lexemaDer + '\n';
             assembler += "MOV _" + lexemaIzq + ", " + "EBX" + '\n';
         }else{
+            lexemaDer = lexemaDer.replace("+","__");
+            lexemaDer = lexemaDer.replace('.','_');
+            lexemaDer = lexemaDer.replace('-','_');
             assembler += "FLD _" + lexemaDer+ '\n';
             assembler += "FSTP _" + lexemaIzq + '\n';
         }

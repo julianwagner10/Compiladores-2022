@@ -148,6 +148,7 @@ public class TablaSimbolos {
         for(String key : this.tablaSimbolos.keySet()) {
                 AtributosTablaS atributos = this.tablaSimbolos.get(key);
                 String lexema = atributos.getLexema();
+            System.out.println("Lexema "+lexema + " id "+atributos.getIdentificador()+" tipo "+atributos.getTipo());
                 switch (atributos.getIdentificador()) {
                     case (Lexico.ID):
                         if(atributos.getTipo().equals("i32")){
@@ -167,7 +168,9 @@ public class TablaSimbolos {
                         break;
 
                     case (Lexico.CTE_FLOTANTE):
-                        assembler += "_" + lexema.replace('.','_') + " DQ " + lexema + '\n'; //64 bits
+                        String Nombre =lexema.replace('-', '_');
+                        Nombre = Nombre.replace("+", "__");
+                        assembler += "_" + Nombre.replace('.','_') + " DQ " + lexema + '\n'; //64 bits
                         break;
 
             }

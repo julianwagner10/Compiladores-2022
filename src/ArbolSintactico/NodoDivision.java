@@ -15,8 +15,8 @@ public class NodoDivision extends NodoOperacion{
         String assembler = "";
         if (this.getTipo().equals("i32")) {
 
-            assembler += "MOV EAX, _" + this.getHijoIzq().getLexema() + '\n';
-            assembler += "IDIV _" + this.getHijoDer().getLexema() + '\n';
+            assembler += "MOV EAX, _" + this.getHijoIzq().getLexemaReemplazado() + '\n';
+            assembler += "IDIV _" + this.getHijoDer().getLexemaReemplazado() + '\n';
 
             String auxVar = "_var" + this.contador;
             assembler += "MOV _" + auxVar + ", EAX" + '\n';// Muevo a la variable.
@@ -31,6 +31,8 @@ public class NodoDivision extends NodoOperacion{
             String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
             String lexemaDer = this.getHijoDer().getLexemaReemplazado();
             lexemaIzq = lexemaIzq.replace("+","__");
+            lexemaIzq = lexemaIzq.replace('.','_');
+            lexemaIzq = lexemaIzq.replace('-','_');
             lexemaDer = lexemaDer.replace('.','_');
             lexemaDer = lexemaDer.replace('-','_');
             lexemaDer = lexemaDer.replace("+","__");

@@ -3,8 +3,8 @@ DiferentesAsignaciones{
 f32 k;
 k =: k + 2.5;
 
-fun f1(i32 y,f32 z):f32{
-    i32 x;
+fun f1(f32 y,i32 z):f32{
+    f32 x;
     if(x<y)then{
         z=:z-5;
         z =: z/y;
@@ -12,8 +12,8 @@ fun f1(i32 y,f32 z):f32{
     else
         z=: y;
     end_if;
-    return z ;
+    return x ;
 }
 
-k =:f1(23,2.2);
+k =:f1(2.3,2);
 }

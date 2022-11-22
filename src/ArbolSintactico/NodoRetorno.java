@@ -13,6 +13,10 @@ public class NodoRetorno extends ArbolSintactico{
     public String generarCodigoAssembler() {
         String assembler = "";
         String operador = this.getHijoIzq().getLexemaReemplazado();
+        operador = operador.replace("+","__");
+        operador = operador.replace('.','_');
+        operador = operador.replace('-','_');
+
         String usoOp = this.getHijoIzq().getUso();
         String tipoOperador = this.getHijoIzq().getTipo();
         if(usoOp.equals("Variable") || usoOp.equals("constante")){ //Necesito generar codigo assembler cuando la expresion aritmetica a retornar es una variable o una constante.
@@ -23,6 +27,7 @@ public class NodoRetorno extends ArbolSintactico{
                 Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableRetorno",this.getAtributo().getAmbito());
             }
             else{
+
                 assembler += "FLD _" + operador+ '\n';
                 String auxVar = "_var" + this.contador;
                 assembler += "FSTP _" + auxVar+ '\n';

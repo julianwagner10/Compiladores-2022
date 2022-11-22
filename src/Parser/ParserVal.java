@@ -12,6 +12,7 @@ import ArbolSintactico.ArbolSintactico;
  */
 public class ParserVal
 {
+  public ArbolSintactico arbol;
 /**
  * integer value of this 'union'
  */
@@ -31,8 +32,6 @@ public String sval;
  * object value of this 'union'
  */
 public Object obj;
-
-public ArbolSintactico arbol;
 
 //#############################################
 //## C O N S T R U C T O R S
