@@ -67,7 +67,6 @@ public class Assembler {
 
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 
-
         bw.write(this.assemblerHeader + this.assemblerData  + this.assemblerCode);
 
         bw.close();

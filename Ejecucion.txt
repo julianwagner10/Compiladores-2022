@@ -1,0 +1,31 @@
+# Compilador grupo 7
+
+Para ejecutar correctamente los casos de prueba especificados para el programa, se deben seguir los siguientes pasos:
+
+1.Primero se debe acceder a la carpeta Compiladores_2022_jar, mediante la ruta: C:\Users\UserX\Compiladores2022\out\artifacts\Compiladores_2022_jar
+
+2.Dentro de ese directorio, se debe ejecutar en consola el comando "java -jar Compiladores-2022.jar", para correr el ejecutable de nuestro proyecto, sin necesidad de ingresar a un IDE.
+
+3.Cuando se solicite ingresar la ruta del archivo, ingresar la ruta "C:\Users\UserX\Compiladores2022\CasosDePrueba\Intermedio-Assembler\X", siendo X la carpeta "Erroneos" o "Validos".
+
+ - Para los casos erroneos, la ruta es la siguiente --> "C:\Users\UserX\Compiladores2022\CasosDePrueba\Intermedio-Assembler\Erroneos\CasoX", donde "CasoX" puede ser:
+	- RecursionDeInvocaciones
+	- RedeclaracionYAusenciaDeVariablesFuncionesYEtiquetas
+	- TiposIncompatibles
+	- ViolacionDeAlcanceDeLenguaje
+
+- Para los casos validos, la ruta es la siguiente --> "C:\Users\UserX\Compiladores2022\CasosDePrueba\Intermedio-Assembler\Validos\CasoX", donde "CasoX" puede ser:
+	- AnidamientoDeFunciones
+	- AsignacionDeVariablesYFunciones
+	- FuncionesParalelasEnMismoAmbito
+	- SELECCION SeleccionBienDefinida
+	- TEMA9 InvocacionDeFuncionCorrecta
+	- TEMA15 SentenciaDeControl
+	- TEMA18 ControlConEtiqueta
+	- TEMA20 SentenciaDeControlComoExpresion
+	- TEMA22 ConversionImplicita
+
+4. Luego el codigo assembler generado para los casos de prueba validos, se encuentra en el archivo "Salida.asm", ubicado en en el mismo directorio que se corrio el ejecutable, para su posterior ensamblado. 
+
+
+
