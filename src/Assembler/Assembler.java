@@ -17,7 +17,12 @@ public class Assembler {
 
 
     private static final long limiteSuperiorint = 2147483647;
-    private static final float limiteSuperiorFloatPositivo = 3.40282347f+38;
+
+    private static final float limiteSuperiorFloatPositivo = 3.40282347e+38f;
+    private static final float limiteInferiorFloatPositivo =  1.17549435e-38f;
+    private static final float limiteSuperiorFloatNegativo = -3.40282347e+38f;
+    private static final float limiteInferiorFloatNegativo = -1.17549435e-38f;
+    private static final float limiteFloatCero = 0.0f;
 
 
     public Assembler(ArbolSintactico arbol){
@@ -33,6 +38,10 @@ public class Assembler {
         this.assemblerData += ".data" + '\n';
         this.assemblerData += "_limiteSuperiorInt DD " + limiteSuperiorint + '\n';
         this.assemblerData += "_limiteSuperiorFloatPositivo DQ " + limiteSuperiorFloatPositivo + '\n';
+        this.assemblerData += "_limiteInferiorFloatPositivo DQ " + limiteInferiorFloatPositivo + '\n';
+        this.assemblerData += "_limiteSuperiorFloatNegativo DQ " + limiteSuperiorFloatNegativo + '\n';
+        this.assemblerData += "_limiteInferiorFloatNegativo DQ " + limiteInferiorFloatNegativo + '\n';
+        this.assemblerData += "_limiteFloatCero DQ " + limiteFloatCero + '\n';
 
 
 
@@ -42,7 +51,7 @@ public class Assembler {
         this.assemblerCode += ".code" + '\n';
 
         this.assemblerCode += "Error_Suma_Enteros:"+ '\n';
-        this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowInt, _errorOverflowInt, MB_OK"+ '\n';
+        this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowInt, addr _errorOverflowInt, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
         this.assemblerCode += "Error_Suma_Flotantes:"+ '\n';
         this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowFloat, addr _errorOverflowFloat, MB_OK"+ '\n';

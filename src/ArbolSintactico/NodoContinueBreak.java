@@ -37,6 +37,7 @@ public class NodoContinueBreak extends ArbolSintactico{
             case ("break retorno"):
             case("valor por defecto"):
                 String auxVar = "_var"+this.contador;
+                this.contador++;
                 if(this.getTipo().equals("i32")) {
                     String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
                     assembler += "MOV EBX, _"+lexemaIzq+ '\n';
@@ -52,6 +53,8 @@ public class NodoContinueBreak extends ArbolSintactico{
                     Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
                 }
                 break;
+            case("continue con etiquetado"):
+                assembler += "JMP " + this.getHijoDer().getLexemaReemplazado() + '\n';
         }
         return assembler;
     }

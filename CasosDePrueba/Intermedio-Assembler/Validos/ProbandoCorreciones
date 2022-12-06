@@ -1,0 +1,4 @@
+ControlComoExpresionBienDef{
+f32 id,x,z;
+x =: -3.41F+38 + 1.1
+}

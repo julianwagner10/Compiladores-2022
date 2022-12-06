@@ -25,6 +25,8 @@ public class NodoCuerpoThen extends ArbolSintactico{
             if (!NodoIf.etiquetaDeSalto.isEmpty()) {
                 assembler += NodoIf.etiquetaDeSalto.pop() + ":" + '\n'; //Desapilo la etiqueta correspondiente a la bifurcacion con su respectivo salto.
                 NodoIf.etiquetaDeSalto.push(label); //Apilo la etiqueta generada para la bifurcacion incondicional.
+            }else{
+                NodoIf.etiquetaDeSalto.push(label);
             }
         }
         else{

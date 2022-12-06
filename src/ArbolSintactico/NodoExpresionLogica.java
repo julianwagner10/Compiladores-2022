@@ -27,9 +27,14 @@ public class NodoExpresionLogica extends ArbolSintactico {
             else{
                 assembler += "FLD _" +this.getHijoIzq().getLexema().replace('.','_') + '\n'; //Copio el lexema ded la izq en ST, es decir, el tope de los registros del coprocesador.
                 assembler += "FCOMP _" +this.getHijoDer().getLexema().replace('.','_') + '\n'; //Comparo el lexema de la der con el valor guardado en ST, y se extrae el valor en ST.
-                String auxVar = "_var" + this.contador;     //Necesito la variable aux para guardar la palabra de estado en la memoria
 
-                Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
+                String auxVar = "_var" + this.contador;
+
+                assembler += "FSTSW _" + auxVar + '\n';
+                assembler += "MOV AX, _" + auxVar + '\n';
+                assembler += "SAHF" + '\n';
+
+                Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "ComparacionFloat");
 
                 String label = "IF_CMP" + ++contadorEtiquetas;
                 assembler += this.getCondicionDeSaltoSinSigno(this.getLexema())+ " " +label + '\n';

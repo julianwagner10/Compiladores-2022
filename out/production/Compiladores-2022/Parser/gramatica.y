@@ -151,8 +151,11 @@ declaracion_fun : FUN ID lista_de_parametros ':' tipo{
 
                         Main.informesSemanticos.add("[Parser | Linea " + Lexico.linea + "] se detectó una funcion declarada con nombre "+$2.sval+ " en el ámbito "+ambito+", con tipo de retorno " + Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getTipo());
                     } else {
-                        Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] la funcion "+ $2.sval + " ya fue declarada en este ambito");
-                        }
+                        if (Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getUso().equals("nombreFuncion"))
+                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] la funcion "+ $2.sval + " ya fue declarada en este ambito");
+                        else
+                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] ya existe una variable declarada con el id "+ $2.sval + ", por lo tanto no puede llamarse asi la funcion");
+                    }
                     ambito = ambito + "."+ $2.sval;
                     }
                 | error_declaracion_fun
@@ -646,7 +649,7 @@ factor_invocacion 	: ID { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbi
                           atributos.setTipo(tipoId);
                           Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                           $$.arbol = new NodoHoja(atributos);
-                          $$.sval = $1.sval;
+                          $$.sval = ambitoCheck;
                           }else{
                             Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] falta la declaracion de "+$1.sval);
                             $$.arbol = null;

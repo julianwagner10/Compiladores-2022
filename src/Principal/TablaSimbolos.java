@@ -155,6 +155,9 @@ public class TablaSimbolos {
 
                         }
                         if(atributos.getTipo().equals("f32")) {
+                            if (atributos.getUso().equals("ComparacionFloat"))
+                                assembler += "_" + lexema.replace('.','_') + " DW ?"  + '\n';
+                            else
                                 assembler += "_" + lexema.replace('.','_') + " DQ ?"  + '\n'; //64 bits
                         }
                         break;
@@ -172,7 +175,7 @@ public class TablaSimbolos {
                     case (Lexico.CTE_FLOTANTE):
                         String Nombre =lexema.replace('-', '_');
                         Nombre = Nombre.replace("+", "__");
-                        assembler += "_" + Nombre.replace('.','_') + " DQ " + lexema + '\n'; //64 bits
+                        assembler += "_" + Nombre.replace('.','_') + " DQ " + lexema.replace("F","E") + '\n'; //64 bits
                         break;
 
             }
