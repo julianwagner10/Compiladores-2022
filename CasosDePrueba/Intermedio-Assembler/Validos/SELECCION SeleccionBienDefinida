@@ -3,13 +3,17 @@ i32 y;
 i32 x;
 x=:30;
 y=:2;
-if (x>25) then{
+if (x-x >25 ) then{
     y=: x;
-    }
+    out('then');
+}
 else{
     y=:20;
+    out('else');
 }
 end_if;
-
 out('se detecto una sentencia de control');
 }
+
+
+

@@ -23,7 +23,7 @@ public class NodoSuma extends NodoOperacion {
             String auxVar = "_var" + this.contador;
             assembler += "MOV _" + auxVar + ", EBX" + '\n';// Muevo a la variable.
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar");
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar",this.getAtributo().getAmbito());
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);
@@ -57,7 +57,7 @@ public class NodoSuma extends NodoOperacion {
 
             String auxVar1 = "_var" + this.contador;
             assembler += "FSTP _" + auxVar1+ '\n';
-            Main.tablaDeSimbolos.setSimbolo(auxVar1, Lexico.ID, "f32", "VariableAuxiliar");
+            Main.tablaDeSimbolos.setSimbolo(auxVar1, Lexico.ID, "f32", "VariableAuxiliar",this.getAtributo().getAmbito());
 
             assembler += "FLD _" + auxVar1 + '\n';
             this.contador++;
@@ -72,9 +72,10 @@ public class NodoSuma extends NodoOperacion {
             assembler += "SAHF" + '\n';
 
             assembler += "JA LabelLimiteSupPositivo \n";
-            assembler += "JBE LabelLimiteInfNegativo \n";
+            assembler += "JB LabelLimiteInfNegativo \n";
+            assembler += "JE Error_Suma_Flotantes \n";
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar2, Lexico.ID, "f32", "ComparacionFloat");
+            Main.tablaDeSimbolos.setSimbolo(auxVar2, Lexico.ID, "f32", "ComparacionFloat",this.getAtributo().getAmbito());
 
             assembler += "LabelLimiteSupPositivo: \n";
             assembler += "FLD _" + auxVar1 + '\n';
@@ -89,7 +90,7 @@ public class NodoSuma extends NodoOperacion {
             assembler += "JB LabelNoOverflow \n";
             assembler += "JAE Error_Suma_Flotantes \n";
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar3, Lexico.ID, "f32", "ComparacionFloat");
+            Main.tablaDeSimbolos.setSimbolo(auxVar3, Lexico.ID, "f32", "ComparacionFloat",this.getAtributo().getAmbito());
 
 
             assembler += "LabelLimiteInfNegativo: \n";
@@ -104,7 +105,7 @@ public class NodoSuma extends NodoOperacion {
             assembler += "JA LabelLimiteSupNegativo \n";
             assembler += "JBE Error_Suma_Flotantes \n";
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar4, Lexico.ID, "f32", "ComparacionFloat");
+            Main.tablaDeSimbolos.setSimbolo(auxVar4, Lexico.ID, "f32", "ComparacionFloat",this.getAtributo().getAmbito());
 
             assembler += "LabelLimiteSupNegativo: \n";
             assembler += "FLD _" + auxVar1 + '\n';
@@ -116,9 +117,10 @@ public class NodoSuma extends NodoOperacion {
             assembler += "MOV AX, _" + auxVar5 + '\n';
             assembler += "SAHF" + '\n';
             assembler += "JB LabelNoOverflow \n";
-            assembler += "JAE LabelCero \n";
+            assembler += "JA LabelCero \n";
+            assembler += "JE Error_Suma_Flotantes \n";
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar5, Lexico.ID, "f32", "ComparacionFloat");
+            Main.tablaDeSimbolos.setSimbolo(auxVar5, Lexico.ID, "f32", "ComparacionFloat",this.getAtributo().getAmbito());
 
 
             assembler += "LabelCero: \n";
@@ -131,7 +133,7 @@ public class NodoSuma extends NodoOperacion {
             assembler += "SAHF" + '\n';
 
             assembler += "JNE Error_Suma_Flotantes \n";
-            Main.tablaDeSimbolos.setSimbolo(auxVar6, Lexico.ID, "f32", "ComparacionFloat");
+            Main.tablaDeSimbolos.setSimbolo(auxVar6, Lexico.ID, "f32", "ComparacionFloat",this.getAtributo().getAmbito());
 
             assembler+= "LabelNoOverflow: \n";
 

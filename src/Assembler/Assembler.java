@@ -56,6 +56,7 @@ public class Assembler {
         this.assemblerCode += "Error_Suma_Flotantes:"+ '\n';
         this.assemblerCode += "invoke MessageBox, NULL, addr _errorOverflowFloat, addr _errorOverflowFloat, MB_OK"+ '\n';
         this.assemblerCode += "invoke ExitProcess, 0" + '\n';
+        this.assemblerCode += '\n';
 
 
         this.generarFunciones(this.arbol); //Genero todos los subprocesos, es decir, las funciones.

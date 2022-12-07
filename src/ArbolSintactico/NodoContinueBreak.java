@@ -37,20 +37,19 @@ public class NodoContinueBreak extends ArbolSintactico{
             case ("break retorno"):
             case("valor por defecto"):
                 String auxVar = "_var"+this.contador;
-                this.contador++;
                 if(this.getTipo().equals("i32")) {
                     String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
                     assembler += "MOV EBX, _"+lexemaIzq+ '\n';
                     assembler += "MOV _"+auxVar+", EBX"+ '\n';
                     this.setVarRetorno(auxVar);
-                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar");
+                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar",this.getAtributo().getAmbito());
                 }
                 else{
                     String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
                     assembler += "FLD _" +lexemaIzq + '\n';
                     assembler += "FSTP _" + auxVar+ '\n';
                     this.setVarRetorno(auxVar);
-                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
+                    Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar",this.getAtributo().getAmbito());
                 }
                 break;
             case("continue con etiquetado"):

@@ -1,17 +1,23 @@
 FuncionBienDeclarada{
 i32 x;
+x=:15;
 fun f1(i32 y,i32 v):i32{
     i32 x;
     fun f2(f32 z):i32{
         i32 x;
+        x=:10;
         if(x<y)then{
             x =:y;
             y=: y + 2;
+            out('x menor a y');
         }
-        else
+        else{
             y=: x;
+            out('x distinto a y');
+        }
         end_if;
         return y;
+        out('Entro a f2');
     }
     x =: f2(2.5);
     fun f3(i32 w,f32 p):i32{
@@ -19,14 +25,19 @@ fun f1(i32 y,i32 v):i32{
             y=: y + 2;
             w =:y;
             p=: p - w;
+            out('w menor a y');
         }
+        else
+            out('w mayor o igual a y');
         end_if;
         return w;
+        out('Entro a f3');
     }
     y =: f3(45,3.4);
     return x;
+    out('Entro a f1');
 }
 
-x=:f1(21,4);
+x=:f1(21,x);
 
 }

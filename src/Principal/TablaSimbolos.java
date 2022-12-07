@@ -104,8 +104,7 @@ public class TablaSimbolos {
             String lexema = (String) iterator.nextElement();
             if (!esPalabraReservada(lexema)) {
                 AtributosTablaS ats = tablaSimbolos.get(lexema);
-                System.out.print("Id:" + ats.getIdentificador() + " Lexema: " + lexema);
-                System.out.println();
+                System.out.println("Id:" + ats.getIdentificador() + " | Lexema: " + lexema + " | Ambito: " + ats.getAmbito());
             }
         }
     }

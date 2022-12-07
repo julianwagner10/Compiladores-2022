@@ -20,8 +20,6 @@ public class NodoAsignacion extends ArbolSintactico{
         String lexemaIzq = this.getHijoIzq().getLexemaReemplazado();
         String lexemaDer = null;
 
-
-
         if(this.getLexema().equals("Asignacion"))
             if(this.getHijoDer().getLexema().equals("Invocacion")){ //Aqui obtengo el valor de retorno de una funcion, cuando se la invoca en una asignacion.
                 String idFuncion = this.getHijoDer().getHijoIzq().getLexema();
@@ -33,6 +31,7 @@ public class NodoAsignacion extends ArbolSintactico{
             if(this.getLexema().equals("AsignacionConControl")){
                 this.getValorDeRetornoDeControl(this.getHijoDer());
                 lexemaDer = this.variableRetorno;
+                this.contador++; //Incremento el contador de variable aca porque quedaba mal el nro de las variables para el valor del break y tambien para el valor por defecto.
             }
         if (this.getTipo().equals("i32")) {
             assembler += "MOV EBX, _" + lexemaDer + '\n';

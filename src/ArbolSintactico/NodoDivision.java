@@ -21,7 +21,7 @@ public class NodoDivision extends NodoOperacion{
             String auxVar = "_var" + this.contador;
             assembler += "MOV _" + auxVar + ", EAX" + '\n';// Muevo a la variable.
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar");
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "i32", "VariableAuxiliar",this.getAtributo().getAmbito());
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);
@@ -48,7 +48,7 @@ public class NodoDivision extends NodoOperacion{
                 }
                 else{
                     String conversion = "_var" + this.contador;
-                    Main.tablaDeSimbolos.setSimbolo(conversion, Lexico.ID, "f32", "VariableAuxiliar");
+                    Main.tablaDeSimbolos.setSimbolo(conversion, Lexico.ID, "f32", "VariableAuxiliar",this.getAtributo().getAmbito());
                     assembler += "FILD _" + lexemaDer + '\n';
                     assembler += "FSTP _" + conversion+ '\n';
                     assembler += "FLD _" + lexemaIzq + '\n';
@@ -60,7 +60,7 @@ public class NodoDivision extends NodoOperacion{
 
             String auxVar = "_var" + this.contador;
             assembler += "FSTP _" + auxVar+ '\n';
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar",this.getAtributo().getAmbito());
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);

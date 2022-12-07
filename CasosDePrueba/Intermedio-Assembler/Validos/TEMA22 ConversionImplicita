@@ -5,9 +5,13 @@ y =: x;
 
 fun f3(i32 w):i32{
     f32 t;
+    t =: 20;
     if(t<w)then{
         w =: w+5;
+        out('t es menor que w');
     }
+    else
+        out('t es mayor o igual que w');
     end_if;
     return w;
 }

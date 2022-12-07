@@ -1,0 +1,27 @@
+DiferentesAsignaciones{
+f32 k;
+fun f1(i32 y,f32 z):i32{
+    i32 x;
+    x=:1;
+    if(x<y)then{
+        z=:z-5;
+        z =: z/y;
+        if (z >= 0.0) then{
+            out('z es 0');
+        }else
+            out('z no es 0');
+        end_if;
+    }
+    else{
+        z=: y;
+        out('x no es menor a y');
+    }
+    end_if;
+    return y ;
+}
+k =:f1(2,2.4);
+k =: 0.0;
+k =: k + 3.40282351F+38;
+
+}
+

@@ -16,6 +16,7 @@ import java.util.*;
 
 programa : ID '{' bloque'}' {arbolSintactico = $3.arbol;
                             Main.tablaDeSimbolos.getAtributosTablaS($1.sval).setUso("nombrePrograma");
+                            Main.tablaDeSimbolos.getAtributosTablaS($1.sval).setAmbito(ambito);
                             Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se detectó un programa con un bloque encerrado entre llaves ");
                             }
          | error_programa; {Main.informesSintacticos.add("[Parser | Linea " + Lexico.linea + "] se leyo programa incorrecto");}
@@ -61,7 +62,6 @@ bloque_ejecutable_if: ejecucion {$$.arbol = $1.arbol;}
                                                       $$.arbol = new NodoBloqueEjecutable($1.arbol,$2.arbol,atributos);}
                     ;
 
-
 declaracion : tipo lista_de_variables ';'{  String tipoVar = $1.sval;
 					                        lista_variables = (ArrayList<String>)$2.obj;
                                             for(String lexema : lista_variables){
@@ -70,12 +70,21 @@ declaracion : tipo lista_de_variables ';'{  String tipoVar = $1.sval;
                                                         Main.tablaDeSimbolos.modificarSimbolo(lexema, nuevoLexema);
                                                         AtributosTablaS atributosT = Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema);
                                                         atributosT.setTipo(tipoVar);
+                                                        atributosT.setAmbito(ambito);
                                                         Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoLexema,atributosT);
                                                     } else {
-                                                        Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] la variable " + lexema + " ya fue declarada en este ambito");
-                                                        Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+                                                        if(Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getUso().equals("nombreFuncion")){
+                                                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] ya se declaro una funcion con id " + lexema + " en este ambito");
+                                                            Main.tablaDeSimbolos.eliminarSimbolo(lexema);
                                                         }
-                                                }
+                                                        else{
+                                                            if(Main.tablaDeSimbolos.getAtributosTablaS(nuevoLexema).getUso().equals("Variable")){
+                                                                Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] la variable " + lexema + " ya fue declarada en este ambito");
+                                                                Main.tablaDeSimbolos.eliminarSimbolo(lexema);
+                                                            }
+                                                        }
+                                                    }
+                                            }
                                             lista_variables.clear();
                                             }
             | funcion {$$.arbol = $1.arbol;}
@@ -113,6 +122,7 @@ funcion : declaracion_fun '{'bloque'}' {Main.informesSintacticos.add("[Parser | 
 								        if(!ambito.equals("main")){
                                         	ambito = ambito.substring(0,ambito.lastIndexOf("."));
                                         }
+
                             }
         | error_funcion
         ;
@@ -191,6 +201,7 @@ parametro : tipo ID{String nuevoAmbitoId = $2.sval +"."+ambito;
                     AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(nuevoAmbitoId);
                     atributos.setTipo($1.sval);
                     atributos.setUso("nombreParametro");
+                    atributos.setAmbito(ambito);
                     Main.tablaDeSimbolos.setAtributosDeSimbolo(nuevoAmbitoId, atributos);
                     $$ = new ParserVal(nuevoAmbitoId);}
           | error_parametro
@@ -307,7 +318,7 @@ break_con_retorno : BREAK factor_invocacion ';'{String ambitoCheck = Main.tablaD
                                                 }
                                                 else
                                                     if(ambitoCheck == null){
-                                                        Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no exite la variable "+ $2.sval +" para poder retornarla");
+                                                        Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no es posible asignar "+ $2.sval +" a la variable deseada");
                                                         $$.arbol = null;
                                                     }
                                                 }
@@ -366,7 +377,8 @@ asignacion : ID ASIGNACION expresion_aritmetica{String ambitoCheck = Main.tablaD
                                                     if ($3.arbol!=null){
                                                         Main.tablaDeSimbolos.eliminarSimbolo($1.sval);
                                                         AtributosTablaS atributosId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck);
-                                                        atributosId.setAmbito(ambito);
+                                                        if(atributosId.getAmbito().equals(""))
+                                                            atributosId.setAmbito(ambito);
                                                         Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                                                         AtributosTablaS atributos = new AtributosTablaS("Asignacion");
                                                         atributos.setAmbito(ambito);
@@ -425,7 +437,7 @@ retorno : RETURN expresion_aritmetica {if(Main.tablaDeSimbolos.getTipoFuncionDeR
                                             $$.arbol = new NodoRetorno($2.arbol,null,retorno);
                                         }
                                         else{
-                                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] el tipo que se quiere retornar no coincide con el de la funcion ");
+                                            Main.erroresSemanticos.add("[Parser | Linea " + Lexico.linea + "] no existe la funcion, el valor a retornar o el tipo del mismo es diferente al de la funcion ");
                                             $$.arbol = null;
                                         }
                                       }
@@ -487,7 +499,8 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
                   Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).setUso("Variable");
                   String tipoId = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getTipo();
                   atributos.setTipo(tipoId);
-                  atributos.setAmbito(ambito);
+                  if(atributos.getAmbito().equals(""))
+                    atributos.setAmbito(ambito);
                   $$.arbol = new NodoHoja(atributos);
                   $$.sval = tipoId;
               }
@@ -531,7 +544,8 @@ factor 	: ID {String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,a
 
 invocacion : ID '(' parametros_reales ')' { String ambitoCheck = Main.tablaDeSimbolos.chequearAmbito($1.sval,ambito);
                                             boolean recursionCheck = Main.tablaDeSimbolos.chequearRecursionFuncion($1.sval,ambito);
-                                            if((ambitoCheck != null) && (recursionCheck)){
+                                            String usoAmbitoCheck = Main.tablaDeSimbolos.getAtributosTablaS(ambitoCheck).getUso();
+                                            if((ambitoCheck != null) && (recursionCheck) && usoAmbitoCheck.equals("nombreFuncion")){
                                                 if ($3.arbol !=null){
                                                     ArrayList<Parametro> parametros_funcion_actual = new ArrayList<>();
                                                     parametros_funcion_actual.addAll(parametrosFunciones.get(ambitoCheck));

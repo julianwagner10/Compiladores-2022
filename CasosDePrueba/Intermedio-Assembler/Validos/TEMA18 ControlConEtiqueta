@@ -1,14 +1,14 @@
 ControlConEtiqueta{
-i32 id,x,z;
-outer : for (id=:0 ; id<=5 ; +1){
-            outer2 : for(x=:0; x<=7; +1){
-                        z=: x + 1;
-                        if (x>5) then{
-                            out('x mayor que 5 salto a etiqueta');
-                            continue : outer;
-                        }
-                        end_if;
-            };
-                z=: 0;
-            };
+i32 id,x;
+outer : for (id=:0 ; id<5 ; +1){
+    outer2 : for(x=:0; x<7; +1){
+                if (x>5) then{
+                    out('x mayor que 5 salto a etiqueta');
+                    continue : outer;
+                }
+                else
+                    out('x es menor o igual que 5');
+                end_if;
+    };
+    };
 }

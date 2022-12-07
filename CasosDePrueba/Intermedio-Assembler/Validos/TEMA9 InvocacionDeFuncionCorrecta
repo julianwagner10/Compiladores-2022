@@ -5,11 +5,15 @@ f32 w;
 
 fun f1(i32 y,f32 z):i32{
     i32 x;
-    if(x<y)then{
+    x=:28;
+    if(x>y)then{
         z =: z+y;
+        out('x es mayor a y');
     }
-    else
+    else{
         z=: y;
+        out('x es menor o igual a y');
+    }
     end_if;
     return x ;
 }

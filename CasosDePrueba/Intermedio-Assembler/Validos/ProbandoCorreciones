@@ -1,4 +1,6 @@
 ControlComoExpresionBienDef{
-f32 id,x,z;
-x =: -3.41F+38 + 1.1
+i32 id,x,z;
+f32 a1;
+x =: 222 + 2147483637;
 }
+

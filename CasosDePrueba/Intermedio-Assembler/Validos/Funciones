@@ -1,0 +1,37 @@
+Funciones{
+i32 x;
+fun f1(i32 y,i32 v):i32{
+     i32 x;
+     fun f2(f32 z):i32{
+        i32 x;
+        i32 d;
+        if(x<y)then{
+            x =:d;
+            y=: y + 2;
+        }
+        else
+            y=: x;
+        end_if;
+        out('Entro a f2');
+        return y;
+     }
+     x =: f2(2.5);
+     fun f3(i32 w,f32 p):i32{
+        if(w<y)then{
+            y=: y + 2;
+            w =:y;
+            p=: p - w;
+        }
+        end_if;
+        out('Entro a f3');
+        fun frep(i32 y,i32 v):i32{
+            x =: 45;
+        }
+        return w;
+     }
+     y =: f3(45,3.4);
+     out('Entro a f1');
+     return x;
+}
+x=:f1(21,x);
+}

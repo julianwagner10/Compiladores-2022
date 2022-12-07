@@ -20,7 +20,7 @@ public class NodoMultiplicacion extends NodoOperacion {
             String auxVar = "_var" + this.contador;
             assembler += "MOV _" + auxVar + ", EAX" + '\n';// Muevo a la variable.
 
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar"); //Transformo a flotante porque el resultado es de 64 bits.
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar",this.getAtributo().getAmbito()); //Transformo a flotante porque el resultado es de 64 bits.
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);
@@ -55,7 +55,7 @@ public class NodoMultiplicacion extends NodoOperacion {
 
             String auxVar = "_var" + this.contador;
             assembler += "FSTP _" + auxVar+ '\n';
-            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar");
+            Main.tablaDeSimbolos.setSimbolo(auxVar, Lexico.ID, "f32", "VariableAuxiliar",this.getAtributo().getAmbito());
 
             this.eliminarHijos(this);
             AtributosTablaS atributos = Main.tablaDeSimbolos.getAtributosTablaS(auxVar);
